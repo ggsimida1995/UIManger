@@ -1,0 +1,721 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+## 在普通类中使用
+
+在非SwiftUI View的普通类中，有多种方法可以使用UIManager的功能。以下提供两种主要方式。
+
+### 方式一：直接使用UIManager静态访问
+
+这种方式直接通过UIManager的静态属性访问Toast和弹窗功能。
+
+#### 导入依赖
+
+```swift
+import SwiftUI
+import UIManager
+```
+
+#### 使用Toast功能
+
+##### 显示普通提示
+
+```swift
+class YourClass {
+    func showToast() {
+        UIManager.toastManager.showToast(message: "这是一条普通提示信息")
+    }
+}
+```
+
+##### 显示成功提示
+
+```swift
+class YourClass {
+    func showSuccess() {
+        UIManager.toastManager.showSuccess(message: "操作成功完成")
+    }
+}
+```
+
+##### 显示错误提示
+
+```swift
+class YourClass {
+    func showError() {
+        UIManager.toastManager.showError(message: "发生错误，请重试")
+    }
+}
+```
+
+#### 使用弹窗功能
+
+##### 基础弹窗
+
+```swift
+class YourClass {
+    func showBasicPopup() {
+        UIManager.popupManager.show {
+            VStack(spacing: 16) {
+                Text("基础弹窗")
+                    .font(.headline)
+                
+                Text("这是一个基础弹窗示例，可以显示任意内容。")
+                    .font(.subheadline)
+                    .multilineTextAlignment(.center)
+                
+                Button(action: {
+                    UIManager.popupManager.closeAllPopups()
+                }) {
+                    Text("关闭")
+                        .frame(width: 100, height: 40)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+            }
+            .padding()
+        }
+    }
+}
+```
+
+##### 带关闭按钮的弹窗
+
+```swift
+class YourClass {
+    func showPopupWithCloseButton() {
+        UIManager.popupManager.show(
+            content: {
+                VStack(spacing: 16) {
+                    Text("带关闭按钮的弹窗")
+                        .font(.headline)
+                    
+                    Text("这个弹窗在右上角有一个关闭按钮，点击即可关闭弹窗。")
+                        .font(.subheadline)
+                        .multilineTextAlignment(.center)
+                    
+                    Text("也可以点击外部区域关闭弹窗。")
+                        .font(.caption)
+                }
+                .padding()
+            },
+            showCloseButton: true,
+            closeButtonPosition: .topTrailing
+        )
+    }
+}
+```
+
+#### 使用类扩展简化调用
+
+如果需要在类中频繁使用UIManager功能，可以创建扩展方法简化调用：
+
+```swift
+// 为类添加UIManager扩展
+extension YourClass {
+    // 普通提示
+    func toast(_ message: String) {
+        UIManager.toastManager.showToast(message: message)
+    }
+    
+    // 成功提示
+    func success(_ message: String) {
+        UIManager.toastManager.showSuccess(message: message)
+    }
+    
+    // 错误提示
+    func error(_ message: String) {
+        UIManager.toastManager.showError(message: message)
+    }
+    
+    // 居中弹窗
+    func popup<Content: View>(
+        @ViewBuilder content: @escaping () -> Content,
+        cornerRadius: CGFloat = 12,
+        closeOnTapOutside: Bool = true,
+        showCloseButton: Bool = false,
+        onClose: (() -> Void)? = nil
+    ) {
+        UIManager.popupManager.show(
+            content: content,
+            position: .center,
+            cornerRadius: cornerRadius,
+            closeOnTapOutside: closeOnTapOutside,
+            showCloseButton: showCloseButton,
+            onClose: onClose
+        )
+    }
+    
+    // 底部弹窗
+    func bottomSheet<Content: View>(
+        @ViewBuilder content: @escaping () -> Content,
+        cornerRadius: CGFloat = 12,
+        closeOnTapOutside: Bool = true,
+        onClose: (() -> Void)? = nil
+    ) {
+        UIManager.popupManager.show(
+            content: content,
+            position: .bottom,
+            size: .fullWidth(nil),
+            cornerRadius: cornerRadius,
+            closeOnTapOutside: closeOnTapOutside,
+            onClose: onClose
+        )
+    }
+    
+    // 关闭所有弹窗
+    func closeAllPopups() {
+        UIManager.popupManager.closeAllPopups()
+    }
+}
+```
+
+使用扩展方法后，可以像在SwiftUI View中一样简洁地调用：
+
+```swift
+class YourClass {
+    func showUIComponents() {
+        // 显示提示
+        self.toast("这是一条普通提示")
+        self.success("操作成功")
+        self.error("发生错误")
+        
+        // 显示弹窗
+        self.popup {
+            Text("这是一个弹窗")
+        }
+        
+        // 关闭弹窗
+        self.closeAllPopups()
+    }
+}
+```
+
+### 方式二：使用ViewModel或全局单例
+
+在更复杂的应用中，您可能希望创建专门的ViewModel或全局单例来管理UI状态。
+
+#### 在ViewModel中使用Toast
+
+可以创建一个ViewModel类，包含显示Toast的方法：
+
+```swift
+import SwiftUI
+import UIManager
+
+class UIHelperViewModel: ObservableObject {
+    // 为了在ViewModel中显示Toast，需要访问ToastManager单例
+    private let toastManager = ToastManager.shared
+    
+    // 显示普通Toast
+    func showToast(message: String) {
+        DispatchQueue.main.async {
+            self.toastManager.showToast(message: message)
+        }
+    }
+    
+    // 显示成功Toast
+    func showSuccessToast(message: String) {
+        DispatchQueue.main.async {
+            self.toastManager.showSuccess(message: message)
+        }
+    }
+    
+    // 显示错误Toast
+    func showErrorToast(message: String) {
+        DispatchQueue.main.async {
+            self.toastManager.showError(message: message)
+        }
+    }
+    
+    // 在异步操作后显示Toast
+    func performAsyncTaskAndShowToast() {
+        // 模拟网络请求
+        DispatchQueue.global().async {
+            // 执行一些操作...
+            
+            // 完成后在主线程显示提示
+            DispatchQueue.main.async {
+                self.toastManager.showSuccess(message: "操作成功完成")
+            }
+        }
+    }
+}
+```
+
+#### 在ViewModel中使用弹窗
+
+要在ViewModel中显示弹窗，需要访问PopupManager单例：
+
+```swift
+class UIHelperViewModel: ObservableObject {
+    private let popupManager = PopupManager.shared
+    private let toastManager = ToastManager.shared
+    
+    // 触发显示基础弹窗
+    func showBasicPopup() {
+        DispatchQueue.main.async {
+            self.popupManager.show {
+                VStack(spacing: 16) {
+                    Text("来自ViewModel的弹窗")
+                        .font(.headline)
+                    
+                    Text("这个弹窗是由ViewModel触发的，而不是直接在View中调用。")
+                        .font(.subheadline)
+                        .multilineTextAlignment(.center)
+                    
+                    Button(action: {
+                        self.popupManager.closeAllPopups()
+                    }) {
+                        Text("关闭")
+                            .frame(width: 100, height: 40)
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
+                }
+                .padding()
+            }
+        }
+    }
+    
+    // 显示警告弹窗
+    func showWarningPopup(message: String, onConfirm: @escaping () -> Void) {
+        DispatchQueue.main.async {
+            self.popupManager.show {
+                VStack(spacing: 16) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 40))
+                        .foregroundColor(.orange)
+                    
+                    Text("警告")
+                        .font(.headline)
+                    
+                    Text(message)
+                        .font(.subheadline)
+                        .multilineTextAlignment(.center)
+                    
+                    HStack {
+                        Button("取消") {
+                            self.popupManager.closeAllPopups()
+                            self.toastManager.showToast(message: "操作已取消")
+                        }
+                        .frame(height: 40)
+                        .frame(maxWidth: .infinity)
+                        .background(Color.gray.opacity(0.2))
+                        .foregroundColor(Color.primary)
+                        .cornerRadius(8)
+                        
+                        Button("确定") {
+                            self.popupManager.closeAllPopups()
+                            onConfirm()
+                            self.toastManager.showSuccess(message: "操作已确认")
+                        }
+                        .frame(height: 40)
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                    }
+                }
+                .padding()
+            }
+        }
+    }
+    
+    // 在业务逻辑操作中使用弹窗
+    func processUserRequest(data: String) {
+        // 验证数据
+        guard !data.isEmpty else {
+            self.showErrorToast(message: "数据不能为空")
+            return
+        }
+        
+        // 确认操作
+        self.showWarningPopup(message: "确定要处理此数据吗？该操作无法撤销。") {
+            // 用户确认后的操作
+            self.processingLogic(data: data)
+        }
+    }
+    
+    private func processingLogic(data: String) {
+        // 处理数据的业务逻辑...
+        print("处理数据: \(data)")
+    }
+}
+```
+
+#### 在SwiftUI视图中使用ViewModel
+
+然后在SwiftUI视图中使用这个ViewModel：
+
+```swift
+struct ContentView: View {
+    @StateObject private var viewModel = UIHelperViewModel()
+    @State private var inputText = ""
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            TextField("输入数据", text: $inputText)
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(8)
+                .padding(.horizontal)
+            
+            Button("显示Toast") {
+                viewModel.showToast(message: "这是来自ViewModel的Toast")
+            }
+            .buttonStyle(.borderedProminent)
+            
+            Button("显示弹窗") {
+                viewModel.showBasicPopup()
+            }
+            .buttonStyle(.bordered)
+            
+            Button("处理请求") {
+                viewModel.processUserRequest(data: inputText)
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(inputText.isEmpty)
+        }
+        .padding()
+        .withUIComponents() // 别忘了添加UI组件修饰器
+    }
+}
+```
+
+#### 全局单例使用
+
+如果需要在应用的多个地方使用，可以创建一个全局访问点：
+
+```swift
+// AppUIManager.swift
+import SwiftUI
+import UIManager
+
+class AppUIManager {
+    static let shared = AppUIManager()
+    
+    private let toastManager = ToastManager.shared
+    private let popupManager = PopupManager.shared
+    
+    private init() {
+        // 私有初始化方法确保单例
+    }
+    
+    // MARK: - Toast方法
+    
+    func showToast(_ message: String) {
+        DispatchQueue.main.async {
+            self.toastManager.showToast(message: message)
+        }
+    }
+    
+    func showSuccess(_ message: String) {
+        DispatchQueue.main.async {
+            self.toastManager.showSuccess(message: message)
+        }
+    }
+    
+    func showError(_ message: String) {
+        DispatchQueue.main.async {
+            self.toastManager.showError(message: message)
+        }
+    }
+    
+    // MARK: - 弹窗方法
+    
+    func showAlert(title: String, message: String, onConfirm: (() -> Void)? = nil) {
+        DispatchQueue.main.async {
+            self.popupManager.show {
+                VStack(spacing: 16) {
+                    Text(title)
+                        .font(.headline)
+                    
+                    Text(message)
+                        .font(.subheadline)
+                        .multilineTextAlignment(.center)
+                    
+                    Button("确定") {
+                        self.popupManager.closeAllPopups()
+                        onConfirm?()
+                    }
+                    .frame(width: 120, height: 40)
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                }
+                .padding()
+            }
+        }
+    }
+    
+    // 添加更多你需要的方法...
+}
+
+// 在任何Swift文件中使用
+// AppUIManager.shared.showToast("全局Toast提示")
+```
+
+记住，要使UIManager正常工作，必须确保有一个根视图应用了`.withUIComponents()`修饰器。
+
+# UIManager 组件库 - 键盘管理弹窗用法
+
+UIManager提供了多种方式来创建带键盘自适应的弹窗，满足不同的使用场景。本文档重点说明键盘管理弹窗的实现方式及Toast与弹窗的层级关系。
+
+## 键盘管理弹窗的实现方式
+
+UIManager支持四种键盘管理弹窗的实现方式：
+
+1. 内置输入弹窗 API
+2. 自定义键盘管理弹窗
+3. 多字段表单弹窗
+4. 传统扩展方式弹窗
+
+### 1. 内置输入弹窗
+
+最简单的方式，使用内置的`showInputPopup`方法：
+
+```swift
+// 内置键盘管理弹窗
+func showKeyboardPopup() {
+    // 使用内置API创建输入弹窗
+    popupManager.showInputPopup(
+        title: "内置输入弹窗",
+        message: "这是使用内置API的输入弹窗，支持键盘自适应",
+        placeholder: "请输入内容...",
+        initialText: "",
+        keyboardType: .default,
+        submitLabel: .done,
+        onCancel: {
+            toastManager.showToast(message: "取消输入")
+        },
+        onSubmit: { text in
+            if text.isEmpty {
+                toastManager.showError(message: "输入内容不能为空")
+            } else {
+                inputValue = text
+                toastManager.showSuccess(message: "输入成功: \(text)")
+            }
+        }
+    )
+}
+```
+
+### 2. 自定义键盘管理弹窗
+
+当需要更复杂的输入界面时，可以使用`showWithKeyboard`方法：
+
+```swift
+// 自定义键盘管理弹窗
+func showCustomKeyboardPopup() {
+    popupManager.showWithKeyboard { keyboardObserver in
+        VStack(spacing: 16) {
+            Text("自定义输入弹窗")
+                .font(.headline)
+                .foregroundColor(themeManager.primaryTextColor)
+            
+            Text("这是一个带键盘管理的自定义输入弹窗")
+                .font(.subheadline)
+                .foregroundColor(themeManager.secondaryTextColor)
+                .multilineTextAlignment(.center)
+            
+            TextField("请输入内容...", text: $customInputValue)
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(8)
+                .focused($focusedField, equals: .custom)
+            
+            // 显示键盘高度
+            Text("键盘高度: \(Int(keyboardObserver.keyboardHeight))")
+                .font(.caption)
+                .foregroundColor(themeManager.secondaryTextColor)
+            
+            Picker("选择类型", selection: $pickerSelection) {
+                Text("选项1").tag(0)
+                Text("选项2").tag(1)
+                Text("选项3").tag(2)
+            }
+            .pickerStyle(.segmented)
+            .padding(.vertical, 8)
+            
+            HStack {
+                // 按钮...
+            }
+        }
+        .padding()
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                focusedField = .custom
+            }
+        }
+    }
+}
+```
+
+### 3. 多字段表单弹窗
+
+处理多个输入字段的表单时使用：
+
+```swift
+// 多字段表单弹窗
+func showMultiFieldFormPopup() {
+    @State var name = ""
+    @State var email = ""
+    @State var description = ""
+    @FocusState var focusedFormField: FormField?
+    
+    enum FormField {
+        case name, email, description
+    }
+    
+    popupManager.showWithKeyboard { keyboardObserver in
+        VStack(spacing: 16) {
+            Text("多字段表单")
+                .font(.headline)
+                .foregroundColor(themeManager.primaryTextColor)
+            
+            ScrollView {
+                VStack(spacing: 16) {
+                    TextField("姓名", text: $name)
+                        // ...设置和样式
+                        .focused($focusedFormField, equals: .name)
+                        .submitLabel(.next)
+                        .onSubmit {
+                            focusedFormField = .email
+                        }
+                    
+                    TextField("邮箱", text: $email)
+                        // ...设置和样式
+                        .focused($focusedFormField, equals: .email)
+                        .submitLabel(.next)
+                        .onSubmit {
+                            focusedFormField = .description
+                        }
+                    
+                    TextEditor(text: $description)
+                        // ...设置和样式
+                        .focused($focusedFormField, equals: .description)
+                }
+            }
+            
+            // 按钮...
+        }
+        .padding()
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                focusedFormField = .name
+            }
+        }
+    }
+}
+```
+
+### 4. 传统扩展方式弹窗
+
+使用View扩展方法创建弹窗：
+
+```swift
+// 传统扩展方式弹窗
+func showExtensionKeyboardPopup() {
+    self.uiPopup {
+        VStack(spacing: 16) {
+            Text("传统方式弹窗")
+                .font(.headline)
+                .foregroundColor(themeManager.primaryTextColor)
+            
+            Text("这个弹窗使用View扩展方法uiPopup实现")
+                .font(.subheadline)
+                .foregroundColor(themeManager.secondaryTextColor)
+                .multilineTextAlignment(.center)
+            
+            TextField("输入内容", text: $inputValue)
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(8)
+                .focused($focusedField, equals: .standard)
+                .onAppear {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        focusedField = .standard
+                    }
+                }
+            
+            HStack {
+                Button("取消") {
+                    // 手动隐藏键盘
+                    UIApplication.shared.sendAction(
+                        #selector(UIResponder.resignFirstResponder),
+                        to: nil, from: nil, for: nil
+                    )
+                    
+                    // 延迟关闭弹窗，让键盘有时间收起
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        self.uiCloseAllPopups()
+                        toastManager.showToast(message: "取消传统弹窗")
+                    }
+                }
+                // ...样式
+                
+                Button("确定") {
+                    // 验证和提交逻辑
+                }
+                // ...样式
+            }
+        }
+        .padding()
+    }
+}
+```
+
+## Toast和弹窗的层级关系
+
+### 确保Toast显示在弹窗上层
+
+为了确保Toast消息始终显示在弹窗之上，UIManager在`withUIComponents()`方法中采用了先应用Popup修饰器，再应用Toast修饰器的顺序：
+
+```swift
+// 在UIManager.swift中
+public extension View {
+    /// 应用所有 UI 组件修饰器
+    func withUIComponents() -> some View {
+        self.withPopups().withToast()
+    }
+}
+```
+
+这种顺序保证了Toast始终在弹窗上层显示，因此在弹窗中显示验证错误等提示时，不会被弹窗本身遮挡。
+
+### 验证和错误处理最佳实践
+
+当需要在弹窗内验证用户输入并显示错误提示时，推荐使用以下模式：
+
+1. 在提交回调中进行验证
+2. 如果验证失败，直接显示Toast错误提示，不关闭弹窗
+3. 如果验证成功，关闭弹窗并显示成功提示
+
+```swift
+onSubmit: { text in
+    if text.isEmpty {
+        // 验证失败，显示错误提示，保持弹窗打开
+        toastManager.showError(message: "输入内容不能为空")
+    } else if isDuplicate(text) {
+        // 检查是否重名，显示特定错误
+        toastManager.showError(message: "名称已存在，请使用其他名称")
+    } else {
+        // 验证成功，关闭弹窗并显示成功提示
+        popupManager.closeAllPopups()
+        inputValue = text
+        toastManager.showSuccess(message: "输入成功: \(text)")
+    }
+}
+```
+
+## 注意事项
+
+1. 弹窗关闭后再显示Toast，Toast可能会很快消失，影响用户体验
+2. 建议在验证失败时保持弹窗打开，让用户可以直接修改输入
+3. 在复杂表单中，可以在表单内部显示错误提示，而不只依赖Toast
+4. 在特定场景下，可能需要调整Toast的显示时间(duration)，确保用户有足够时间看到提示
