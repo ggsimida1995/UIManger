@@ -474,40 +474,76 @@ public struct UIManagerDemos: View {
             
             popupManager.show(
                 content: {
-                    ScrollView {
-                        VStack(spacing: 20) {
-                            ForEach(0..<2) { index in
-                                TextField("输入框 \(index)", text: .constant(""))
-                                    .textFieldStyle(.roundedBorder)
-                                    .focused($isTextFieldFocused)
-                                    .padding(.horizontal)
+                    VStack(spacing: 20) {
+                        ScrollView {
+                            VStack(spacing: 20) {
+                                ForEach(0..<2) { index in
+                                    TextField("输入框 \(index)", text: .constant(""))
+                                        .textFieldStyle(.roundedBorder)
+                                        .focused($isTextFieldFocused)
+                                        .padding(.horizontal)
+                                        // 添加以下修饰符以提高键盘交互的稳定性
+                                        .submitLabel(.done)
+                                        .keyboardType(.default)
+                                        .autocapitalization(.none)
+                                        .disableAutocorrection(true)
+                                }
                             }
+                            .padding(.top, 40)
+                            .padding(.bottom, 20)
                         }
-                        .padding(.top, 40)
-                    }
-                    .safeAreaInset(edge: .bottom) {  // 用 safeAreaInset 动态空出键盘高度
-                        Color.clear.frame(height: 0)
+                        .simultaneousGesture(
+                            TapGesture()
+                                .onEnded { _ in
+                                    // 点击ScrollView内部的空白区域不会关闭键盘
+                                }
+                        )
+                        
+                        // 添加一个完成按钮，方便用户关闭键盘
+                        Button(action: {
+                            isTextFieldFocused = false
+                            // 使用短延迟更好地配合键盘动画
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                popupManager.closeAllPopups()
+                            }
+                        }) {
+                            Text("完成")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(height: 44)
+                                .frame(maxWidth: .infinity)
+                                .background(themeManager.themeColor)
+                                .cornerRadius(8)
+                        }
+                        .padding(.horizontal)
                     }
                     .onAppear {
-                        // 先聚焦输入框，触发键盘显示
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                        // 先等弹窗完全显示
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            // 再聚焦输入框，触发键盘显示
                             isTextFieldFocused = true
                             
-                            // 延迟设置偏移量，给键盘足够时间弹出
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            // 等待键盘出现后设置偏移量
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                 // 创建一个新的配置，应用设置的偏移量
                                 var newConfig = config
                                 newConfig.offsetY = offsetY
                                 
-                                // 更新弹窗配置
-                                popupManager.updatePopup(id: popupID, config: newConfig)
+                                // 使用动画更新弹窗配置，平滑过渡
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    popupManager.updatePopup(id: popupID, config: newConfig)
+                                }
                             }
                         }
+                    }
+                    .onDisappear {
+                        // 确保弹窗关闭时键盘也会收起
+                        isTextFieldFocused = false
                     }
                 },
                 position: .center,
                 width: 300,
-                height: 150,
+                height: 280, // 增加高度以容纳按钮
                 config: config,
                 id: popupID // 使用自定义ID
             )

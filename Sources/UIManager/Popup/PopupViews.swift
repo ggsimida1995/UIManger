@@ -1,4 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 /// Popup 容器视图
 public struct PopupContainerView: View {
@@ -139,17 +142,34 @@ public struct PopupViewModifier: ViewModifier {
                 }
             
             if popupManager.popupCount > 0 {
-                Color.black.opacity(0.4)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        for index in (0..<popupManager.popupCount).reversed() {
-                            if let popup = popupManager.popup(at: index), popup.config.closeOnTapOutside {
-                                popupManager.closePopup(id: popup.id)
-                                break
+                // 使用ZStack确保蒙层和弹窗内容分开布局
+                ZStack {
+                    // 蒙层使用全屏幕覆盖，并确保不受键盘影响
+                    Color.black.opacity(0.4)
+                        .edgesIgnoringSafeArea(.all)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .contentShape(Rectangle()) // 确保点击区域覆盖全屏
+                        .onTapGesture {
+                            // 检查关闭条件并关闭弹窗
+                            for index in (0..<popupManager.popupCount).reversed() {
+                                if let popup = popupManager.popup(at: index), popup.config.closeOnTapOutside {
+                                    // 先尝试隐藏键盘，然后关闭弹窗
+                                    #if canImport(UIKit)
+                                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                                    #endif
+                                    
+                                    // 稍微延迟关闭弹窗，确保键盘已经开始收起
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                        popupManager.closePopup(id: popup.id)
+                                    }
+                                    break
+                                }
                             }
                         }
-                    }
-                    .zIndex(900)
+                        .zIndex(900)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .edgesIgnoringSafeArea(.all)
                 
                 // 使用局部变量防止在渲染过程中数量变化
                 let count = min(activePopupCount, popupManager.popupCount)
