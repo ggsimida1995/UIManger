@@ -34,6 +34,8 @@ public struct PopupContainerView: View {
                 }
             }
             .padding(getPadding())
+            // 应用垂直偏移
+            .offset(y: -popup.config.offsetY)
         
         if case .custom(let point) = popup.position {
             GeometryReader { geo in
@@ -42,7 +44,8 @@ public struct PopupContainerView: View {
                         safePosition(
                             relativePoint: point,
                             screenSize: geo.size,
-                            contentSize: estimateContentSize(geo: geo)
+                            contentSize: estimateContentSize(geo: geo),
+                            offsetY: popup.config.offsetY
                         )
                     )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -62,12 +65,15 @@ public struct PopupContainerView: View {
     }
     
     // 计算安全的位置坐标，防止弹窗显示在屏幕外
-    private func safePosition(relativePoint: CGPoint, screenSize: CGSize, contentSize: CGSize) -> CGPoint {
+    private func safePosition(relativePoint: CGPoint, screenSize: CGSize, contentSize: CGSize, offsetY: CGFloat = 0) -> CGPoint {
         let halfWidth = contentSize.width / 2
         let halfHeight = contentSize.height / 2
         
         let safeX = min(max(halfWidth, relativePoint.x * screenSize.width), screenSize.width - halfWidth)
-        let safeY = min(max(halfHeight, relativePoint.y * screenSize.height), screenSize.height - halfHeight)
+        
+        // 考虑垂直偏移量调整Y坐标
+        var safeY = min(max(halfHeight, relativePoint.y * screenSize.height), screenSize.height - halfHeight)
+        safeY -= offsetY // 应用垂直偏移（向上为负）
         
         return CGPoint(x: safeX, y: safeY)
     }
@@ -79,9 +85,21 @@ public struct PopupContainerView: View {
         }) {
             Image(systemName: "xmark")
                 .font(.system(size: 17, weight: .bold))
-                .foregroundColor(.gray)
+                .foregroundColor(popup.config.closeButtonStyle.iconColor)
                 .padding(8)
-                .background(Circle().fill(Color.gray.opacity(0.1)))
+                .background(
+                    Group {
+                        switch popup.config.closeButtonStyle {
+                        case .circular:
+                            Circle().fill(popup.config.closeButtonStyle.backgroundColor)
+                        case .square:
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(popup.config.closeButtonStyle.backgroundColor)
+                        case .minimal, .custom:
+                            popup.config.closeButtonStyle.backgroundColor.clipShape(Circle())
+                        }
+                    }
+                )
         }
         .buttonStyle(PlainButtonStyle())
         .padding(8)
