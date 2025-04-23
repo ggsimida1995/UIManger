@@ -8,21 +8,16 @@ public enum PopupPosition: Hashable {
     case bottom     // 底部
     case left       // 左侧
     case center     // 中心
-    case custom(CGPoint) // 自定义位置
+    case custom(CGPoint) // 自定义位置，使用相对屏幕的比例坐标 (0-1)
     
     // 为了满足Hashable协议，需要实现hash方法
     public func hash(into hasher: inout Hasher) {
         switch self {
-        case .top:
-            hasher.combine(0)
-        case .right:
-            hasher.combine(1)
-        case .bottom:
-            hasher.combine(2)
-        case .left:
-            hasher.combine(3)
-        case .center:
-            hasher.combine(4)
+        case .top: hasher.combine(0)
+        case .right: hasher.combine(1)
+        case .bottom: hasher.combine(2)
+        case .left: hasher.combine(3)
+        case .center: hasher.combine(4)
         case .custom(let point):
             hasher.combine(5)
             hasher.combine(point.x)
@@ -44,18 +39,12 @@ public enum PopupPosition: Hashable {
     
     func getAlignment() -> Alignment {
         switch self {
-        case .top:
-            return .top
-        case .right:
-            return .trailing
-        case .bottom:
-            return .bottom
-        case .left:
-            return .leading
-        case .center:
-            return .center
-        case .custom:
-            return .center
+        case .top: return .top
+        case .right: return .trailing
+        case .bottom: return .bottom
+        case .left: return .leading
+        case .center: return .center
+        case .custom: return .center  // 对于自定义位置，默认使用中心对齐但实际会被忽略
         }
     }
     
@@ -70,9 +59,7 @@ public enum PopupPosition: Hashable {
             return AnyTransition.move(edge: .bottom).combined(with: .opacity)
         case .left:
             return AnyTransition.move(edge: .leading).combined(with: .opacity)
-        case .center:
-             return AnyTransition.opacity
-        case .custom:
+        case .center, .custom:
             return AnyTransition.opacity
         }
     }
@@ -93,25 +80,14 @@ public enum PopupSize {
         case .flexible:
             return nil
         case .fullWidth(let height):
-            if let height = height {
-                return CGSize(width: screenSize.width, height: height)
-            } else {
-                return CGSize(width: screenSize.width, height: CGFloat.nan)
-            }
+            return CGSize(width: screenSize.width, height: height ?? CGFloat.nan)
         case .fullHeight(let width):
-            if let width = width {
-                return CGSize(width: width, height: screenSize.height - safeArea.top - safeArea.bottom)
-            } else {
-                return CGSize(width: CGFloat.nan, height: screenSize.height - safeArea.top - safeArea.bottom)
-            }
+            let safeHeight = screenSize.height - safeArea.top - safeArea.bottom
+            return CGSize(width: width ?? CGFloat.nan, height: safeHeight)
         case .percentage(let width, let height):
             let w = screenSize.width * max(0.1, min(0.95, width))
-            if let h = height {
-                let h = screenSize.height * max(0.1, min(0.95, h))
-                return CGSize(width: w, height: h)
-            } else {
-                return CGSize(width: w, height: CGFloat.nan)
-            }
+            let h = height.map { screenSize.height * max(0.1, min(0.95, $0)) } ?? CGFloat.nan
+            return CGSize(width: w, height: h)
         }
     }
 }
@@ -160,7 +136,6 @@ public struct PopupData: Identifiable {
     public var position: PopupPosition
     public var size: PopupSize
     public var config: PopupBaseConfig
-    public var keyboardObserver: KeyboardHeightObserver?
     
     // 标准弹窗
     public init<Content: View>(
@@ -173,31 +148,5 @@ public struct PopupData: Identifiable {
         self.position = position
         self.size = size
         self.config = config
-        self.keyboardObserver = nil
-    }
-    
-    // 输入弹窗
-    public init<Content: View>(
-        content: @escaping (KeyboardHeightObserver) -> Content,
-        position: PopupPosition = .center,
-        size: PopupSize = .flexible,
-        config: PopupBaseConfig = PopupBaseConfig()
-    ) {
-        let observer = KeyboardHeightObserver()
-        self.keyboardObserver = observer
-        self.position = position
-        self.size = size
-        self.config = config
-        
-        // 创建包装视图
-        let wrappedContent = KeyboardAdaptiveView(keyboardObserver: observer) {
-            content(observer)
-        }
-        self.content = AnyView(wrappedContent)
-    }
-    
-    // 判断是否为键盘适配型弹窗
-    var isKeyboardAdaptive: Bool {
-        return keyboardObserver != nil
     }
 } 
