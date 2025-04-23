@@ -2,13 +2,45 @@ import SwiftUI
 import Combine
 
 /// Popup 位置枚举
-public enum PopupPosition {
+public enum PopupPosition: Hashable {
     case top        // 顶部
     case right      // 右侧
     case bottom     // 底部
     case left       // 左侧
     case center     // 中心
     case custom(CGPoint) // 自定义位置
+    
+    // 为了满足Hashable协议，需要实现hash方法
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case .top:
+            hasher.combine(0)
+        case .right:
+            hasher.combine(1)
+        case .bottom:
+            hasher.combine(2)
+        case .left:
+            hasher.combine(3)
+        case .center:
+            hasher.combine(4)
+        case .custom(let point):
+            hasher.combine(5)
+            hasher.combine(point.x)
+            hasher.combine(point.y)
+        }
+    }
+    
+    // 为了满足Equatable协议(Hashable继承自Equatable)，需要实现==
+    public static func == (lhs: PopupPosition, rhs: PopupPosition) -> Bool {
+        switch (lhs, rhs) {
+        case (.top, .top), (.right, .right), (.bottom, .bottom), (.left, .left), (.center, .center):
+            return true
+        case (.custom(let lhsPoint), .custom(let rhsPoint)):
+            return lhsPoint.x == rhsPoint.x && lhsPoint.y == rhsPoint.y
+        default:
+            return false
+        }
+    }
     
     func getAlignment() -> Alignment {
         switch self {
