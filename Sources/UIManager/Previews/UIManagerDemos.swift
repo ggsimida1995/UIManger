@@ -398,7 +398,10 @@ public struct UIManagerDemos: View {
         // 显示输入框弹窗
         private func showInputPopup() {
             let config = PopupBaseConfig(
+                backgroundColor: Color(.secondarySystemBackground),
                 cornerRadius: 16,
+                shadowEnabled: true,
+                closeOnTapOutside: true,
                 showCloseButton: true,
                 closeButtonPosition: .topTrailing
             )
@@ -407,27 +410,73 @@ public struct UIManagerDemos: View {
                 content: {
                     ScrollView {
                         VStack(spacing: 20) {
+                            Text("请输入内容")
+                                .font(.headline)
+                                .foregroundColor(themeManager.primaryTextColor)
+                                .padding(.top, 10)
+                            
                             ForEach(0..<2) { index in
-                                TextField("输入框 \(index)", text: .constant(""))
+                                TextField("输入框 \(index+1)", text: .constant(""))
                                     .textFieldStyle(.roundedBorder)
                                     .focused($isTextFieldFocused)
                                     .padding(.horizontal)
+                                    // 添加键盘类型设置，避免emoji搜索问题
+                                    .keyboardType(.default)
+                                    // 禁用自动更正和拼写检查
+                                    .disableAutocorrection(true)
+                                    .autocapitalization(.none)
                             }
+                            
+                            // 添加提交按钮
+                            Button(action: {
+                                // 主动让键盘退出
+                                isTextFieldFocused = false
+                                // 延迟关闭弹窗，确保键盘已收起
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                    popupManager.closeAllPopups()
+                                }
+                            }) {
+                                Text("确认")
+                                    .frame(width: 100, height: 40)
+                                    .background(themeManager.themeColor)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(8)
+                            }
+                            .padding(.vertical)
                         }
-                        .padding(.top, 40)
+                        .padding(.top, 10)
                     }
-                    .safeAreaInset(edge: .bottom) {  // 🔥 用 safeAreaInset 动态空出键盘高度
-                        Color.clear.frame(height: 0)
+                    // 使用onTapGesture检测空白区域点击，关闭键盘
+                    .onTapGesture {
+                        isTextFieldFocused = false
                     }
+                    // 添加键盘适配
+                    .safeAreaInset(edge: .bottom) {
+                        Color.clear.frame(height: 10)
+                    }
+                    // 监听键盘事件
                     .onAppear {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { _ in
+                            // 处理键盘出现逻辑
+                        }
+                        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
+                            // 处理键盘隐藏逻辑
+                        }
+                        
+                        // 延迟聚焦到输入框
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                             isTextFieldFocused = true
                         }
+                    }
+                    .onDisappear {
+                        // 移除通知
+                        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+                        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
                     }
                 },
                 position: .center,
                 width: 300,
-                height: 150,
+                height: 250,
                 config: config
             )
         }
