@@ -245,8 +245,8 @@ public extension View {
         return GeometryReader { geometry in
             self
                 .frame(
-                    width: calculatedSize.width != .nan ? calculatedSize.width : nil,
-                    height: calculatedSize.height != .nan ? calculatedSize.height : nil
+                    width: !calculatedSize.width.isNaN ? calculatedSize.width : nil,
+                    height: !calculatedSize.height.isNaN ? calculatedSize.height : nil
                 )
                 .position(
                     x: geometry.size.width / 2,

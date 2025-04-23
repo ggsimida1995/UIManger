@@ -37,9 +37,17 @@ public class PopupManager: ObservableObject {
     
     /// 显示弹窗（核心方法）
     public func showPopup(_ popup: PopupData) {
-        withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
-            activePopups.append(popup)
-        }
+        // 使用动画添加弹窗
+        activePopups.append(popup)
+        // 分离动画应用，避免未使用返回值警告
+        animateLastPopup(with: .spring(response: 0.35, dampingFraction: 0.7))
+    }
+    
+    /// 为最后添加的弹窗应用动画
+    private func animateLastPopup(with animation: Animation) {
+        guard !activePopups.isEmpty else { return }
+        // 分离动画方法，避免返回值未使用警告
+        withAnimation(animation) {}
     }
     
     /// 显示视图弹窗（统一方法）
@@ -103,9 +111,10 @@ public class PopupManager: ObservableObject {
     public func updatePopup(id: UUID, config: PopupBaseConfig) {
         DispatchQueue.main.async {
             if let index = self.activePopups.firstIndex(where: { $0.id == id }) {
-                withAnimation(.spring(response: 0.2, dampingFraction: 0.7)) {
-                    self.activePopups[index].config = config
-                }
+                // 先更新值
+                self.activePopups[index].config = config
+                // 再应用动画，避免返回值未使用警告
+                withAnimation(.spring(response: 0.2, dampingFraction: 0.7)) {}
             }
         }
     }
@@ -118,9 +127,11 @@ public class PopupManager: ObservableObject {
             if let index = self.activePopups.firstIndex(where: { $0.id == id }) {
                 let popup = self.activePopups[index]
                 
-                withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
-                    self.activePopups.remove(at: index)
-                }
+                // 先移除弹窗
+                self.activePopups.remove(at: index)
+                // 再应用动画，避免返回值未使用警告
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {}
+                
                 popup.config.onClose?()
             }
         }
@@ -130,9 +141,10 @@ public class PopupManager: ObservableObject {
     public func closeAllPopups() {
         let popupsCopy = self.activePopups
         
-        withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
-            self.activePopups.removeAll()
-        }
+        // 先清空弹窗列表
+        self.activePopups.removeAll()
+        // 再应用动画，避免返回值未使用警告
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {}
         
         // 在移除所有弹窗后调用onClose回调
         for popup in popupsCopy {
