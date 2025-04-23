@@ -86,6 +86,30 @@ public struct UIManagerDemos: View {
         @State private var showSizeControls: Bool = false
         @State private var customX: CGFloat = 0.5  // 自定义X坐标比例(0-1)
         @State private var customY: CGFloat = 0.5  // 自定义Y坐标比例(0-1)
+        @State private var showCloseButton: Bool = false  // 是否显示关闭按钮
+        @State private var offsetY: CGFloat = 0 // 垂直偏移量
+        
+        // 关闭按钮样式选项
+        enum CloseButtonStyleOption: String, CaseIterable, Identifiable {
+            case circular = "圆形"
+            case square = "方形"
+            case minimal = "简约"
+            case custom = "自定义"
+            
+            var id: String { self.rawValue }
+            
+            // 转换为PopupBaseConfig.CloseButtonStyle
+            func toStyle(themeColor: Color) -> PopupBaseConfig.CloseButtonStyle {
+                switch self {
+                case .circular: return .circular
+                case .square: return .square
+                case .minimal: return .minimal
+                case .custom: return .custom(themeColor, Color.white)
+                }
+            }
+        }
+        
+        @State private var selectedButtonStyle: CloseButtonStyleOption = .circular
         
         // 输入框相关状态
         @State private var text = ""
@@ -267,6 +291,37 @@ public struct UIManagerDemos: View {
                     .padding(.horizontal)
                 }
                 
+                // 在自定义尺寸控制之后添加关闭按钮控制
+                VStack(alignment: .leading, spacing: 8) {
+                    Toggle("显示关闭按钮", isOn: $showCloseButton)
+                        .font(.headline)
+                        .foregroundColor(themeManager.primaryTextColor)
+                    
+                    if showCloseButton {
+                        Picker("关闭按钮样式", selection: $selectedButtonStyle) {
+                            ForEach(CloseButtonStyleOption.allCases) { style in
+                                Text(style.rawValue).tag(style)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .padding(.top, 4)
+                    }
+                }
+                .padding(.horizontal)
+                
+                // 在关闭按钮控制后添加偏移量控制
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("垂直偏移量: \(Int(offsetY))")
+                        .font(.headline)
+                        .foregroundColor(themeManager.primaryTextColor)
+                    
+                    Slider(value: $offsetY, in: 0...200, step: 10) {
+                        Text("偏移量")
+                    }
+                    .accentColor(themeManager.themeColor)
+                }
+                .padding(.horizontal)
+                
                 // 显示基础弹窗按钮
                 Button(action: showPopup) {
                     Text("显示弹窗")
@@ -298,7 +353,7 @@ public struct UIManagerDemos: View {
             .background(themeManager.backgroundColor)
         }
         
-        // 显示基础弹窗
+        // 修改showPopup方法，包含偏移量设置
         private func showPopup() {
             // 根据位置和设置决定尺寸
             var popupWidth: CGFloat? = nil
@@ -324,9 +379,15 @@ public struct UIManagerDemos: View {
                 }
             }
             
+            // 创建配置，添加关闭按钮设置
             let config = PopupBaseConfig(
-                showCloseButton: true,
-                closeButtonPosition: .topTrailing
+                cornerRadius: 12,
+                shadowEnabled: true,
+                closeOnTapOutside: true,
+                showCloseButton: showCloseButton,
+                closeButtonPosition: .topTrailing,
+                closeButtonStyle: selectedButtonStyle.toStyle(themeColor: themeManager.themeColor),
+                offsetY: offsetY
             )
             
             // 将位置选项转换为PopupPosition
@@ -395,12 +456,20 @@ public struct UIManagerDemos: View {
             )
         }
         
-        // 显示输入框弹窗
+        // 修改showInputPopup方法，增加延时设置偏移量功能
         private func showInputPopup() {
+            // 创建一个自定义ID，用于后续更新弹窗
+            let popupID = UUID()
+            
+            // 初始弹窗配置，开始时不设置偏移
             let config = PopupBaseConfig(
                 cornerRadius: 16,
-                showCloseButton: true,
-                closeButtonPosition: .topTrailing
+                shadowEnabled: true,
+                closeOnTapOutside: true,
+                showCloseButton: showCloseButton,
+                closeButtonPosition: .topTrailing,
+                closeButtonStyle: selectedButtonStyle.toStyle(themeColor: themeManager.themeColor),
+                offsetY: 0 // 初始不偏移
             )
             
             popupManager.show(
@@ -416,19 +485,31 @@ public struct UIManagerDemos: View {
                         }
                         .padding(.top, 40)
                     }
-                    .safeAreaInset(edge: .bottom) {  // 🔥 用 safeAreaInset 动态空出键盘高度
+                    .safeAreaInset(edge: .bottom) {  // 用 safeAreaInset 动态空出键盘高度
                         Color.clear.frame(height: 0)
                     }
                     .onAppear {
+                        // 先聚焦输入框，触发键盘显示
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                             isTextFieldFocused = true
+                            
+                            // 延迟设置偏移量，给键盘足够时间弹出
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                // 创建一个新的配置，应用设置的偏移量
+                                var newConfig = config
+                                newConfig.offsetY = offsetY
+                                
+                                // 更新弹窗配置
+                                popupManager.updatePopup(id: popupID, config: newConfig)
+                            }
                         }
                     }
                 },
                 position: .center,
                 width: 300,
                 height: 150,
-                config: config
+                config: config,
+                id: popupID // 使用自定义ID
             )
         }
         

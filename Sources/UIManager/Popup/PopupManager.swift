@@ -49,12 +49,14 @@ public class PopupManager: ObservableObject {
     ///   - width: 弹窗宽度（nil表示自适应宽度）
     ///   - height: 弹窗高度（nil表示自适应高度）
     ///   - config: 弹窗配置（如圆角、阴影等）
+    ///   - id: 自定义ID（可选）
     public func show<Content: View>(
         @ViewBuilder content: @escaping () -> Content,
         position: PopupPosition = .center,
         width: CGFloat? = nil,
         height: CGFloat? = nil,
-        config: PopupBaseConfig = PopupBaseConfig()
+        config: PopupBaseConfig = PopupBaseConfig(),
+        id: UUID? = nil
     ) {
         // 根据位置和尺寸设置合适的PopupSize
         let size: PopupSize = {
@@ -73,13 +75,39 @@ public class PopupManager: ObservableObject {
         }()
         
         // 创建并显示弹窗
-        let popup = PopupData(
-            content: content(),
-            position: position,
-            size: size,
-            config: config
-        )
+        let popup: PopupData
+        
+        if let customID = id {
+            // 使用自定义ID
+            popup = PopupData(
+                id: customID,
+                content: content(),
+                position: position,
+                size: size,
+                config: config
+            )
+        } else {
+            // 使用自动生成的ID
+            popup = PopupData(
+                content: content(),
+                position: position,
+                size: size,
+                config: config
+            )
+        }
+        
         showPopup(popup)
+    }
+    
+    /// 更新现有弹窗的配置
+    public func updatePopup(id: UUID, config: PopupBaseConfig) {
+        DispatchQueue.main.async {
+            if let index = self.activePopups.firstIndex(where: { $0.id == id }) {
+                withAnimation(.spring(response: 0.2, dampingFraction: 0.7)) {
+                    self.activePopups[index].config = config
+                }
+            }
+        }
     }
     
     // MARK: - 关闭方法

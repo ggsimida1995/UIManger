@@ -102,11 +102,44 @@ public struct PopupBaseConfig {
     public var animation: Animation = .spring(response: 0.3, dampingFraction: 0.8)
     public var onClose: (() -> Void)?
     
+    // 弹窗垂直偏移量（正值向上偏移，负值向下偏移）
+    public var offsetY: CGFloat = 0
+    
     public enum CloseButtonPosition {
         case topLeading, topTrailing, none
     }
     
+    public enum CloseButtonStyle {
+        case circular     // 圆形按钮
+        case square       // 方形按钮
+        case minimal      // 仅图标
+        case custom(Color, Color) // 自定义按钮样式 (背景色, 图标色)
+        
+        // 获取背景颜色
+        var backgroundColor: Color {
+            switch self {
+            case .circular, .square:
+                return Color.gray.opacity(0.1)
+            case .minimal:
+                return Color.clear
+            case .custom(_, let iconColor):
+                return iconColor.opacity(0.1)
+            }
+        }
+        
+        // 获取图标颜色
+        var iconColor: Color {
+            switch self {
+            case .circular, .square, .minimal:
+                return Color.gray
+            case .custom(let bgColor, _):
+                return bgColor
+            }
+        }
+    }
+    
     public var closeButtonPosition: CloseButtonPosition = .topTrailing
+    public var closeButtonStyle: CloseButtonStyle = .circular
     
     public init(
         backgroundColor: Color = Color(.systemBackground),
@@ -115,7 +148,9 @@ public struct PopupBaseConfig {
         closeOnTapOutside: Bool = true,
         showCloseButton: Bool = false,
         closeButtonPosition: CloseButtonPosition = .topTrailing,
+        closeButtonStyle: CloseButtonStyle = .circular,
         animation: Animation = .spring(response: 0.3, dampingFraction: 0.8),
+        offsetY: CGFloat = 0,
         onClose: (() -> Void)? = nil
     ) {
         self.backgroundColor = backgroundColor
@@ -124,26 +159,44 @@ public struct PopupBaseConfig {
         self.closeOnTapOutside = closeOnTapOutside
         self.showCloseButton = showCloseButton
         self.closeButtonPosition = closeButtonPosition
+        self.closeButtonStyle = closeButtonStyle
         self.animation = animation
+        self.offsetY = offsetY
         self.onClose = onClose
     }
 }
 
 // MARK: - 通用Popup数据结构
 public struct PopupData: Identifiable {
-    public let id = UUID()
+    public var id: UUID
     public var content: AnyView
     public var position: PopupPosition
     public var size: PopupSize
     public var config: PopupBaseConfig
     
-    // 标准弹窗
+    // 标准弹窗，使用随机生成的ID
     public init<Content: View>(
         content: Content,
         position: PopupPosition = .center,
         size: PopupSize = .flexible,
         config: PopupBaseConfig = PopupBaseConfig()
     ) {
+        self.id = UUID()
+        self.content = AnyView(content)
+        self.position = position
+        self.size = size
+        self.config = config
+    }
+    
+    // 带自定义ID的初始化方法
+    public init<Content: View>(
+        id: UUID,
+        content: Content,
+        position: PopupPosition = .center,
+        size: PopupSize = .flexible,
+        config: PopupBaseConfig = PopupBaseConfig()
+    ) {
+        self.id = id
         self.content = AnyView(content)
         self.position = position
         self.size = size
