@@ -36,6 +36,7 @@ public struct PopupContainerView: View {
                     closeButton
                 }
             }
+            .padding(getPadding())
             // 应用垂直偏移
             .offset(y: -popup.config.offsetY)
         
