@@ -60,7 +60,17 @@ public enum PopupPosition: Hashable {
         case .left:
             return AnyTransition.move(edge: .leading).combined(with: .opacity)
         case .center, .custom:
-            return AnyTransition.opacity
+            return AnyTransition.scale(scale: 0.8, anchor: .center).combined(with: .opacity)
+        }
+    }
+    
+    // 获取默认动画
+    func getDefaultAnimation(duration: Double = 0.3) -> Animation {
+        switch self {
+        case .top, .right, .bottom, .left:
+            return .linear(duration: duration) // 使用线性动画
+        case .center, .custom:
+            return .easeInOut(duration: duration) // 中心和自定义位置使用缓入缓出
         }
     }
 }
@@ -101,6 +111,9 @@ public struct PopupBaseConfig {
     public var showCloseButton: Bool = false
     public var animation: Animation = .spring(response: 0.3, dampingFraction: 0.8)
     public var onClose: (() -> Void)?
+    
+    // 自定义过渡效果（如果为 nil，则使用默认的位置相关过渡效果）
+    public var customTransition: AnyTransition? = nil
     
     // 弹窗垂直偏移量（正值向上偏移，负值向下偏移）
     public var offsetY: CGFloat = 0
@@ -150,6 +163,7 @@ public struct PopupBaseConfig {
         closeButtonPosition: CloseButtonPosition = .topTrailing,
         closeButtonStyle: CloseButtonStyle = .circular,
         animation: Animation = .spring(response: 0.3, dampingFraction: 0.8),
+        customTransition: AnyTransition? = nil,
         offsetY: CGFloat = 0,
         onClose: (() -> Void)? = nil
     ) {
@@ -161,6 +175,7 @@ public struct PopupBaseConfig {
         self.closeButtonPosition = closeButtonPosition
         self.closeButtonStyle = closeButtonStyle
         self.animation = animation
+        self.customTransition = customTransition
         self.offsetY = offsetY
         self.onClose = onClose
     }
@@ -173,19 +188,23 @@ public struct PopupData: Identifiable {
     public var position: PopupPosition
     public var size: PopupSize
     public var config: PopupBaseConfig
+    // 退出时使用的配置，如果为nil则使用普通config
+    public var exitConfig: PopupBaseConfig?
     
     // 标准弹窗，使用随机生成的ID
     public init<Content: View>(
         content: Content,
         position: PopupPosition = .center,
         size: PopupSize = .flexible,
-        config: PopupBaseConfig = PopupBaseConfig()
+        config: PopupBaseConfig = PopupBaseConfig(),
+        exitConfig: PopupBaseConfig? = nil
     ) {
         self.id = UUID()
         self.content = AnyView(content)
         self.position = position
         self.size = size
         self.config = config
+        self.exitConfig = exitConfig
     }
     
     // 带自定义ID的初始化方法
@@ -194,12 +213,46 @@ public struct PopupData: Identifiable {
         content: Content,
         position: PopupPosition = .center,
         size: PopupSize = .flexible,
-        config: PopupBaseConfig = PopupBaseConfig()
+        config: PopupBaseConfig = PopupBaseConfig(),
+        exitConfig: PopupBaseConfig? = nil
     ) {
         self.id = id
         self.content = AnyView(content)
         self.position = position
         self.size = size
         self.config = config
+        self.exitConfig = exitConfig
+    }
+} 
+
+// 扩展PopupModel，添加退出配置
+public class PopupModel: Identifiable, ObservableObject {
+    public var id: UUID
+    public var content: AnyView
+    public var position: PopupPosition
+    public var width: CGFloat?
+    public var height: CGFloat?
+    @Published public var config: PopupBaseConfig
+    @Published public var exitConfig: PopupBaseConfig? // 新增退出配置
+    public var onClose: (() -> Void)?
+    
+    public init(
+        id: UUID = UUID(),
+        content: AnyView,
+        position: PopupPosition,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil,
+        config: PopupBaseConfig = PopupBaseConfig(),
+        exitConfig: PopupBaseConfig? = nil,
+        onClose: (() -> Void)? = nil
+    ) {
+        self.id = id
+        self.content = content
+        self.position = position
+        self.width = width
+        self.height = height
+        self.config = config
+        self.exitConfig = exitConfig
+        self.onClose = onClose
     }
 } 
