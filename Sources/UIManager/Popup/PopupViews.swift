@@ -36,7 +36,7 @@ public struct PopupContainerView: View {
                     closeButton
                 }
             }.border(Color.red,width: 1)
-            // .padding(getPadding())
+            .padding(getPadding())
             // 应用垂直偏移
             .offset(y: -popup.config.offsetY)
         
@@ -123,7 +123,7 @@ public struct PopupContainerView: View {
         case .top, .bottom, .left, .right:
             return EdgeInsets()
         default:
-            return EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
+            return EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10)
         }
     }
 }
