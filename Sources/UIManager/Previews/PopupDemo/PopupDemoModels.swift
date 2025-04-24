@@ -1,3 +1,4 @@
+#if DEBUG || PREVIEW
 import SwiftUI
 
 // 弹窗演示模型和枚举
@@ -217,4 +218,4 @@ public extension PreviewPopupDemo {
             }
         }
     }
-} 
+} #endif

@@ -3,7 +3,8 @@ import UIManager
 
 @main
 struct DemoApp: App {
-    @StateObject private var themeManager = UIManagerDemos.UIManagerThemeViewModel()
+    // 使用共享的主题管理器实例
+    @StateObject private var themeManager = UIManagerThemeViewModel.shared
     
     var body: some Scene {
         WindowGroup {

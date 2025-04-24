@@ -1,9 +1,11 @@
+#if DEBUG || PREVIEW
 #if canImport(UIKit)
 import SwiftUI
 
 /// UIManager 组件预览集合入口点
 public struct UIManagerDemos: View {
-    @StateObject private var themeManager = UIManagerThemeViewModel()
+    // 使用共享的主题管理器实例
+    @ObservedObject private var themeManager = UIManagerThemeViewModel.shared
     
     public init() {
         // 确保初始化环境
@@ -463,4 +465,5 @@ struct DialogDemoScreen: View {
     UIManagerDemos()
         .environment(\.popupManager, PopupManager.shared) // 确保预览使用相同的实例
 }
+#endif
 #endif

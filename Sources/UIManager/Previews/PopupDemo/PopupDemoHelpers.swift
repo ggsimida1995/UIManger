@@ -1,3 +1,4 @@
+#if DEBUG || PREVIEW
 import SwiftUI
 
 // 弹窗演示的帮助方法
@@ -463,4 +464,4 @@ public extension PreviewPopupDemo {
             return "自定义位置弹窗"
         }
     }
-} 
+} #endif

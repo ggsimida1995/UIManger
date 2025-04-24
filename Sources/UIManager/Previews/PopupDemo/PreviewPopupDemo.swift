@@ -1,3 +1,4 @@
+#if DEBUG || PREVIEW
 import SwiftUI
 
 // 弹出窗口演示组件
@@ -498,4 +499,4 @@ public struct PreviewPopupDemo: View {
             .background(themeManager.backgroundColor)
         }
     }
-} 
+} #endif
