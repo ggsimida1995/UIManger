@@ -57,9 +57,11 @@ public struct ThemeDemoView: View {
         .padding()
         .background(themeManager.backgroundColor.edgesIgnoringSafeArea(.all))
         .onChange(of: colorScheme) { newColorScheme in
+            // 无条件调用updateWithColorScheme确保预览效果正确
             themeManager.updateWithColorScheme(newColorScheme)
         }
         .onAppear {
+            // 无条件调用updateWithColorScheme确保预览效果正确
             themeManager.updateWithColorScheme(colorScheme)
         }
     }
@@ -82,18 +84,4 @@ public struct ThemeDemoView: View {
     }
 }
 
-// MARK: - Previews
-struct ThemeDemoView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            ThemeDemoView()
-                .environmentObject(UIManagerThemeViewModel.shared)
-                .preferredColorScheme(.light)
-            
-            ThemeDemoView()
-                .environmentObject(UIManagerThemeViewModel.shared)
-                .preferredColorScheme(.dark)
-        }
-    }
-}
 #endif 

@@ -17,7 +17,7 @@ public class UIManagerThemeViewModel: ObservableObject {
     private init() {
         // 默认使用系统外观
         updateThemeBasedOnSystemAppearance()
-        
+        printThemeStatus()
         #if canImport(UIKit)
         // 监听应用程序激活事件，每次应用程序从后台恢复时更新主题
         NotificationCenter.default.addObserver(
@@ -100,9 +100,17 @@ public class UIManagerThemeViewModel: ObservableObject {
     
     // 使用SwiftUI的ColorScheme更新主题（在视图中调用）
     public func updateWithColorScheme(_ colorScheme: ColorScheme) {
-        if followsSystem {
-            isDarkMode = colorScheme == .dark
+        // 为了支持预览环境，总是使用传入的colorScheme更新主题
+        // 这样在Xcode预览中也能正确显示深色/浅色主题
+        isDarkMode = colorScheme == .dark
+        
+        // 在真机环境中，只有followsSystem为true时才应用系统外观
+        #if !PREVIEW && !DEBUG
+        if !followsSystem {
+            // 如果不跟随系统，则保持用户手动设置的isDarkMode值
+            isDarkMode = isDarkMode
         }
+        #endif
     }
     
     // 开启或关闭跟随系统外观
@@ -112,4 +120,56 @@ public class UIManagerThemeViewModel: ObservableObject {
             updateThemeBasedOnSystemAppearance()
         }
     }
-} 
+    
+    /// 打印当前主题状态
+    public func printThemeStatus() {
+        let themeStatus = isDarkMode ? "深色模式" : "浅色模式"
+        let followStatus = followsSystem ? "跟随系统" : "手动设置"
+        print("当前主题状态: \(themeStatus), 设置模式: \(followStatus)")
+        
+        #if canImport(UIKit)
+        if #available(iOS 12.0, *) {
+            let systemAppearance = UITraitCollection.current.userInterfaceStyle == .dark ? "深色" : "浅色"
+            print("系统当前外观: \(systemAppearance)")
+        }
+        #elseif os(macOS)
+        if #available(macOS 10.14, *) {
+            if let appearance = NSAppearance.current.bestMatch(from: [.darkAqua, .aqua]) {
+                let systemAppearance = appearance == .darkAqua ? "深色" : "浅色"
+                print("系统当前外观: \(systemAppearance)")
+            }
+        }
+        #endif
+    }
+}
+
+// MARK: - 预览支持
+#if DEBUG || PREVIEW
+public struct UIManagerThemeModifier: ViewModifier {
+    @ObservedObject var themeManager: UIManagerThemeViewModel
+    @Environment(\.colorScheme) var colorScheme
+    
+    public init(themeManager: UIManagerThemeViewModel = .shared) {
+        self.themeManager = themeManager
+    }
+    
+    public func body(content: Content) -> some View {
+        content
+            .environmentObject(themeManager)
+            .onAppear {
+                // 自动更新主题以匹配预览环境的colorScheme
+                themeManager.updateWithColorScheme(colorScheme)
+            }
+            .onChange(of: colorScheme) { newColorScheme in
+                themeManager.updateWithColorScheme(newColorScheme)
+            }
+    }
+}
+
+public extension View {
+    /// 应用UIManager主题到视图中，确保在预览环境中正确显示
+    func withUIManagerTheme(_ themeManager: UIManagerThemeViewModel = .shared) -> some View {
+        self.modifier(UIManagerThemeModifier(themeManager: themeManager))
+    }
+}
+#endif 
