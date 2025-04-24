@@ -11,7 +11,7 @@ public enum PopupPosition: Hashable {
     case bottom     // 底部
     case left       // 左侧
     case center     // 中心
-    case custom(CGPoint) // 自定义位置，使用相对屏幕的比例坐标 (0-1)
+    case absolute(left: CGFloat?, top: CGFloat?, right: CGFloat?, bottom: CGFloat?) // 绝对位置
     
     // 为了满足Hashable协议，需要实现hash方法
     public func hash(into hasher: inout Hasher) {
@@ -21,10 +21,12 @@ public enum PopupPosition: Hashable {
         case .bottom: hasher.combine(2)
         case .left: hasher.combine(3)
         case .center: hasher.combine(4)
-        case .custom(let point):
+        case .absolute(let left, let top, let right, let bottom):
             hasher.combine(5)
-            hasher.combine(point.x)
-            hasher.combine(point.y)
+            hasher.combine(left)
+            hasher.combine(top)
+            hasher.combine(right)
+            hasher.combine(bottom)
         }
     }
     
@@ -33,8 +35,9 @@ public enum PopupPosition: Hashable {
         switch (lhs, rhs) {
         case (.top, .top), (.right, .right), (.bottom, .bottom), (.left, .left), (.center, .center):
             return true
-        case (.custom(let lhsPoint), .custom(let rhsPoint)):
-            return lhsPoint.x == rhsPoint.x && lhsPoint.y == rhsPoint.y
+        case (.absolute(let lhsLeft, let lhsTop, let lhsRight, let lhsBottom), 
+              .absolute(let rhsLeft, let rhsTop, let rhsRight, let rhsBottom)):
+            return lhsLeft == rhsLeft && lhsTop == rhsTop && lhsRight == rhsRight && lhsBottom == rhsBottom
         default:
             return false
         }
@@ -47,7 +50,7 @@ public enum PopupPosition: Hashable {
         case .bottom: return .bottom
         case .left: return .leading
         case .center: return .center
-        case .custom: return .center  // 对于自定义位置，默认使用中心对齐但实际会被忽略
+        case .absolute: return .center  // 对于绝对位置，默认使用中心对齐但实际会被忽略
         }
     }
     
@@ -62,7 +65,7 @@ public enum PopupPosition: Hashable {
             return AnyTransition.move(edge: .bottom).combined(with: .opacity)
         case .left:
             return AnyTransition.move(edge: .leading).combined(with: .opacity)
-        case .center, .custom:
+        case .center, .absolute:
             // 使用不对称过渡效果：进入时从大到小，退出时从小到大
             return AnyTransition.asymmetric(
                 insertion: .scale(scale: 1.1, anchor: .center).combined(with: .opacity),
@@ -76,7 +79,7 @@ public enum PopupPosition: Hashable {
         switch self {
         case .top, .right, .bottom, .left:
             return .linear(duration: duration) // 使用线性动画
-        case .center, .custom:
+        case .center, .absolute:
             return .easeInOut(duration: duration) // 中心和自定义位置使用缓入缓出
         }
     }
@@ -109,32 +112,30 @@ public enum PopupSize {
     }
 }
 
-// MARK: - 基础Popup配置
-public struct PopupBaseConfig {
-    // 获取当前环境的默认背景色
-    public static var defaultBackgroundColor: Color {
-        // 优先使用主题管理器的背景色
-        UIManagerThemeViewModel.shared.backgroundColor
-    }
+/// Popup 配置类型
+public struct PopupConfig {
+    // MARK: - 视觉属性
     
+    /// 弹窗背景色
     public var backgroundColor: Color
-    public var cornerRadius: CGFloat = 12
-    public var shadowEnabled: Bool = true
-    public var closeOnTapOutside: Bool = true
-    public var showCloseButton: Bool = false
-    public var animation: Animation = .spring(response: 0.3, dampingFraction: 0.8)
-    public var onClose: (() -> Void)?
     
-    // 自定义过渡效果（如果为 nil，则使用默认的位置相关过渡效果）
-    public var customTransition: AnyTransition? = nil
+    /// 弹窗圆角半径
+    public var cornerRadius: CGFloat
     
-    // 弹窗垂直偏移量（正值向上偏移，负值向下偏移）
-    public var offsetY: CGFloat = 0
+    /// 是否启用阴影
+    public var shadowEnabled: Bool
     
+    /// 弹窗垂直偏移量
+    public var offsetY: CGFloat
+    
+    // MARK: - 关闭按钮
+    
+    /// 关闭按钮位置
     public enum CloseButtonPosition {
         case topLeading, topTrailing, none
     }
     
+    /// 关闭按钮样式
     public enum CloseButtonStyle {
         case circular     // 圆形按钮
         case square       // 方形按钮
@@ -164,54 +165,111 @@ public struct PopupBaseConfig {
         }
     }
     
-    public var closeButtonPosition: CloseButtonPosition = .topTrailing
-    public var closeButtonStyle: CloseButtonStyle = .circular
+    /// 是否显示关闭按钮
+    public var showCloseButton: Bool
     
-    // 标准初始化方法
+    /// 关闭按钮位置
+    public var closeButtonPosition: CloseButtonPosition
+    
+    /// 关闭按钮样式
+    public var closeButtonStyle: CloseButtonStyle
+    
+    // MARK: - 交互行为
+    
+    /// 点击外部是否关闭弹窗
+    public var closeOnTapOutside: Bool
+    
+    // MARK: - 动画和过渡效果
+    
+    /// 弹窗显示/隐藏动画
+    public var animation: Animation
+    
+    /// 自定义过渡效果
+    public var customTransition: AnyTransition?
+    
+    // MARK: - 回调
+    
+    /// 弹窗关闭回调
+    public var onClose: (() -> Void)?
+    
+    // MARK: - 构造方法
+    
+    /// 获取当前环境的默认背景色
+    public static var defaultBackgroundColor: Color {
+        // 优先使用主题管理器的背景色
+        UIManagerThemeViewModel.shared.backgroundColor
+    }
+    
+    /// 初始化方法
     public init(
+        // 视觉属性
         backgroundColor: Color = defaultBackgroundColor,
         cornerRadius: CGFloat = 12,
         shadowEnabled: Bool = true,
-        closeOnTapOutside: Bool = true,
+        offsetY: CGFloat = 0,
+        
+        // 关闭按钮
         showCloseButton: Bool = false,
         closeButtonPosition: CloseButtonPosition = .topTrailing,
         closeButtonStyle: CloseButtonStyle = .circular,
+        
+        // 交互行为
+        closeOnTapOutside: Bool = true,
+        
+        // 动画和过渡效果
         animation: Animation = .spring(response: 0.3, dampingFraction: 0.8),
         customTransition: AnyTransition? = nil,
-        offsetY: CGFloat = 0,
+        
+        // 回调
         onClose: (() -> Void)? = nil
     ) {
         self.backgroundColor = backgroundColor
         self.cornerRadius = cornerRadius
         self.shadowEnabled = shadowEnabled
-        self.closeOnTapOutside = closeOnTapOutside
+        self.offsetY = offsetY
+        
         self.showCloseButton = showCloseButton
         self.closeButtonPosition = closeButtonPosition
         self.closeButtonStyle = closeButtonStyle
+        
+        self.closeOnTapOutside = closeOnTapOutside
+        
         self.animation = animation
         self.customTransition = customTransition
-        self.offsetY = offsetY
+        
         self.onClose = onClose
     }
 }
 
 // MARK: - 通用Popup数据结构
 public struct PopupData: Identifiable {
+    /// 唯一标识
     public var id: UUID
-    public var content: AnyView
-    public var position: PopupPosition
-    public var size: PopupSize
-    public var config: PopupBaseConfig
-    // 退出时使用的配置，如果为nil则使用普通config
-    public var exitConfig: PopupBaseConfig?
     
-    // 标准弹窗，使用随机生成的ID
+    /// 弹窗内容
+    public var content: AnyView
+    
+    /// 弹窗位置
+    public var position: PopupPosition
+    
+    /// 弹窗尺寸
+    public var size: PopupSize
+    
+    /// 弹窗配置
+    public var config: PopupConfig
+    
+    /// 退出时使用的配置（如果为nil则使用普通config）
+    public var exitConfig: PopupConfig?
+    
+    // MARK: - 构造方法
+    
+    /// 标准弹窗，使用随机生成的ID
     public init<Content: View>(
         content: Content,
         position: PopupPosition = .center,
         size: PopupSize = .flexible,
-        config: PopupBaseConfig = PopupBaseConfig(),
-        exitConfig: PopupBaseConfig? = nil
+        config: PopupConfig = PopupConfig(),
+        exitConfig: PopupConfig? = nil
     ) {
         self.id = UUID()
         self.content = AnyView(content)
@@ -221,14 +279,14 @@ public struct PopupData: Identifiable {
         self.exitConfig = exitConfig
     }
     
-    // 带自定义ID的初始化方法
+    /// 带自定义ID的初始化方法
     public init<Content: View>(
         id: UUID,
         content: Content,
         position: PopupPosition = .center,
         size: PopupSize = .flexible,
-        config: PopupBaseConfig = PopupBaseConfig(),
-        exitConfig: PopupBaseConfig? = nil
+        config: PopupConfig = PopupConfig(),
+        exitConfig: PopupConfig? = nil
     ) {
         self.id = id
         self.content = AnyView(content)
@@ -237,27 +295,43 @@ public struct PopupData: Identifiable {
         self.config = config
         self.exitConfig = exitConfig
     }
-} 
+}
 
-// 扩展PopupModel，添加退出配置
+// MARK: - 弹窗模型
 public class PopupModel: Identifiable, ObservableObject {
+    /// 唯一标识
     public var id: UUID
+    
+    /// 弹窗内容
     public var content: AnyView
+    
+    /// 弹窗位置
     public var position: PopupPosition
+    
+    /// 弹窗宽度
     public var width: CGFloat?
+    
+    /// 弹窗高度
     public var height: CGFloat?
-    @Published public var config: PopupBaseConfig
-    @Published public var exitConfig: PopupBaseConfig? // 新增退出配置
+    
+    /// 弹窗配置
+    @Published public var config: PopupConfig
+    
+    /// 退出配置
+    @Published public var exitConfig: PopupConfig?
+    
+    /// 关闭回调
     public var onClose: (() -> Void)?
     
+    /// 初始化方法
     public init(
         id: UUID = UUID(),
         content: AnyView,
         position: PopupPosition,
         width: CGFloat? = nil,
         height: CGFloat? = nil,
-        config: PopupBaseConfig = PopupBaseConfig(),
-        exitConfig: PopupBaseConfig? = nil,
+        config: PopupConfig = PopupConfig(),
+        exitConfig: PopupConfig? = nil,
         onClose: (() -> Void)? = nil
     ) {
         self.id = id

@@ -1,5 +1,8 @@
 import SwiftUI
 import Combine
+#if canImport(UIKit)
+import UIKit
+#endif
 
 /// Popup 管理器 - 全局单例
 public class PopupManager: ObservableObject {
@@ -60,7 +63,7 @@ public class PopupManager: ObservableObject {
     ///   - position: 弹窗位置（如：.center, .top, .bottom, .left, .right）
     ///   - width: 弹窗宽度（nil表示自适应宽度）
     ///   - height: 弹窗高度（nil表示自适应高度）
-    ///   - config: 弹窗配置（如圆角、阴影等）
+    ///   - config: 弹窗配置
     ///   - exitConfig: 退出时使用的弹窗配置（如果为nil，则使用config）
     ///   - id: 自定义ID（可选）
     public func show<Content: View>(
@@ -68,8 +71,8 @@ public class PopupManager: ObservableObject {
         position: PopupPosition = .center,
         width: CGFloat? = nil,
         height: CGFloat? = nil,
-        config: PopupBaseConfig = PopupBaseConfig(),
-        exitConfig: PopupBaseConfig? = nil,
+        config: PopupConfig = PopupConfig(),
+        exitConfig: PopupConfig? = nil,
         id: UUID? = nil
     ) {
         // 根据位置和尺寸设置合适的PopupSize
@@ -79,7 +82,7 @@ public class PopupManager: ObservableObject {
                 return .fullWidth(height)
             case .left, .right:
                 return .fullHeight(width)
-            case .center, .custom:
+            case .center, .absolute:
                 if let width = width, let height = height {
                     return .fixed(CGSize(width: width, height: height))
                 } else {
@@ -130,8 +133,151 @@ public class PopupManager: ObservableObject {
         }
     }
     
+    /// 使用绝对位置显示弹窗
+    /// - Parameters:
+    ///   - content: 弹窗内容视图
+    ///   - left: 距离左边缘的距离（如果为nil则水平居中或使用right值）
+    ///   - top: 距离顶部边缘的距离（如果为nil则垂直居中或使用bottom值）
+    ///   - right: 距离右边缘的距离（如果left和right都为nil则水平居中）
+    ///   - bottom: 距离底部边缘的距离（如果top和bottom都为nil则垂直居中）
+    ///   - width: 弹窗宽度（nil表示自适应宽度）
+    ///   - height: 弹窗高度（nil表示自适应高度）
+    ///   - config: 弹窗配置
+    ///   - exitConfig: 退出时使用的弹窗配置（如果为nil，则使用config）
+    ///   - id: 自定义ID（可选）
+    public func showAt<Content: View>(
+        @ViewBuilder content: @escaping () -> Content,
+        left: CGFloat? = nil,
+        top: CGFloat? = nil,
+        right: CGFloat? = nil,
+        bottom: CGFloat? = nil,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil,
+        config: PopupConfig = PopupConfig(),
+        exitConfig: PopupConfig? = nil,
+        id: UUID? = nil
+    ) {
+        // 创建绝对位置
+        let position = PopupPosition.absolute(left: left, top: top, right: right, bottom: bottom)
+        
+        // 调用标准显示方法
+        show(
+            content: content,
+            position: position,
+            width: width,
+            height: height,
+            config: config,
+            exitConfig: exitConfig,
+            id: id
+        )
+    }
+    
+    /// 显示侧边栏弹窗（便捷方法）
+    /// - Parameters:
+    ///   - side: 侧边栏位置 (.left 或 .right)
+    ///   - width: 侧边栏宽度（默认为屏幕宽度的80%）
+    ///   - content: 侧边栏内容视图
+    ///   - config: 弹窗配置
+    ///   - exitConfig: 退出时使用的弹窗配置
+    ///   - id: 自定义ID
+    public func showSidebar<Content: View>(
+        side: PopupPosition,
+        width: CGFloat? = nil,
+        @ViewBuilder content: @escaping () -> Content,
+        config: PopupConfig = PopupConfig(),
+        exitConfig: PopupConfig? = nil,
+        id: UUID? = nil
+    ) {
+        // 确保side是left或right
+        guard side == .left || side == .right else {
+            print("警告: showSidebar 方法仅支持 .left 或 .right 位置")
+            return
+        }
+        
+        // 如果没有指定宽度，则默认为屏幕宽度的80%
+        let calculatedWidth: CGFloat? = width ?? {
+            #if canImport(UIKit) && !targetEnvironment(macCatalyst)
+            return UIScreen.main.bounds.width * 0.8
+            #elseif canImport(AppKit)
+            return NSScreen.main?.frame.width ?? 800 * 0.8
+            #else
+            return 800 * 0.8 // 默认宽度
+            #endif
+        }()
+        
+        // 创建侧边栏专用动画配置
+        var sidebarConfig = config
+        if config.customTransition == nil {
+            // 为侧边栏设置专门的过渡效果
+            sidebarConfig.customTransition = side.getEntryTransition()
+        }
+        if config.animation == .spring(response: 0.3, dampingFraction: 0.8) {
+            // 为侧边栏设置专门的动画
+            sidebarConfig.animation = .spring(response: 0.35, dampingFraction: 0.7)
+        }
+        
+        // 调用标准显示方法
+        show(
+            content: content,
+            position: side,
+            width: calculatedWidth,
+            height: nil,
+            config: sidebarConfig,
+            exitConfig: exitConfig,
+            id: id
+        )
+    }
+    
+    /// 显示横幅弹窗（顶部或底部，便捷方法）
+    /// - Parameters:
+    ///   - position: 横幅位置 (.top 或 .bottom)
+    ///   - height: 横幅高度（默认为80）
+    ///   - content: 横幅内容视图
+    ///   - config: 弹窗配置
+    ///   - exitConfig: 退出时使用的弹窗配置
+    ///   - autoHide: 是否自动隐藏
+    ///   - autoHideDuration: 自动隐藏时间（秒）
+    ///   - id: 自定义ID
+    public func showBanner<Content: View>(
+        position: PopupPosition,
+        height: CGFloat = 80,
+        @ViewBuilder content: @escaping () -> Content,
+        config: PopupConfig = PopupConfig(),
+        exitConfig: PopupConfig? = nil,
+        autoHide: Bool = false,
+        autoHideDuration: TimeInterval = 3.0,
+        id: UUID? = nil
+    ) {
+        // 确保position是top或bottom
+        guard position == .top || position == .bottom else {
+            print("警告: showBanner 方法仅支持 .top 或 .bottom 位置")
+            return
+        }
+        
+        // 生成唯一ID以供自动隐藏使用
+        let bannerId = id ?? UUID()
+        
+        // 显示横幅
+        show(
+            content: content,
+            position: position,
+            width: nil,
+            height: height,
+            config: config,
+            exitConfig: exitConfig,
+            id: bannerId
+        )
+        
+        // 如果需要自动隐藏，设置定时器
+        if autoHide {
+            DispatchQueue.main.asyncAfter(deadline: .now() + autoHideDuration) {
+                self.closePopup(id: bannerId)
+            }
+        }
+    }
+    
     /// 更新现有弹窗的配置
-    public func updatePopup(id: UUID, config: PopupBaseConfig) {
+    public func updatePopup(id: UUID, config: PopupConfig) {
         DispatchQueue.main.async {
             if let index = self.activePopups.firstIndex(where: { $0.id == id }) {
                 self.objectWillChange.send()
@@ -152,19 +298,19 @@ public class PopupManager: ObservableObject {
                 
                 // 如果没有自定义退出配置，创建一个与进入动画一致的退出配置
                 if popup.exitConfig == nil {
-                    let exitConfig = PopupBaseConfig(
+                    let exitConfig = PopupConfig(
                         backgroundColor: popup.config.backgroundColor,
                         cornerRadius: popup.config.cornerRadius,
                         shadowEnabled: popup.config.shadowEnabled,
-                        closeOnTapOutside: popup.config.closeOnTapOutside,
+                        offsetY: popup.config.offsetY,
                         showCloseButton: popup.config.showCloseButton,
                         closeButtonPosition: popup.config.closeButtonPosition,
                         closeButtonStyle: popup.config.closeButtonStyle,
+                        closeOnTapOutside: popup.config.closeOnTapOutside,
                         // 使用与位置相关的线性动画
                         animation: position.getDefaultAnimation(),
                         // 使用与位置相关的过渡效果
                         customTransition: position.getEntryTransition(),
-                        offsetY: popup.config.offsetY,
                         onClose: popup.config.onClose
                     )
                     self.activePopups[index].exitConfig = exitConfig
@@ -220,7 +366,7 @@ public class PopupManager: ObservableObject {
     }
     
     /// 更新退出配置
-    public func updateExitConfig(id: UUID, config: PopupBaseConfig) {
+    public func updateExitConfig(id: UUID, config: PopupConfig) {
         DispatchQueue.main.async {
             if let index = self.activePopups.firstIndex(where: { $0.id == id }) {
                 self.objectWillChange.send()
@@ -243,5 +389,4 @@ public extension EnvironmentValues {
         get { self[PopupManagerKey.self] }
         set { self[PopupManagerKey.self] = newValue }
     }
-}
-
+} 
