@@ -230,7 +230,8 @@ public struct UIManagerDemos: View {
                 case .fade:
                     return AnyTransition.opacity
                 case .scale:
-                    return AnyTransition.scale(scale: 0.85).combined(with: .opacity)
+                    // 添加center锚点以避免缩放时的位置偏移
+                    return AnyTransition.scale(scale: 0.85, anchor: .center).combined(with: .opacity)
                 case .slide:
                     // 根据位置选择合适的滑动方向
                     switch position {
@@ -795,7 +796,8 @@ public struct UIManagerDemos: View {
             case .scale:
                 switch selectedScaleType {
                 case .uniform, .fromCenter:
-                    return AnyTransition.scale(scale: 0.7).combined(with: .opacity)
+                    // 明确指定使用.center作为缩放锚点，确保缩放时没有额外的位置偏移
+                    return AnyTransition.scale(scale: 0.7, anchor: .center).combined(with: .opacity)
                 case .fromTop:
                     return AnyTransition.scale(scale: 0.7, anchor: .top).combined(with: .opacity)
                 case .fromBottom:
@@ -823,7 +825,11 @@ public struct UIManagerDemos: View {
             case .move:
                 return AnyTransition.move(edge: selectedDirection.toEdge()).combined(with: .opacity)
             case .asymmetric:
-                return AnyTransition.scale(scale: 0.7).combined(with: .opacity)
+                // 确保异步过渡效果也使用中心锚点
+                return AnyTransition.asymmetric(
+                    insertion: .scale(scale: 0.7, anchor: .center).combined(with: .opacity),
+                    removal: .opacity
+                )
             }
         }
         

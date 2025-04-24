@@ -60,7 +60,7 @@ public enum PopupPosition: Hashable {
         case .left:
             return AnyTransition.move(edge: .leading).combined(with: .opacity)
         case .center, .custom:
-            return AnyTransition.scale(scale: 0.8, anchor: .center).combined(with: .opacity)
+            return AnyTransition.opacity
         }
     }
     
