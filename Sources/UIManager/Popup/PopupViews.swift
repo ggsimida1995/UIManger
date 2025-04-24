@@ -219,18 +219,10 @@ public extension View {
         position: PopupPosition = .center,
         width: CGFloat? = nil,
         height: CGFloat? = nil,
-        cornerRadius: CGFloat = 12,
-        closeOnTapOutside: Bool = true,
-        showCloseButton: Bool = false,
-        onClose: (() -> Void)? = nil
+        config: PopupBaseConfig = PopupBaseConfig(),
+        exitConfig: PopupBaseConfig? = nil,
+        id: UUID? = nil
     ) {
-        let config = PopupBaseConfig(
-            cornerRadius: cornerRadius,
-            closeOnTapOutside: closeOnTapOutside,
-            showCloseButton: showCloseButton,
-            onClose: onClose
-        )
-        
         // 使用显式动画包装
         withAnimation(config.animation) {
             PopupManager.shared.show(
@@ -238,7 +230,9 @@ public extension View {
                 position: position,
                 width: width,
                 height: height,
-                config: config
+                config: config,
+                exitConfig: exitConfig,
+                id: id
             )
         }
     }
