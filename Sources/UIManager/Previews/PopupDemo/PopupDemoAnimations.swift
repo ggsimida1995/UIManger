@@ -1,3 +1,4 @@
+#if DEBUG || PREVIEW
 import SwiftUI
 
 // 弹窗演示的动画帮助函数
@@ -88,4 +89,4 @@ public extension PreviewPopupDemo {
             return AnyTransition.scale(scale: 0, anchor: .center).combined(with: .opacity)
         }
     }
-} 
+} #endif

@@ -1,5 +1,8 @@
 import SwiftUI
 import Combine
+#if canImport(UIKit)
+import UIKit
+#endif
 
 /// Popup 位置枚举
 public enum PopupPosition: Hashable {
@@ -108,7 +111,13 @@ public enum PopupSize {
 
 // MARK: - 基础Popup配置
 public struct PopupBaseConfig {
-    public var backgroundColor: Color = Color(UIColor.systemBackground).opacity(0.95)
+    // 获取当前环境的默认背景色
+    public static var defaultBackgroundColor: Color {
+        // 优先使用主题管理器的背景色
+        UIManagerThemeViewModel.shared.backgroundColor
+    }
+    
+    public var backgroundColor: Color
     public var cornerRadius: CGFloat = 12
     public var shadowEnabled: Bool = true
     public var closeOnTapOutside: Bool = true
@@ -158,8 +167,9 @@ public struct PopupBaseConfig {
     public var closeButtonPosition: CloseButtonPosition = .topTrailing
     public var closeButtonStyle: CloseButtonStyle = .circular
     
+    // 标准初始化方法
     public init(
-        backgroundColor: Color = Color(UIColor.systemBackground).opacity(0.95),
+        backgroundColor: Color = defaultBackgroundColor,
         cornerRadius: CGFloat = 12,
         shadowEnabled: Bool = true,
         closeOnTapOutside: Bool = true,
