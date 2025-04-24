@@ -14,7 +14,7 @@ public struct PopupContainerView: View {
     
     public var body: some View {
         let content = popup.content
-            .padding()
+            // .padding()
             .frame(
                 width: popup.size.getSize(screenSize: screenSize, safeArea: safeArea)?.width,
                 height: popup.size.getSize(screenSize: screenSize, safeArea: safeArea)?.height
@@ -35,8 +35,8 @@ public struct PopupContainerView: View {
                 if popup.config.showCloseButton {
                     closeButton
                 }
-            }
-            .padding(getPadding())
+            }.border(Color.red,width: 1)
+            // .padding(getPadding())
             // 应用垂直偏移
             .offset(y: -popup.config.offsetY)
         
