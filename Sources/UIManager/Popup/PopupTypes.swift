@@ -60,7 +60,11 @@ public enum PopupPosition: Hashable {
         case .left:
             return AnyTransition.move(edge: .leading).combined(with: .opacity)
         case .center, .custom:
-            return AnyTransition.opacity
+            // 使用不对称过渡效果：进入时从大到小，退出时从小到大
+            return AnyTransition.asymmetric(
+                insertion: .scale(scale: 1.1, anchor: .center).combined(with: .opacity),
+                removal: .scale(scale: 1.1, anchor: .center).combined(with: .opacity)
+            )
         }
     }
     
@@ -104,7 +108,7 @@ public enum PopupSize {
 
 // MARK: - 基础Popup配置
 public struct PopupBaseConfig {
-    public var backgroundColor: Color = Color(.systemBackground)
+    public var backgroundColor: Color = Color(UIColor.systemBackground).opacity(0.95)
     public var cornerRadius: CGFloat = 12
     public var shadowEnabled: Bool = true
     public var closeOnTapOutside: Bool = true
@@ -155,7 +159,7 @@ public struct PopupBaseConfig {
     public var closeButtonStyle: CloseButtonStyle = .circular
     
     public init(
-        backgroundColor: Color = Color(.systemBackground),
+        backgroundColor: Color = Color(UIColor.systemBackground).opacity(0.95),
         cornerRadius: CGFloat = 12,
         shadowEnabled: Bool = true,
         closeOnTapOutside: Bool = true,
