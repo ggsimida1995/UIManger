@@ -1,11 +1,12 @@
 #if DEBUG || PREVIEW
 import SwiftUI
+import UIManager
 
 // 弹窗演示模型和枚举
 public extension PreviewPopupDemo {
     // 使用自定义类型来区分不同的位置选项，而不是直接使用PopupPosition
     enum PositionOption: String, CaseIterable, Identifiable {
-        case center, top, bottom, left, right, custom
+        case center, top, bottom, left, right
         public var id: String { self.rawValue }
     }
     
@@ -208,8 +209,8 @@ public extension PreviewPopupDemo {
         
         public var id: String { self.rawValue }
         
-        // 转换为PopupBaseConfig.CloseButtonStyle
-        func toStyle(themeColor: Color) -> PopupBaseConfig.CloseButtonStyle {
+        // 转换为PopupConfig.CloseButtonStyle
+        func toStyle(themeColor: Color) -> PopupConfig.CloseButtonStyle {
             switch self {
             case .circular: return .circular
             case .square: return .square

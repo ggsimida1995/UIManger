@@ -14,7 +14,7 @@ public struct PopupContainerView: View {
     
     public var body: some View {
         let content = popup.content
-            // .padding()
+            .padding(10)
             .frame(
                 width: popup.size.getSize(screenSize: screenSize, safeArea: safeArea)?.width,
                 height: popup.size.getSize(screenSize: screenSize, safeArea: safeArea)?.height
@@ -35,17 +35,19 @@ public struct PopupContainerView: View {
                 if popup.config.showCloseButton {
                     closeButton
                 }
-            }.border(Color.red,width: 1)
-            .padding(getPadding())
+            }
             // 应用垂直偏移
             .offset(y: -popup.config.offsetY)
         
-        if case .custom(let point) = popup.position {
+        if case .absolute(let left, let top, let right, let bottom) = popup.position {
             GeometryReader { geo in
                 content
                     .position(
-                        safePosition(
-                            relativePoint: point,
+                        absolutePosition(
+                            left: left,
+                            top: top,
+                            right: right,
+                            bottom: bottom,
                             screenSize: geo.size,
                             contentSize: estimateContentSize(geo: geo),
                             offsetY: popup.config.offsetY
@@ -67,18 +69,53 @@ public struct PopupContainerView: View {
         return CGSize(width: 280, height: 200)
     }
     
-    // 计算安全的位置坐标，防止弹窗显示在屏幕外
-    private func safePosition(relativePoint: CGPoint, screenSize: CGSize, contentSize: CGSize, offsetY: CGFloat = 0) -> CGPoint {
+    // 计算绝对位置坐标
+    private func absolutePosition(
+        left: CGFloat?,
+        top: CGFloat?,
+        right: CGFloat?,
+        bottom: CGFloat?,
+        screenSize: CGSize,
+        contentSize: CGSize,
+        offsetY: CGFloat = 0
+    ) -> CGPoint {
         let halfWidth = contentSize.width / 2
         let halfHeight = contentSize.height / 2
         
-        let safeX = min(max(halfWidth, relativePoint.x * screenSize.width), screenSize.width - halfWidth)
+        // 计算X坐标
+        var xPos: CGFloat
+        if let left = left {
+            // 相对于左边缘
+            xPos = left + halfWidth
+        } else if let right = right {
+            // 相对于右边缘
+            xPos = screenSize.width - right - halfWidth
+        } else {
+            // 默认居中
+            xPos = screenSize.width / 2
+        }
         
-        // 考虑垂直偏移量调整Y坐标
-        var safeY = min(max(halfHeight, relativePoint.y * screenSize.height), screenSize.height - halfHeight)
-        safeY -= offsetY // 应用垂直偏移（向上为负）
+        // 计算Y坐标
+        var yPos: CGFloat
+        if let top = top {
+            // 相对于顶部
+            yPos = top + halfHeight
+        } else if let bottom = bottom {
+            // 相对于底部
+            yPos = screenSize.height - bottom - halfHeight
+        } else {
+            // 默认居中
+            yPos = screenSize.height / 2
+        }
         
-        return CGPoint(x: safeX, y: safeY)
+        // 确保弹窗显示在屏幕内
+        xPos = min(max(halfWidth, xPos), screenSize.width - halfWidth)
+        yPos = min(max(halfHeight, yPos), screenSize.height - halfHeight)
+        
+        // 应用垂直偏移
+        yPos -= offsetY
+        
+        return CGPoint(x: xPos, y: yPos)
     }
     
     // 关闭按钮视图
@@ -219,8 +256,8 @@ public extension View {
         position: PopupPosition = .center,
         width: CGFloat? = nil,
         height: CGFloat? = nil,
-        config: PopupBaseConfig = PopupBaseConfig(),
-        exitConfig: PopupBaseConfig? = nil,
+        config: PopupConfig = PopupConfig(),
+        exitConfig: PopupConfig? = nil,
         id: UUID? = nil
     ) {
         // 使用显式动画包装
@@ -235,6 +272,78 @@ public extension View {
                 id: id
             )
         }
+    }
+    
+    /// 使用绝对位置显示弹窗
+    func uiPopupAt<Content: View>(
+        @ViewBuilder content: @escaping () -> Content,
+        left: CGFloat? = nil,
+        top: CGFloat? = nil,
+        right: CGFloat? = nil,
+        bottom: CGFloat? = nil,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil,
+        config: PopupConfig = PopupConfig(),
+        exitConfig: PopupConfig? = nil,
+        id: UUID? = nil
+    ) {
+        // 使用显式动画包装
+        withAnimation(config.animation) {
+            PopupManager.shared.showAt(
+                content: content,
+                left: left,
+                top: top,
+                right: right,
+                bottom: bottom,
+                width: width,
+                height: height,
+                config: config,
+                exitConfig: exitConfig,
+                id: id
+            )
+        }
+    }
+    
+    /// 显示侧边栏弹窗
+    func uiSidebar<Content: View>(
+        side: PopupPosition,
+        width: CGFloat? = nil,
+        @ViewBuilder content: @escaping () -> Content,
+        config: PopupConfig = PopupConfig(),
+        exitConfig: PopupConfig? = nil,
+        id: UUID? = nil
+    ) {
+        PopupManager.shared.showSidebar(
+            side: side,
+            width: width,
+            content: content,
+            config: config,
+            exitConfig: exitConfig,
+            id: id
+        )
+    }
+    
+    /// 显示顶部或底部横幅
+    func uiBanner<Content: View>(
+        position: PopupPosition,
+        height: CGFloat = 80,
+        @ViewBuilder content: @escaping () -> Content,
+        config: PopupConfig = PopupConfig(),
+        exitConfig: PopupConfig? = nil,
+        autoHide: Bool = false,
+        autoHideDuration: TimeInterval = 3.0,
+        id: UUID? = nil
+    ) {
+        PopupManager.shared.showBanner(
+            position: position,
+            height: height,
+            content: content,
+            config: config,
+            exitConfig: exitConfig,
+            autoHide: autoHide,
+            autoHideDuration: autoHideDuration,
+            id: id
+        )
     }
     
     /// 关闭所有弹窗

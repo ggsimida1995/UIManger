@@ -1,5 +1,6 @@
 #if DEBUG || PREVIEW
 import SwiftUI
+import UIManager
 
 // 弹窗演示的动画帮助函数
 public extension PreviewPopupDemo {

@@ -1,5 +1,6 @@
 #if DEBUG || PREVIEW
 import SwiftUI
+import UIManager
 
 // 弹窗演示的帮助方法
 public extension PreviewPopupDemo {
@@ -23,9 +24,6 @@ public extension PreviewPopupDemo {
             case .center:
                 popupWidth = 280
                 popupHeight = 200
-            case .custom:
-                popupWidth = 280
-                popupHeight = 200
             }
         }
         
@@ -33,18 +31,18 @@ public extension PreviewPopupDemo {
         let popupID = UUID()
         
         // 创建配置，添加关闭按钮设置和动画设置
-        var entryConfig = PopupBaseConfig(
+        var entryConfig = PopupConfig(
             cornerRadius: 12,
             shadowEnabled: true,
-            closeOnTapOutside: true,
+            offsetY: offsetY,
             showCloseButton: showCloseButton,
             closeButtonPosition: .topTrailing,
             closeButtonStyle: selectedButtonStyle.toStyle(themeColor: themeManager.themeColor),
-            offsetY: offsetY
+            closeOnTapOutside: true
         )
         
         // 创建退出配置
-        var exitConfig: PopupBaseConfig? = nil
+        var exitConfig: PopupConfig? = nil
         
         // 设置进入动画 - 使用用户选择的进入动画类型
         if showAnimationControls {
@@ -52,16 +50,16 @@ public extension PreviewPopupDemo {
             entryConfig.customTransition = getEntryTransition()
             
             // 创建退出配置
-            exitConfig = PopupBaseConfig(
+            exitConfig = PopupConfig(
                 cornerRadius: entryConfig.cornerRadius,
                 shadowEnabled: entryConfig.shadowEnabled,
-                closeOnTapOutside: entryConfig.closeOnTapOutside,
+                offsetY: entryConfig.offsetY,
                 showCloseButton: entryConfig.showCloseButton,
                 closeButtonPosition: entryConfig.closeButtonPosition,
                 closeButtonStyle: entryConfig.closeButtonStyle,
+                closeOnTapOutside: entryConfig.closeOnTapOutside,
                 animation: selectedExitAnimation.toAnimation(duration: animationDuration),
-                customTransition: getExitTransition(),
-                offsetY: entryConfig.offsetY
+                customTransition: getExitTransition()
             )
         }
         
@@ -78,9 +76,6 @@ public extension PreviewPopupDemo {
             position = .left
         case .right:
             position = .right
-        case .custom:
-            // 创建自定义位置，使用比例坐标
-            position = .custom(CGPoint(x: customX, y: customY))
         }
         
         // 使用显式的动画包装显示弹窗操作
@@ -98,23 +93,6 @@ public extension PreviewPopupDemo {
                         
                         // 信息区块，增加分隔和背景
                         VStack(spacing: 10) {
-                            if selectedPositionOption == .custom {
-                                HStack {
-                                    Image(systemName: "location")
-                                        .foregroundColor(themeManager.themeColor)
-                                    Text("位置: X=\(Int(customX * 100))%, Y=\(Int(customY * 100))%")
-                                        .font(.subheadline)
-                                        .foregroundColor(themeManager.isDarkMode ? .white : .black)
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                
-                                Text("(实际显示位置会自动调整以确保弹窗完全显示在屏幕内)")
-                                    .font(.caption)
-                                    .foregroundColor(themeManager.isDarkMode ? Color.white.opacity(0.7) : Color.black.opacity(0.6))
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(.leading, 24)
-                            }
-                            
                             if showSizeControls {
                                 HStack {
                                     Image(systemName: "arrow.up.left.and.arrow.down.right")
@@ -258,18 +236,18 @@ public extension PreviewPopupDemo {
         let popupID = UUID()
         
         // 初始弹窗配置，开始时不设置偏移
-        var entryConfig = PopupBaseConfig(
+        var entryConfig = PopupConfig(
             cornerRadius: 16,
             shadowEnabled: true,
-            closeOnTapOutside: true,
+            offsetY: 0, // 初始不偏移
             showCloseButton: showCloseButton,
             closeButtonPosition: .topTrailing,
             closeButtonStyle: selectedButtonStyle.toStyle(themeColor: themeManager.themeColor),
-            offsetY: 0 // 初始不偏移
+            closeOnTapOutside: true
         )
         
         // 创建退出配置
-        var exitConfig: PopupBaseConfig? = nil
+        var exitConfig: PopupConfig? = nil
         
         // 设置进入动画 - 使用用户选择的进入动画类型
         if showAnimationControls {
@@ -277,16 +255,16 @@ public extension PreviewPopupDemo {
             entryConfig.customTransition = getEntryTransition()
             
             // 创建退出配置
-            exitConfig = PopupBaseConfig(
+            exitConfig = PopupConfig(
                 cornerRadius: entryConfig.cornerRadius,
                 shadowEnabled: entryConfig.shadowEnabled,
-                closeOnTapOutside: entryConfig.closeOnTapOutside,
+                offsetY: entryConfig.offsetY,
                 showCloseButton: entryConfig.showCloseButton,
                 closeButtonPosition: entryConfig.closeButtonPosition,
                 closeButtonStyle: entryConfig.closeButtonStyle,
+                closeOnTapOutside: entryConfig.closeOnTapOutside,
                 animation: selectedExitAnimation.toAnimation(duration: animationDuration),
-                customTransition: getExitTransition(),
-                offsetY: entryConfig.offsetY
+                customTransition: getExitTransition()
             )
         }
         
@@ -378,17 +356,17 @@ public extension PreviewPopupDemo {
             popupHeight = 200
         case .left, .right:
             popupWidth = 200
-        case .center, .custom:
+        case .center, .absolute:
             popupWidth = 250
             popupHeight = 200
         }
         
         // 创建一个简单的配置，不使用任何自定义设置，让系统使用默认配置
-        let config = PopupBaseConfig(
+        let config = PopupConfig(
             cornerRadius: 12,
             shadowEnabled: true,
-            closeOnTapOutside: true,
-            showCloseButton: true
+            showCloseButton: true,
+            closeOnTapOutside: true
         )
         
         // 显示弹窗，不传递任何自定义动画或过渡效果，让系统使用默认值
@@ -429,6 +407,88 @@ public extension PreviewPopupDemo {
         )
     }
     
+    // 显示绝对位置演示
+    func showAbsolutePositionPopup(left: CGFloat? = nil, top: CGFloat? = nil, right: CGFloat? = nil, bottom: CGFloat? = nil) {
+        // 创建绝对位置
+        let position = PopupPosition.absolute(left: left, top: top, right: right, bottom: bottom)
+        
+        // 弹窗尺寸
+        let popupWidth: CGFloat = 250
+        let popupHeight: CGFloat = 200
+        
+        // 弹窗ID
+        let popupID = UUID()
+        
+        // 创建配置
+        let config = PopupConfig(
+            cornerRadius: 12,
+            shadowEnabled: true,
+            showCloseButton: true,
+            closeOnTapOutside: true
+        )
+        
+        // 确定位置描述
+        var positionDesc = ""
+        if let left = left {
+            positionDesc = "距左边: \(Int(left))px"
+        } else if let right = right {
+            positionDesc = "距右边: \(Int(right))px"
+        }
+        
+        if let top = top {
+            if !positionDesc.isEmpty {
+                positionDesc += ", "
+            }
+            positionDesc += "距顶部: \(Int(top))px"
+        } else if let bottom = bottom {
+            if !positionDesc.isEmpty {
+                positionDesc += ", "
+            }
+            positionDesc += "距底部: \(Int(bottom))px"
+        }
+        
+        // 显示弹窗
+        popupManager.showAt(
+            content: {
+                VStack(spacing: 16) {
+                    Text(getPositionName(position))
+                        .font(.headline)
+                        .foregroundColor(themeManager.primaryTextColor)
+                    
+                    VStack(spacing: 8) {
+                        Text("绝对位置弹窗")
+                            .font(.subheadline)
+                            .foregroundColor(themeManager.secondaryTextColor)
+                        
+                        Text(positionDesc)
+                            .font(.caption)
+                            .foregroundColor(themeManager.secondaryTextColor)
+                    }
+                    .multilineTextAlignment(.center)
+                    
+                    Button(action: {
+                        popupManager.closePopup(id: popupID)
+                    }) {
+                        Text("关闭")
+                            .frame(width: 100, height: 40)
+                            .background(themeManager.themeColor)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
+                }
+                .padding()
+            },
+            left: left,
+            top: top,
+            right: right,
+            bottom: bottom,
+            width: popupWidth,
+            height: popupHeight,
+            config: config,
+            id: popupID
+        )
+    }
+    
     // 获取位置名称
     func getPositionName(_ position: PopupPosition) -> String {
         switch position {
@@ -442,8 +502,23 @@ public extension PreviewPopupDemo {
             return "左侧弹窗"
         case .right:
             return "右侧弹窗"
-        case .custom(let point):
-            return "自定义位置弹窗 (\(Int(point.x * 100))%, \(Int(point.y * 100))%)"
+        case .absolute(let left, let top, let right, let bottom):
+            // 根据设置的边距描述位置
+            if let left = left, left == 0 {
+                return "左边贴边弹窗"
+            } else if let right = right, right == 0 {
+                return "右边贴边弹窗"
+            } else if let top = top, top == 0 {
+                return "顶部贴边弹窗"
+            } else if let bottom = bottom, bottom == 0 {
+                return "底部贴边弹窗"
+            } else if let left = left, let top = top {
+                return "自定义位置弹窗 (左\(Int(left))px, 上\(Int(top))px)"
+            } else if let right = right, let bottom = bottom {
+                return "自定义位置弹窗 (右\(Int(right))px, 下\(Int(bottom))px)"
+            } else {
+                return "自定义位置弹窗"
+            }
         }
     }
     
@@ -460,8 +535,6 @@ public extension PreviewPopupDemo {
             return "左侧弹窗"
         case .right:
             return "右侧弹窗"
-        case .custom:
-            return "自定义位置弹窗"
         }
     }
 } #endif

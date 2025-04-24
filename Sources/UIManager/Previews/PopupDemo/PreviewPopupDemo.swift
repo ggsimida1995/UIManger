@@ -1,5 +1,6 @@
 #if DEBUG || PREVIEW
 import SwiftUI
+import UIManager
 
 // 弹出窗口演示组件
 public struct PreviewPopupDemo: View {
@@ -11,8 +12,6 @@ public struct PreviewPopupDemo: View {
     @State var width: CGFloat = 250
     @State var height: CGFloat = 250
     @State var showSizeControls: Bool = false
-    @State var customX: CGFloat = 0.5  // 自定义X坐标比例(0-1)
-    @State var customY: CGFloat = 0.5  // 自定义Y坐标比例(0-1)
     @State var showCloseButton: Bool = false  // 是否显示关闭按钮
     @State var offsetY: CGFloat = 0 // 垂直偏移量
     
@@ -56,89 +55,10 @@ public struct PreviewPopupDemo: View {
                         Text("底部").tag(PositionOption.bottom)
                         Text("左侧").tag(PositionOption.left)
                         Text("右侧").tag(PositionOption.right)
-                        Text("自定义").tag(PositionOption.custom)
                     }
                     .pickerStyle(.segmented)
                 }
                 .padding(.horizontal)
-                
-                // 自定义位置控制
-                if selectedPositionOption == .custom {
-                    VStack(spacing: 12) {
-                        Text("自定义位置坐标")
-                            .font(.headline)
-                            .foregroundColor(themeManager.primaryTextColor)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        
-                        // X坐标滑块
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                Text("X坐标: \(Int(customX * 100))%")
-                                    .font(.subheadline)
-                                    .foregroundColor(themeManager.primaryTextColor)
-                                
-                                Spacer()
-                                
-                                Button("重置") {
-                                    customX = 0.5
-                                }
-                                .font(.caption)
-                                .foregroundColor(themeManager.themeColor)
-                            }
-                            
-                            Slider(value: $customX, in: 0...1, step: 0.05)
-                                .accentColor(themeManager.themeColor)
-                        }
-                        
-                        // Y坐标滑块
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                Text("Y坐标: \(Int(customY * 100))%")
-                                    .font(.subheadline)
-                                    .foregroundColor(themeManager.primaryTextColor)
-                                
-                                Spacer()
-                                
-                                Button("重置") {
-                                    customY = 0.5
-                                }
-                                .font(.caption)
-                                .foregroundColor(themeManager.themeColor)
-                            }
-                            
-                            Slider(value: $customY, in: 0...1, step: 0.05)
-                                .accentColor(themeManager.themeColor)
-                        }
-                        
-                        // 位置预览
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(Color.gray.opacity(0.1))
-                                .frame(height: 120)
-                                .overlay(
-                                    Rectangle()
-                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                )
-                            
-                            // 位置指示器
-                            Circle()
-                                .fill(themeManager.themeColor)
-                                .frame(width: 16, height: 16)
-                                .position(
-                                    x: customX * 300,
-                                    y: customY * 120
-                                )
-                        }
-                        .frame(width: 300, height: 120)
-                        
-                        // 添加边界保护说明
-                        Text("实际显示位置会自动调整以确保弹窗不会超出屏幕")
-                            .font(.caption)
-                            .foregroundColor(themeManager.secondaryTextColor)
-                            .multilineTextAlignment(.center)
-                    }
-                    .padding(.horizontal)
-                }
                 
                 // 尺寸控制开关
                 Toggle(isOn: $showSizeControls) {
@@ -484,6 +404,124 @@ public struct PreviewPopupDemo: View {
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
                             .background(themeManager.themeColor.opacity(0.6))
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                        }
+                    }
+                }
+                .padding(.horizontal)
+                
+                // 添加绝对位置弹窗演示
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("绝对位置弹窗预览")
+                        .font(.headline)
+                        .foregroundColor(themeManager.primaryTextColor)
+                    
+                    Text("使用距离边缘的绝对像素距离定位弹窗")
+                        .font(.caption)
+                        .foregroundColor(themeManager.secondaryTextColor)
+                    
+                    // 贴边弹窗
+                    HStack(spacing: 10) {
+                        Button(action: { showAbsolutePositionPopup(left: 0) }) {
+                            VStack {
+                                Image(systemName: "rectangle.leadinghalf.inset.filled")
+                                Text("贴左边")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 60)
+                            .background(themeManager.themeColor.opacity(0.5))
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                        }
+                        
+                        Button(action: { showAbsolutePositionPopup(right: 0) }) {
+                            VStack {
+                                Image(systemName: "rectangle.trailinghalf.inset.filled")
+                                Text("贴右边")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 60)
+                            .background(themeManager.themeColor.opacity(0.5))
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                        }
+                    }
+                    
+                    HStack(spacing: 10) {
+                        Button(action: { showAbsolutePositionPopup(top: 0) }) {
+                            VStack {
+                                Image(systemName: "rectangle.tophalf.inset.filled")
+                                Text("贴顶部")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 60)
+                            .background(themeManager.themeColor.opacity(0.5))
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                        }
+                        
+                        Button(action: { showAbsolutePositionPopup(bottom: 0) }) {
+                            VStack {
+                                Image(systemName: "rectangle.bottomhalf.inset.filled")
+                                Text("贴底部")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 60)
+                            .background(themeManager.themeColor.opacity(0.5))
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                        }
+                    }
+                    
+                    // 添加角落贴边弹窗
+                    HStack(spacing: 10) {
+                        Button(action: { showAbsolutePositionPopup(left: 0, top: 0) }) {
+                            VStack {
+                                Image(systemName: "arrow.up.left.square")
+                                Text("左上角")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 60)
+                            .background(themeManager.themeColor.opacity(0.5))
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                        }
+                        
+                        Button(action: { showAbsolutePositionPopup(left: nil, top: 0, right: 0, bottom: nil) }) {
+                            VStack {
+                                Image(systemName: "arrow.up.right.square")
+                                Text("右上角")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 60)
+                            .background(themeManager.themeColor.opacity(0.5))
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                        }
+                    }
+                    
+                    HStack(spacing: 10) {
+                        Button(action: { showAbsolutePositionPopup(left: 0, top: nil, right: nil, bottom: 0) }) {
+                            VStack {
+                                Image(systemName: "arrow.down.left.square")
+                                Text("左下角")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 60)
+                            .background(themeManager.themeColor.opacity(0.5))
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                        }
+                        
+                        Button(action: { showAbsolutePositionPopup(left: nil, top: nil, right: 0, bottom: 0) }) {
+                            VStack {
+                                Image(systemName: "arrow.down.right.square")
+                                Text("右下角")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 60)
+                            .background(themeManager.themeColor.opacity(0.5))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
