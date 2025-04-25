@@ -14,7 +14,7 @@ public struct PopupContainerView: View {
     
     public var body: some View {
         let content = popup.content
-            .padding(10)
+            .padding()
             .frame(
                 width: popup.size.getSize(screenSize: screenSize, safeArea: safeArea)?.width,
                 height: popup.size.getSize(screenSize: screenSize, safeArea: safeArea)?.height
@@ -164,7 +164,7 @@ public struct PopupContainerView: View {
         case .top, .bottom, .left, .right:
             return EdgeInsets()
         default:
-            return EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10)
+            return EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
         }
     }
 }
