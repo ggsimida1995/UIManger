@@ -258,9 +258,6 @@ public struct PopupData: Identifiable {
     /// 弹窗配置
     public var config: PopupConfig
     
-    /// 退出时使用的配置（如果为nil则使用普通config）
-    public var exitConfig: PopupConfig?
-    
     // MARK: - 构造方法
     
     /// 标准弹窗，使用随机生成的ID
@@ -268,15 +265,13 @@ public struct PopupData: Identifiable {
         content: Content,
         position: PopupPosition = .center,
         size: PopupSize = .flexible,
-        config: PopupConfig = PopupConfig(),
-        exitConfig: PopupConfig? = nil
+        config: PopupConfig = PopupConfig()
     ) {
         self.id = UUID()
         self.content = AnyView(content)
         self.position = position
         self.size = size
         self.config = config
-        self.exitConfig = exitConfig
     }
     
     /// 带自定义ID的初始化方法
@@ -285,15 +280,13 @@ public struct PopupData: Identifiable {
         content: Content,
         position: PopupPosition = .center,
         size: PopupSize = .flexible,
-        config: PopupConfig = PopupConfig(),
-        exitConfig: PopupConfig? = nil
+        config: PopupConfig = PopupConfig()
     ) {
         self.id = id
         self.content = AnyView(content)
         self.position = position
         self.size = size
         self.config = config
-        self.exitConfig = exitConfig
     }
 }
 

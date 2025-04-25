@@ -41,26 +41,10 @@ public extension PreviewPopupDemo {
             closeOnTapOutside: true
         )
         
-        // 创建退出配置
-        var exitConfig: PopupConfig? = nil
-        
         // 设置进入动画 - 使用用户选择的进入动画类型
         if showAnimationControls {
             entryConfig.animation = selectedEntryAnimation.toAnimation(duration: animationDuration)
             entryConfig.customTransition = getEntryTransition()
-            
-            // 创建退出配置
-            exitConfig = PopupConfig(
-                cornerRadius: entryConfig.cornerRadius,
-                shadowEnabled: entryConfig.shadowEnabled,
-                offsetY: entryConfig.offsetY,
-                showCloseButton: entryConfig.showCloseButton,
-                closeButtonPosition: entryConfig.closeButtonPosition,
-                closeButtonStyle: entryConfig.closeButtonStyle,
-                closeOnTapOutside: entryConfig.closeOnTapOutside,
-                animation: selectedExitAnimation.toAnimation(duration: animationDuration),
-                customTransition: getExitTransition()
-            )
         }
         
         // 将位置选项转换为PopupPosition
@@ -200,15 +184,8 @@ public extension PreviewPopupDemo {
                             .padding(.vertical, 4)
                         
                         Button(action: {
-                            // 使用与进入相反的退出动画关闭弹窗
-                            if let exitAnim = exitConfig?.animation {
-                                withAnimation(exitAnim) {
-                                    popupManager.closePopup(id: popupID)
-                                }
-                            } else {
-                                withAnimation {
-                                    popupManager.closePopup(id: popupID)
-                                }
+                            withAnimation {
+                                popupManager.closePopup(id: popupID)
                             }
                         }) {
                             Text("关闭")
@@ -224,7 +201,6 @@ public extension PreviewPopupDemo {
                 width: popupWidth,
                 height: popupHeight,
                 config: entryConfig,
-                exitConfig: exitConfig,
                 id: popupID
             )
         }
@@ -246,26 +222,10 @@ public extension PreviewPopupDemo {
             closeOnTapOutside: true
         )
         
-        // 创建退出配置
-        var exitConfig: PopupConfig? = nil
-        
         // 设置进入动画 - 使用用户选择的进入动画类型
         if showAnimationControls {
             entryConfig.animation = selectedEntryAnimation.toAnimation(duration: animationDuration)
             entryConfig.customTransition = getEntryTransition()
-            
-            // 创建退出配置
-            exitConfig = PopupConfig(
-                cornerRadius: entryConfig.cornerRadius,
-                shadowEnabled: entryConfig.shadowEnabled,
-                offsetY: entryConfig.offsetY,
-                showCloseButton: entryConfig.showCloseButton,
-                closeButtonPosition: entryConfig.closeButtonPosition,
-                closeButtonStyle: entryConfig.closeButtonStyle,
-                closeOnTapOutside: entryConfig.closeOnTapOutside,
-                animation: selectedExitAnimation.toAnimation(duration: animationDuration),
-                customTransition: getExitTransition()
-            )
         }
         
         // 使用进入动画包装显示操作
@@ -298,15 +258,8 @@ public extension PreviewPopupDemo {
                             isTextFieldFocused = false
                             // 使用短延迟更好地配合键盘动画
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                // 使用与进入相反的退出动画关闭弹窗
-                                if let exitAnim = exitConfig?.animation {
-                                    withAnimation(exitAnim) {
-                                        popupManager.closePopup(id: popupID)
-                                    }
-                                } else {
-                                    withAnimation {
-                                        popupManager.closePopup(id: popupID)
-                                    }
+                                withAnimation {
+                                    popupManager.closePopup(id: popupID)
                                 }
                             }
                         }) {
@@ -336,8 +289,7 @@ public extension PreviewPopupDemo {
                 width: 300,
                 height: 280, // 增加高度以容纳按钮
                 config: entryConfig,
-                exitConfig: exitConfig,
-                id: popupID // 使用自定义ID
+                id: popupID
             )
         }
     }
@@ -448,7 +400,7 @@ public extension PreviewPopupDemo {
         }
         
         // 显示弹窗
-        popupManager.showAt(
+        popupManager.show(
             content: {
                 VStack(spacing: 16) {
                     Text(getPositionName(position))
@@ -478,10 +430,7 @@ public extension PreviewPopupDemo {
                 }
                 .padding()
             },
-            left: left,
-            top: top,
-            right: right,
-            bottom: bottom,
+            position: position,
             width: popupWidth,
             height: popupHeight,
             config: config,
