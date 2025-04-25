@@ -77,19 +77,27 @@ public class PopupManager: ObservableObject {
         let size: PopupSize = {
             switch position {
             case .top, .bottom:
-                return .fullWidth(height)
+                // 确保高度是有效值
+                let safeHeight = height.map { max(0, $0) } ?? CGFloat.nan
+                return .fullWidth(safeHeight)
             case .left, .right:
-                return .fullHeight(width)
+                // 确保宽度是有效值
+                let safeWidth = width.map { max(0, $0) } ?? CGFloat.nan
+                return .fullHeight(safeWidth)
             case .center, .absolute:
                 if let width = width, let height = height {
-                    // 如果同时指定了宽度和高度，则使用固定尺寸
-                    return .fixed(CGSize(width: width, height: height))
+                    // 确保宽度和高度都是有效值
+                    let safeWidth = max(0, width)
+                    let safeHeight = max(0, height)
+                    return .fixed(CGSize(width: safeWidth, height: safeHeight))
                 } else if let width = width {
-                    // 如果只指定了宽度，则使用固定宽度和自适应高度
-                    return .fixed(CGSize(width: width, height: CGFloat.nan))
+                    // 确保宽度是有效值
+                    let safeWidth = max(0, width)
+                    return .fixed(CGSize(width: safeWidth, height: CGFloat.nan))
                 } else if let height = height {
-                    // 如果只指定了高度，则使用自适应宽度和固定高度
-                    return .fixed(CGSize(width: CGFloat.nan, height: height))
+                    // 确保高度是有效值
+                    let safeHeight = max(0, height)
+                    return .fixed(CGSize(width: CGFloat.nan, height: safeHeight))
                 } else {
                     // 如果都没有指定，则完全自适应
                     return .flexible
