@@ -37,6 +37,11 @@ public struct UIManager {
         popupManager.closeAllPopups()
         toastManager.hideCurrentToast()
     }
+
+    /// 通过uuid关闭指定的弹窗
+    public static func closePopup(id: UUID) {
+        popupManager.closePopup(id: id)
+    }
 }
 
 // MARK: - View 扩展

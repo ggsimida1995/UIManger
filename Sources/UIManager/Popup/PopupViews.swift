@@ -283,6 +283,13 @@ public extension View {
             PopupManager.shared.closeAllPopups()
         }
     }
+
+    /// 通过uuid关闭指定的弹窗
+    func uiClosePopup(id: UUID) {
+        withAnimation {
+            PopupManager.shared.closePopup(id: id)
+        }
+    }
 }
 
 // MARK: - 弹窗视图修饰符
