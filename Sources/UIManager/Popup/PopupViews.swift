@@ -37,8 +37,8 @@ public struct PopupContainerView: View {
                 }
             }
             .padding(getPadding())
-            // 应用垂直偏移
-            .offset(y: -popup.config.offsetY)
+            // 应用垂直偏移，确保不是NaN
+            .offset(y: popup.config.offsetY.isNaN ? 0 : -popup.config.offsetY)
         
         if case .absolute(let left, let top, let right, let bottom) = popup.position {
             GeometryReader { geo in
@@ -51,7 +51,7 @@ public struct PopupContainerView: View {
                             bottom: bottom,
                             screenSize: geo.size,
                             contentSize: estimateContentSize(geo: geo),
-                            offsetY: popup.config.offsetY
+                            offsetY: popup.config.offsetY.isNaN ? 0 : popup.config.offsetY
                         )
                     )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -65,7 +65,10 @@ public struct PopupContainerView: View {
     // 估算内容尺寸
     private func estimateContentSize(geo: GeometryProxy) -> CGSize {
         if let size = popup.size.getSize(screenSize: geo.size, safeArea: safeArea) {
-            return CGSize(width: size.width + 32, height: size.height + 32)
+            // 确保尺寸有效
+            let width = size.width.isNaN ? 280 : size.width
+            let height = size.height.isNaN ? 200 : size.height
+            return CGSize(width: width + 32, height: height + 32)
         }
         return CGSize(width: 280, height: 200)
     }
@@ -85,10 +88,10 @@ public struct PopupContainerView: View {
         
         // 计算X坐标
         var xPos: CGFloat
-        if let left = left {
+        if let left = left, !left.isNaN {
             // 相对于左边缘
             xPos = left + halfWidth
-        } else if let right = right {
+        } else if let right = right, !right.isNaN {
             // 相对于右边缘
             xPos = screenSize.width - right - halfWidth
         } else {
@@ -98,10 +101,10 @@ public struct PopupContainerView: View {
         
         // 计算Y坐标
         var yPos: CGFloat
-        if let top = top {
+        if let top = top, !top.isNaN {
             // 相对于顶部
             yPos = top + halfHeight
-        } else if let bottom = bottom {
+        } else if let bottom = bottom, !bottom.isNaN {
             // 相对于底部
             yPos = screenSize.height - bottom - halfHeight
         } else {
@@ -113,8 +116,8 @@ public struct PopupContainerView: View {
         xPos = min(max(halfWidth, xPos), screenSize.width - halfWidth)
         yPos = min(max(halfHeight, yPos), screenSize.height - halfHeight)
         
-        // 应用垂直偏移
-        yPos -= offsetY
+        // 应用垂直偏移，确保不是NaN
+        yPos -= offsetY.isNaN ? 0 : offsetY
         
         return CGPoint(x: xPos, y: yPos)
     }
@@ -258,7 +261,6 @@ public extension View {
         width: CGFloat? = nil,
         height: CGFloat? = nil,
         config: PopupConfig = PopupConfig(),
-        exitConfig: PopupConfig? = nil,
         id: UUID? = nil
     ) {
         // 使用显式动画包装
@@ -269,83 +271,11 @@ public extension View {
                 width: width,
                 height: height,
                 config: config,
-                exitConfig: exitConfig,
                 id: id
             )
         }
     }
-    
-    /// 使用绝对位置显示弹窗
-    func uiPopupAt<Content: View>(
-        @ViewBuilder content: @escaping () -> Content,
-        left: CGFloat? = nil,
-        top: CGFloat? = nil,
-        right: CGFloat? = nil,
-        bottom: CGFloat? = nil,
-        width: CGFloat? = nil,
-        height: CGFloat? = nil,
-        config: PopupConfig = PopupConfig(),
-        exitConfig: PopupConfig? = nil,
-        id: UUID? = nil
-    ) {
-        // 使用显式动画包装
-        withAnimation(config.animation) {
-            PopupManager.shared.showAt(
-                content: content,
-                left: left,
-                top: top,
-                right: right,
-                bottom: bottom,
-                width: width,
-                height: height,
-                config: config,
-                exitConfig: exitConfig,
-                id: id
-            )
-        }
-    }
-    
-    /// 显示侧边栏弹窗
-    func uiSidebar<Content: View>(
-        side: PopupPosition,
-        width: CGFloat? = nil,
-        @ViewBuilder content: @escaping () -> Content,
-        config: PopupConfig = PopupConfig(),
-        exitConfig: PopupConfig? = nil,
-        id: UUID? = nil
-    ) {
-        PopupManager.shared.showSidebar(
-            side: side,
-            width: width,
-            content: content,
-            config: config,
-            exitConfig: exitConfig,
-            id: id
-        )
-    }
-    
-    /// 显示顶部或底部横幅
-    func uiBanner<Content: View>(
-        position: PopupPosition,
-        height: CGFloat = 80,
-        @ViewBuilder content: @escaping () -> Content,
-        config: PopupConfig = PopupConfig(),
-        exitConfig: PopupConfig? = nil,
-        autoHide: Bool = false,
-        autoHideDuration: TimeInterval = 3.0,
-        id: UUID? = nil
-    ) {
-        PopupManager.shared.showBanner(
-            position: position,
-            height: height,
-            content: content,
-            config: config,
-            exitConfig: exitConfig,
-            autoHide: autoHide,
-            autoHideDuration: autoHideDuration,
-            id: id
-        )
-    }
+   
     
     /// 关闭所有弹窗
     func uiCloseAllPopups() {
