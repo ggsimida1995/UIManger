@@ -16,8 +16,20 @@ public struct PopupContainerView: View {
         let content = popup.content
             .padding()
             .frame(
-                width: popup.size.getSize(screenSize: screenSize, safeArea: safeArea)?.width,
-                height: popup.size.getSize(screenSize: screenSize, safeArea: safeArea)?.height
+                width: {
+                    if let width = popup.size.getSize(screenSize: screenSize, safeArea: safeArea)?.width,
+                       !width.isNaN && width > 0 {
+                        return width
+                    }
+                    return nil
+                }(),
+                height: {
+                    if let height = popup.size.getSize(screenSize: screenSize, safeArea: safeArea)?.height,
+                       !height.isNaN && height > 0 {
+                        return height
+                    }
+                    return nil
+                }()
             )
             .background(popup.config.backgroundColor)
             .cornerRadius(popup.config.cornerRadius)
