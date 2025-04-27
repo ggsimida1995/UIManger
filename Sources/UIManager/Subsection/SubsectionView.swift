@@ -67,6 +67,7 @@ public struct SubsectionView: View {
             }
             .frame(height: config.height)
             .frame(maxWidth: config.width)
+            .padding(10)
         }
     }
     
