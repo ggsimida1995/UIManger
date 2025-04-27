@@ -50,6 +50,26 @@ struct SubsectionDemoScreen: View {
         cornerRadius: 20
     )
     
+    private let customHeightConfig = SubsectionConfig(
+        items: [
+            SubsectionItem(title: "选项1", value: "1"),
+            SubsectionItem(title: "选项2", value: "2"),
+            SubsectionItem(title: "选项3", value: "3")
+        ],
+        current: 0,
+        height: 44
+    )
+    
+    private let customWidthConfig = SubsectionConfig(
+        items: [
+            SubsectionItem(title: "选项1", value: "1"),
+            SubsectionItem(title: "选项2", value: "2"),
+            SubsectionItem(title: "选项3", value: "3")
+        ],
+        current: 0,
+        width: 200
+    )
+    
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -151,6 +171,40 @@ struct SubsectionDemoScreen: View {
                 
                 SubsectionView(config: customCornerConfig) { index in
                     print("自定义圆角选中: \(index)")
+                }
+            }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.systemBackground))
+                    .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
+            )
+            
+            // 自定义高度
+            VStack(alignment: .leading, spacing: 8) {
+                Text("自定义高度")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                
+                SubsectionView(config: customHeightConfig) { index in
+                    print("自定义高度选中: \(index)")
+                }
+            }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.systemBackground))
+                    .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
+            )
+            
+            // 自定义宽度
+            VStack(alignment: .leading, spacing: 8) {
+                Text("自定义宽度")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                
+                SubsectionView(config: customWidthConfig) { index in
+                    print("自定义宽度选中: \(index)")
                 }
             }
             .padding()

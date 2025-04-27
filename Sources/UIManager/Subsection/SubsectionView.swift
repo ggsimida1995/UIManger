@@ -69,9 +69,9 @@ public struct SubsectionView: View {
                 .background(config.inactiveBgColor)
                 .clipShape(RoundedRectangle(cornerRadius: config.cornerRadius))
             }
-            .frame(height: 40)
+            .frame(height: config.height)
+            .frame(maxWidth: config.width)
         }
-        .padding()
     }
     
     private func selectItem(_ index: Int) {
