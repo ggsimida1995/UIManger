@@ -18,12 +18,6 @@ public struct UIManager {
         return PopupManager.shared
     }
     
-    
-    /// 分段器管理器实例
-    public static var subsectionManager: SubsectionManager {
-        return SubsectionManager.shared
-    }
-    
     /// 初始化 UIManager（在 App 启动时调用）
     public static func initialize() {
         // 未来可能会添加初始化代码

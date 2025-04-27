@@ -2,7 +2,7 @@ import SwiftUI
 
 /// 分段器视图
 public struct SubsectionView: View {
-    @StateObject private var manager = SubsectionManager.shared
+    @State private var currentIndex: Int
     private let config: SubsectionConfig
     private let onChange: ((Int) -> Void)?
     
@@ -17,11 +17,7 @@ public struct SubsectionView: View {
     ) {
         self.config = config ?? SubsectionConfig(items: [])
         self.onChange = onChange
-        
-        // 设置默认选中索引
-        if let config = config {
-            manager.currentIndex = config.current
-        }
+        self._currentIndex = State(initialValue: config?.current ?? 0)
     }
     
     public var body: some View {
@@ -39,7 +35,7 @@ public struct SubsectionView: View {
                         ForEach(config.items.indices, id: \.self) { index in
                             SubsectionButton(
                                 title: config.items[index].title,
-                                isSelected: manager.currentIndex == index,
+                                isSelected: currentIndex == index,
                                 action: { selectItem(index) },
                                 width: proxy.size.width / CGFloat(config.items.count),
                                 height: proxy.size.height,
@@ -53,15 +49,15 @@ public struct SubsectionView: View {
                         .foregroundColor(config.activeBgColor)
                         .frame(width: proxy.size.width / CGFloat(config.items.count) - 2 * padding, height: proxy.size.height - 4)
                         .cornerRadius(config.cornerRadius)
-                        .offset(x: CGFloat(manager.currentIndex) * (proxy.size.width / CGFloat(config.items.count)) + padding, y: 0)
+                        .offset(x: CGFloat(currentIndex) * (proxy.size.width / CGFloat(config.items.count)) + padding, y: 0)
                     
                     // 显示选中的文字
-                    if let selectedItem = config.items[safe: manager.currentIndex] {
+                    if let selectedItem = config.items[safe: currentIndex] {
                         Text(selectedItem.title)
                             .font(.system(size: config.fontSize, weight: config.bold ? .bold : .regular))
                             .foregroundColor(config.activeTextColor)
                             .frame(width: proxy.size.width / CGFloat(config.items.count) - 2 * padding, height: proxy.size.height - 4)
-                            .offset(x: CGFloat(manager.currentIndex) * (proxy.size.width / CGFloat(config.items.count)) + padding, y: 0)
+                            .offset(x: CGFloat(currentIndex) * (proxy.size.width / CGFloat(config.items.count)) + padding, y: 0)
                             .zIndex(1)
                     }
                 }
@@ -76,7 +72,7 @@ public struct SubsectionView: View {
     
     private func selectItem(_ index: Int) {
         withAnimation(animation) {
-            manager.currentIndex = index
+            currentIndex = index
             onChange?(index)
         }
     }
