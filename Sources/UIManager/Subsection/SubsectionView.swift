@@ -12,6 +12,11 @@ public struct SubsectionView: View {
     private let spacing: CGFloat = 0
     private let padding: CGFloat = 2
     
+    // 当前颜色配置
+    private var currentColorConfig: SubsectionColorConfig.ColorMode {
+        colorScheme == .dark ? config.colorConfig.darkMode : config.colorConfig.lightMode
+    }
+    
     public init(
         config: SubsectionConfig? = nil,
         onChange: ((Int) -> Void)? = nil
@@ -40,14 +45,15 @@ public struct SubsectionView: View {
                                 action: { selectItem(index) },
                                 width: proxy.size.width / CGFloat(config.items.count),
                                 height: proxy.size.height,
-                                config: config
+                                config: config,
+                                currentColorConfig: currentColorConfig
                             )
                         }
                     }
                     
                     // 滑动指示器
                     Rectangle()
-                        .foregroundColor(config.activeBgColor)
+                        .foregroundColor(currentColorConfig.activeBgColor)
                         .frame(width: proxy.size.width / CGFloat(config.items.count) - 2 * padding, height: proxy.size.height - 4)
                         .cornerRadius(config.cornerRadius)
                         .offset(x: CGFloat(currentIndex) * (proxy.size.width / CGFloat(config.items.count)) + padding, y: 0)
@@ -56,14 +62,14 @@ public struct SubsectionView: View {
                     if let selectedItem = config.items[safe: currentIndex] {
                         Text(selectedItem.title)
                             .font(.system(size: config.fontSize, weight: config.bold ? .bold : .regular))
-                            .foregroundColor(config.activeTextColor)
+                            .foregroundColor(currentColorConfig.activeTextColor)
                             .frame(width: proxy.size.width / CGFloat(config.items.count) - 2 * padding, height: proxy.size.height - 4)
                             .offset(x: CGFloat(currentIndex) * (proxy.size.width / CGFloat(config.items.count)) + padding, y: 0)
                             .zIndex(1)
                     }
                 }
                 .frame(height: proxy.size.height)
-                .background(config.inactiveBgColor)
+                .background(currentColorConfig.inactiveBgColor)
                 .clipShape(RoundedRectangle(cornerRadius: config.cornerRadius))
             }
             .frame(height: config.height)
@@ -88,12 +94,13 @@ private struct SubsectionButton: View {
     let width: CGFloat
     let height: CGFloat
     let config: SubsectionConfig
+    let currentColorConfig: SubsectionColorConfig.ColorMode
     
     var body: some View {
         Button(action: action) {
             Text(title)
                 .font(.system(size: config.fontSize, weight: config.bold ? .bold : .regular))
-                .foregroundColor(isSelected ? config.activeTextColor : config.inactiveTextColor)
+                .foregroundColor(isSelected ? currentColorConfig.activeTextColor : currentColorConfig.inactiveTextColor)
                 .frame(width: width, height: height - 4)
         }
     }
