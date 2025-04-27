@@ -54,12 +54,12 @@ public struct SubsectionConfig {
         self.activeTextColor = activeTextColor ?? Color(red: 250/255, green: 97/255, blue: 81/255)  // 红色 #FA6151
         
         // 活跃状态背景颜色
-        self.activeBgColor = activeBgColor ?? Color(.systemBackground)
+        self.activeBgColor = activeBgColor ??  Color(.secondarySystemBackground)
         
         // 非活跃状态文字颜色（深色和浅色模式相同）
         self.inactiveTextColor = inactiveTextColor ?? Color(.secondaryLabel)
         
         // 非活跃状态背景颜色
-        self.inactiveBgColor = inactiveBgColor ?? Color(.secondarySystemBackground)
+        self.inactiveBgColor = inactiveBgColor ?? Color(.systemBackground)
     }
 } 
