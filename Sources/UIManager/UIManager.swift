@@ -18,16 +18,14 @@ public struct UIManager {
         return PopupManager.shared
     }
     
-    /// 主题管理器实例
-    public static var themeManager: UIManagerThemeViewModel {
-        return UIManagerThemeViewModel.shared
+    
+    /// 分段器管理器实例
+    public static var subsectionManager: SubsectionManager {
+        return SubsectionManager.shared
     }
     
     /// 初始化 UIManager（在 App 启动时调用）
     public static func initialize() {
-        // 确保主题管理器被初始化
-        _ = UIManagerThemeViewModel.shared
-        
         // 未来可能会添加初始化代码
         print("UIManager v\(version) 已初始化")
     }

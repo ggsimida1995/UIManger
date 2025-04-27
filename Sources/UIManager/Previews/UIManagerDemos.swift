@@ -4,9 +4,6 @@ import SwiftUI
 
 /// UIManager 组件预览集合入口点
 public struct UIManagerDemos: View {
-    // 使用共享的主题管理器实例
-    @ObservedObject private var themeManager = UIManagerThemeViewModel.shared
-    
     public init() {
         // 确保初始化环境
     }
@@ -20,32 +17,14 @@ public struct UIManagerDemos: View {
                         Text("UI组件预览")
                             .font(.largeTitle)
                             .fontWeight(.bold)
-                            .foregroundColor(themeManager.primaryTextColor)
                         
                         Text("选择一个组件类型开始演示")
                             .font(.subheadline)
-                            .foregroundColor(themeManager.secondaryTextColor)
+                            .foregroundColor(.secondary)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .listRowInsets(EdgeInsets(top: 20, leading: 16, bottom: 16, trailing: 16))
                     .listRowBackground(Color.clear)
-                }
-                
-                // 主题切换
-                Section {
-                    HStack {
-                        Text("主题模式")
-                            .foregroundColor(themeManager.primaryTextColor)
-                        
-                        Spacer()
-                        
-                        Toggle("", isOn: $themeManager.isDarkMode)
-                            .toggleStyle(SwitchToggleStyle(tint: themeManager.themeColor))
-                            .labelsHidden()
-                    }
-                    .padding(.vertical, 4)
-                } header: {
-                    Text("设置")
                 }
                 
                 // 组件导航列表
@@ -55,21 +34,20 @@ public struct UIManagerDemos: View {
                             HStack(spacing: 16) {
                                 Image(systemName: demo.icon)
                                     .font(.system(size: 24))
-                                    .foregroundColor(themeManager.themeColor)
+                                    .foregroundColor(.blue)
                                     .frame(width: 40, height: 40)
                                     .background(
                                         RoundedRectangle(cornerRadius: 10)
-                                            .fill(themeManager.themeColor.opacity(0.1))
+                                            .fill(Color.blue.opacity(0.1))
                                     )
                                 
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(demo.title)
                                         .font(.headline)
-                                        .foregroundColor(themeManager.primaryTextColor)
                                     
                                     Text(demo.description)
                                         .font(.subheadline)
-                                        .foregroundColor(themeManager.secondaryTextColor)
+                                        .foregroundColor(.secondary)
                                         .lineLimit(1)
                                 }
                             }
@@ -84,32 +62,21 @@ public struct UIManagerDemos: View {
                 Section {
                     HStack {
                         Text("UIManager版本")
-                            .foregroundColor(themeManager.secondaryTextColor)
+                            .foregroundColor(.secondary)
                         
                         Spacer()
                         
                         Text("v\(UIManager.version)")
-                            .foregroundColor(themeManager.secondaryTextColor)
+                            .foregroundColor(.secondary)
                     }
                 } header: {
                     Text("关于")
                 }
             }
             .listStyle(InsetGroupedListStyle())
-            .background(themeManager.backgroundColor.edgesIgnoringSafeArea(.all))
+            .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle("UI组件")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        themeManager.toggleDarkMode()
-                    }) {
-                        Image(systemName: themeManager.isDarkMode ? "sun.max.fill" : "moon.fill")
-                            .foregroundColor(themeManager.themeColor)
-                    }
-                }
-            }
-            .environmentObject(themeManager)
             .environmentObject(PopupManager.shared)
             .environmentObject(ToastManager.shared)
             .withUIComponents()
@@ -130,9 +97,12 @@ public struct UIManagerDemos: View {
                 LoadingDemoScreen()
             case .dialog:
                 DialogDemoScreen()
+            case .subsection:
+                SubsectionDemoScreen()
+            case .button:
+                ButtonDemo()
             }
         }
-        .environmentObject(themeManager)
         .environmentObject(PopupManager.shared)
         .environmentObject(ToastManager.shared)
         .withUIComponents()
@@ -144,6 +114,8 @@ public struct UIManagerDemos: View {
         case toast
         case loading
         case dialog
+        case subsection
+        case button
         
         var title: String {
             switch self {
@@ -151,6 +123,8 @@ public struct UIManagerDemos: View {
             case .toast: return "Toast提示"
             case .loading: return "加载动画"
             case .dialog: return "对话框"
+            case .subsection: return "分段器"
+            case .button: return "按钮"
             }
         }
         
@@ -160,6 +134,8 @@ public struct UIManagerDemos: View {
             case .toast: return "轻量级的文本提示组件"
             case .loading: return "各种加载状态显示组件"
             case .dialog: return "提供用户交互的对话框组件"
+            case .subsection: return "灵活的分段选择组件"
+            case .button: return "丰富的按钮样式组件"
             }
         }
         
@@ -169,6 +145,8 @@ public struct UIManagerDemos: View {
             case .toast: return "text.bubble.fill"
             case .loading: return "arrow.clockwise.circle"
             case .dialog: return "text.bubble.fill"
+            case .subsection: return "list.bullet"
+            case .button: return "button.programmable"
             }
         }
     }
@@ -178,18 +156,15 @@ public struct UIManagerDemos: View {
 
 /// 弹窗演示屏幕
 struct PopupDemoScreen: View {
-    @EnvironmentObject var themeManager: UIManagerThemeViewModel
-    
     var body: some View {
         PreviewPopupDemo()
             .navigationTitle("弹窗组件")
-            .background(themeManager.backgroundColor.edgesIgnoringSafeArea(.all))
+            .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
     }
 }
 
 /// Toast演示屏幕
 struct ToastDemoScreen: View {
-    @EnvironmentObject var themeManager: UIManagerThemeViewModel
     @EnvironmentObject var toastManager: ToastManager
     
     var body: some View {
@@ -204,7 +179,7 @@ struct ToastDemoScreen: View {
             .padding()
         }
         .navigationTitle("Toast提示")
-        .background(themeManager.backgroundColor.edgesIgnoringSafeArea(.all))
+        .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
     }
     
     // MARK: - UI组件
@@ -213,11 +188,10 @@ struct ToastDemoScreen: View {
             Text("Toast提示组件")
                 .font(.title)
                 .fontWeight(.bold)
-                .foregroundColor(themeManager.primaryTextColor)
             
             Text("轻量级、非阻断式的简短消息通知")
                 .font(.subheadline)
-                .foregroundColor(themeManager.secondaryTextColor)
+                .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.bottom)
@@ -227,7 +201,6 @@ struct ToastDemoScreen: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Toast样式")
                 .font(.headline)
-                .foregroundColor(themeManager.primaryTextColor)
             
             // 普通提示按钮
             toastButton(
@@ -268,7 +241,7 @@ struct ToastDemoScreen: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(themeManager.isDarkMode ? Color.gray.opacity(0.2) : Color.white)
+                .fill(Color(.systemBackground))
                 .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
         )
     }
@@ -277,7 +250,6 @@ struct ToastDemoScreen: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("自定义持续时间")
                 .font(.headline)
-                .foregroundColor(themeManager.primaryTextColor)
             
             // 长时间显示
             toastButton(
@@ -300,7 +272,7 @@ struct ToastDemoScreen: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(themeManager.isDarkMode ? Color.gray.opacity(0.2) : Color.white)
+                .fill(Color(.systemBackground))
                 .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
         )
     }
@@ -325,7 +297,6 @@ struct ToastDemoScreen: View {
                 
                 Text(title)
                     .font(.system(size: 16))
-                    .foregroundColor(themeManager.primaryTextColor)
                 
                 Spacer()
                 
@@ -337,7 +308,7 @@ struct ToastDemoScreen: View {
             .padding(.horizontal, 16)
             .background(
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(themeManager.isDarkMode ? Color.black.opacity(0.3) : Color.gray.opacity(0.05))
+                    .fill(Color(.systemGray6))
             )
         }
     }
@@ -345,18 +316,15 @@ struct ToastDemoScreen: View {
 
 /// 加载动画演示屏幕
 struct LoadingDemoScreen: View {
-    @EnvironmentObject var themeManager: UIManagerThemeViewModel
-    
     var body: some View {
         VStack(spacing: 20) {
             Text("加载指示器演示")
                 .font(.title)
-                .foregroundColor(themeManager.primaryTextColor)
             
             Text("此功能正在开发中，敬请期待...")
                 .font(.headline)
                 .multilineTextAlignment(.center)
-                .foregroundColor(themeManager.secondaryTextColor)
+                .foregroundColor(.secondary)
                 .padding()
             
             // 示例加载动画
@@ -366,12 +334,12 @@ struct LoadingDemoScreen: View {
                     .padding()
                 
                 Text("模拟加载中")
-                    .foregroundColor(themeManager.secondaryTextColor)
+                    .foregroundColor(.secondary)
             }
             .frame(width: 200, height: 200)
             .background(
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(themeManager.isDarkMode ? Color.black.opacity(0.5) : Color.white)
+                    .fill(Color(.systemBackground))
                     .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
             )
             
@@ -379,60 +347,55 @@ struct LoadingDemoScreen: View {
                 // 实际功能将在后续实现
             }
             .padding()
-            .background(themeManager.themeColor)
+            .background(Color.blue)
             .foregroundColor(.white)
             .cornerRadius(10)
             .padding(.top, 40)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(themeManager.backgroundColor.edgesIgnoringSafeArea(.all))
+        .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
         .navigationTitle("加载动画")
     }
 }
 
 /// 对话框演示屏幕
 struct DialogDemoScreen: View {
-    @EnvironmentObject var themeManager: UIManagerThemeViewModel
-    
     var body: some View {
         VStack(spacing: 20) {
             Text("对话框演示")
                 .font(.title)
-                .foregroundColor(themeManager.primaryTextColor)
             
             Text("此功能正在开发中，敬请期待...")
                 .font(.headline)
                 .multilineTextAlignment(.center)
-                .foregroundColor(themeManager.secondaryTextColor)
+                .foregroundColor(.secondary)
                 .padding()
             
             // 对话框示例UI
             VStack(spacing: 24) {
                 Image(systemName: "text.bubble.fill")
                     .font(.system(size: 40))
-                    .foregroundColor(themeManager.themeColor)
+                    .foregroundColor(.blue)
                 
                 Text("确认操作")
                     .font(.headline)
-                    .foregroundColor(themeManager.primaryTextColor)
                 
                 Text("您确定要执行此操作吗？")
                     .font(.subheadline)
-                    .foregroundColor(themeManager.secondaryTextColor)
+                    .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
                 
                 HStack(spacing: 12) {
                     Button("取消") {}
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)
-                        .background(Color.gray.opacity(0.2))
-                        .foregroundColor(themeManager.primaryTextColor)
+                        .background(Color(.systemGray6))
                         .cornerRadius(8)
                     
                     Button("确认") {}
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)
-                        .background(themeManager.themeColor)
+                        .background(Color.blue)
                         .foregroundColor(.white)
                         .cornerRadius(8)
                 }
@@ -441,7 +404,7 @@ struct DialogDemoScreen: View {
             .frame(width: 280)
             .background(
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(themeManager.isDarkMode ? Color.black.opacity(0.5) : Color.white)
+                    .fill(Color(.systemBackground))
                     .shadow(color: Color.black.opacity(0.1), radius: 20, x: 0, y: 10)
             )
             
@@ -449,13 +412,13 @@ struct DialogDemoScreen: View {
                 // 实际功能将在后续实现
             }
             .padding()
-            .background(themeManager.themeColor)
+            .background(Color.blue)
             .foregroundColor(.white)
             .cornerRadius(10)
             .padding(.top, 40)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(themeManager.backgroundColor.edgesIgnoringSafeArea(.all))
+        .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
         .navigationTitle("对话框")
     }
 }
