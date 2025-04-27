@@ -23,10 +23,20 @@ struct SubsectionDemoScreen: View {
             SubsectionItem(title: "选项3", value: "3")
         ],
         current: 0,
-        activeTextColor: Color(red: 250/255, green: 97/255, blue: 81/255),
-        activeBgColor: Color(red: 255/255, green: 255/255, blue: 255/255),
-        inactiveTextColor: Color(red: 48/255, green: 49/255, blue: 51/255),
-        inactiveBgColor: Color(red: 238/255, green: 238/255, blue: 239/255)
+        colorConfig: SubsectionColorConfig(
+            lightMode: SubsectionColorConfig.ColorMode(
+                activeTextColor: Color(red: 250/255, green: 97/255, blue: 81/255),
+                activeBgColor: Color(red: 255/255, green: 255/255, blue: 255/255),
+                inactiveTextColor: Color(red: 48/255, green: 49/255, blue: 51/255),
+                inactiveBgColor: Color(red: 238/255, green: 238/255, blue: 239/255)
+            ),
+            darkMode: SubsectionColorConfig.ColorMode(
+                activeTextColor: Color(red: 250/255, green: 97/255, blue: 81/255),
+                activeBgColor: Color(red: 31/255, green: 31/255, blue: 31/255),
+                inactiveTextColor: Color(red: 149/255, green: 149/255, blue: 149/255),
+                inactiveBgColor: Color(red: 21/255, green: 21/255, blue: 21/255)
+            )
+        )
     )
     
     private let customFontConfig = SubsectionConfig(
