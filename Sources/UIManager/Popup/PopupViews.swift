@@ -31,7 +31,10 @@ public struct PopupContainerView: View {
                     return nil
                 }()
             )
-            .background(popup.config.backgroundColor)
+            .background(
+                popup.config.backgroundColor
+                    .opacity(1) // 确保背景色完全不透明
+            )
             .cornerRadius(popup.config.cornerRadius)
             .shadow(
                 color: Color.black.opacity(popup.config.shadowEnabled ? (colorScheme == .dark ? 0.3 : 0.15) : 0),
@@ -51,6 +54,8 @@ public struct PopupContainerView: View {
             .padding(getPadding())
             // 应用垂直偏移，确保不是NaN
             .offset(y: popup.config.offsetY.isNaN ? 0 : -popup.config.offsetY)
+            // 添加动画修饰符
+            .animation(popup.config.animation, value: true)
         
         if case .absolute(let left, let top, let right, let bottom) = popup.position {
             GeometryReader { geo in
@@ -206,7 +211,9 @@ public struct PopupViewModifier: ViewModifier {
                             
                             // 延迟一小段时间再关闭弹窗
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                popupManager.closePopup(id: popup.id)
+                                withAnimation(popup.config.animation) {
+                                    popupManager.closePopup(id: popup.id)
+                                }
                             }
                         }
                     }

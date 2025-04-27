@@ -4,7 +4,6 @@ import UIManager
 
 // 弹出窗口演示组件
 public struct PreviewPopupDemo: View {
-    @EnvironmentObject var themeManager: UIManagerThemeViewModel
     @EnvironmentObject var popupManager: PopupManager
     
     // 状态属性
@@ -40,14 +39,12 @@ public struct PreviewPopupDemo: View {
                 Text("Popup 基础组件演示")
                     .font(.title)
                     .fontWeight(.bold)
-                    .foregroundColor(themeManager.primaryTextColor)
                     .padding(.vertical, 10)
                 
                 // 位置选择器
                 VStack(alignment: .leading, spacing: 8) {
                     Text("选择弹窗位置")
                         .font(.headline)
-                        .foregroundColor(themeManager.primaryTextColor)
                     
                     Picker("位置", selection: $selectedPositionOption) {
                         Text("中间").tag(PositionOption.center)
@@ -64,7 +61,6 @@ public struct PreviewPopupDemo: View {
                 Toggle(isOn: $showSizeControls) {
                     Text("自定义尺寸")
                         .font(.headline)
-                        .foregroundColor(themeManager.primaryTextColor)
                 }
                 .padding(.horizontal)
                 
@@ -76,7 +72,6 @@ public struct PreviewPopupDemo: View {
                             HStack {
                                 Text("宽度: \(Int(width))")
                                     .font(.subheadline)
-                                    .foregroundColor(themeManager.primaryTextColor)
                                 
                                 Spacer()
                                 
@@ -84,11 +79,11 @@ public struct PreviewPopupDemo: View {
                                     width = 250
                                 }
                                 .font(.caption)
-                                .foregroundColor(themeManager.themeColor)
+                                .foregroundColor(.blue)
                             }
                             
                             Slider(value: $width, in: 100...350, step: 10)
-                                .accentColor(themeManager.themeColor)
+                                .accentColor(.blue)
                         }
                         
                         // 高度滑块
@@ -96,7 +91,6 @@ public struct PreviewPopupDemo: View {
                             HStack {
                                 Text("高度: \(Int(height))")
                                     .font(.subheadline)
-                                    .foregroundColor(themeManager.primaryTextColor)
                                 
                                 Spacer()
                                 
@@ -104,17 +98,17 @@ public struct PreviewPopupDemo: View {
                                     height = 250
                                 }
                                 .font(.caption)
-                                .foregroundColor(themeManager.themeColor)
+                                .foregroundColor(.blue)
                             }
                             
                             Slider(value: $height, in: 100...350, step: 10)
-                                .accentColor(themeManager.themeColor)
+                                .accentColor(.blue)
                         }
                         
                         // 尺寸预览
                         ZStack {
                             RoundedRectangle(cornerRadius: 8)
-                                .stroke(themeManager.themeColor, lineWidth: 1)
+                                .stroke(Color.blue, lineWidth: 1)
                                 .frame(
                                     width: width * 0.3,
                                     height: height * 0.3
@@ -122,7 +116,7 @@ public struct PreviewPopupDemo: View {
                             
                             Text("\(Int(width)) × \(Int(height))")
                                 .font(.caption)
-                                .foregroundColor(themeManager.secondaryTextColor)
+                                .foregroundColor(.secondary)
                         }
                         .frame(height: 100)
                     }
@@ -133,7 +127,6 @@ public struct PreviewPopupDemo: View {
                 Toggle(isOn: $showAnimationControls) {
                     Text("自定义动画")
                         .font(.headline)
-                        .foregroundColor(themeManager.primaryTextColor)
                 }
                 .padding(.horizontal)
                 
@@ -144,7 +137,6 @@ public struct PreviewPopupDemo: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("过渡效果类型")
                                 .font(.subheadline)
-                                .foregroundColor(themeManager.primaryTextColor)
                             
                             Picker("过渡效果类型", selection: $selectedTransitionType) {
                                 ForEach(TransitionType.allCases) { type in
@@ -156,7 +148,7 @@ public struct PreviewPopupDemo: View {
                             // 添加当前选中的过渡效果描述
                             Text(selectedTransitionType.description)
                                 .font(.caption)
-                                .foregroundColor(themeManager.secondaryTextColor)
+                                .foregroundColor(.secondary)
                                 .padding(.top, 4)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
@@ -167,14 +159,13 @@ public struct PreviewPopupDemo: View {
                                 HStack {
                                     Text("高级设置")
                                         .font(.subheadline)
-                                        .foregroundColor(themeManager.primaryTextColor)
                                     
                                     Spacer()
                                     
                                     Button(action: { showAdvancedAnimation.toggle() }) {
                                         Label(showAdvancedAnimation ? "收起" : "展开", systemImage: showAdvancedAnimation ? "chevron.up" : "chevron.down")
                                             .font(.caption)
-                                            .foregroundColor(themeManager.themeColor)
+                                            .foregroundColor(.blue)
                                     }
                                 }
                                 
@@ -184,7 +175,7 @@ public struct PreviewPopupDemo: View {
                                         VStack(alignment: .leading, spacing: 4) {
                                             Text("方向")
                                                 .font(.caption)
-                                                .foregroundColor(themeManager.secondaryTextColor)
+                                                .foregroundColor(.secondary)
                                             
                                             Picker("方向", selection: $selectedDirection) {
                                                 ForEach([AnimationDirection.top, .bottom, .leading, .trailing]) { direction in
@@ -196,7 +187,7 @@ public struct PreviewPopupDemo: View {
                                             // 添加当前选中的方向描述
                                             Text(selectedDirection.description)
                                                 .font(.caption)
-                                                .foregroundColor(themeManager.secondaryTextColor.opacity(0.8))
+                                                .foregroundColor(.secondary.opacity(0.8))
                                                 .padding(.top, 4)
                                         }
                                     } else if selectedTransitionType == .scale {
@@ -204,7 +195,7 @@ public struct PreviewPopupDemo: View {
                                         VStack(alignment: .leading, spacing: 4) {
                                             Text("缩放方式")
                                                 .font(.caption)
-                                                .foregroundColor(themeManager.secondaryTextColor)
+                                                .foregroundColor(.secondary)
                                             
                                             Picker("缩放方式", selection: $selectedScaleType) {
                                                 ForEach(ScaleType.allCases) { type in
@@ -216,13 +207,13 @@ public struct PreviewPopupDemo: View {
                                             // 添加当前选中的缩放方式描述
                                             Text(selectedScaleType.description)
                                                 .font(.caption)
-                                                .foregroundColor(themeManager.secondaryTextColor.opacity(0.8))
+                                                .foregroundColor(.secondary.opacity(0.8))
                                                 .padding(.top, 4)
                                         }
                                     } else if selectedTransitionType == .asymmetric {
                                         Text("进入时从零大小缩放到正常大小并淡入，退出时从正常大小缩小到零并淡出")
                                             .font(.caption)
-                                            .foregroundColor(themeManager.secondaryTextColor)
+                                            .foregroundColor(.secondary)
                                             .multilineTextAlignment(.center)
                                     }
                                 }
@@ -233,7 +224,6 @@ public struct PreviewPopupDemo: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("进入动画")
                                 .font(.subheadline)
-                                .foregroundColor(themeManager.primaryTextColor)
                             
                             Picker("进入动画", selection: $selectedEntryAnimation) {
                                 ForEach(AnimationType.allCases) { anim in
@@ -245,7 +235,7 @@ public struct PreviewPopupDemo: View {
                             // 添加当前选中的进入动画描述
                             Text(selectedEntryAnimation.description)
                                 .font(.caption)
-                                .foregroundColor(themeManager.secondaryTextColor)
+                                .foregroundColor(.secondary)
                                 .padding(.top, 4)
                         }
                         
@@ -253,7 +243,6 @@ public struct PreviewPopupDemo: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("退出动画")
                                 .font(.subheadline)
-                                .foregroundColor(themeManager.primaryTextColor)
                             
                             Picker("退出动画", selection: $selectedExitAnimation) {
                                 ForEach(AnimationType.allCases) { anim in
@@ -265,7 +254,7 @@ public struct PreviewPopupDemo: View {
                             // 添加当前选中的退出动画描述
                             Text(selectedExitAnimation.description)
                                 .font(.caption)
-                                .foregroundColor(themeManager.secondaryTextColor)
+                                .foregroundColor(.secondary)
                                 .padding(.top, 4)
                         }
                         
@@ -274,7 +263,6 @@ public struct PreviewPopupDemo: View {
                             HStack {
                                 Text("持续时间: \(String(format: "%.1f", animationDuration))秒")
                                     .font(.subheadline)
-                                    .foregroundColor(themeManager.primaryTextColor)
                                 
                                 Spacer()
                                 
@@ -282,11 +270,11 @@ public struct PreviewPopupDemo: View {
                                     animationDuration = 0.3
                                 }
                                 .font(.caption)
-                                .foregroundColor(themeManager.themeColor)
+                                .foregroundColor(.blue)
                             }
                             
                             Slider(value: $animationDuration, in: 0.1...2.0, step: 0.1)
-                                .accentColor(themeManager.themeColor)
+                                .accentColor(.blue)
                         }
                     }
                     .padding(.horizontal)
@@ -296,7 +284,6 @@ public struct PreviewPopupDemo: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Toggle("显示关闭按钮", isOn: $showCloseButton)
                         .font(.headline)
-                        .foregroundColor(themeManager.primaryTextColor)
                     
                     if showCloseButton {
                         Picker("关闭按钮样式", selection: $selectedButtonStyle) {
@@ -314,12 +301,11 @@ public struct PreviewPopupDemo: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("垂直偏移量: \(Int(offsetY))")
                         .font(.headline)
-                        .foregroundColor(themeManager.primaryTextColor)
                     
                     Slider(value: $offsetY, in: 0...200, step: 10) {
                         Text("偏移量")
                     }
-                    .accentColor(themeManager.themeColor)
+                    .accentColor(.blue)
                 }
                 .padding(.horizontal)
                 
@@ -330,7 +316,7 @@ public struct PreviewPopupDemo: View {
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .frame(height: 44)
-                        .background(themeManager.themeColor)
+                        .background(Color.blue)
                         .cornerRadius(10)
                         .padding(.horizontal)
                 }
@@ -342,7 +328,7 @@ public struct PreviewPopupDemo: View {
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .frame(height: 44)
-                        .background(themeManager.themeColor.opacity(0.8))
+                        .background(Color.blue.opacity(0.8))
                         .cornerRadius(10)
                         .padding(.horizontal)
                 }
@@ -351,11 +337,10 @@ public struct PreviewPopupDemo: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("标准方向动画预览")
                         .font(.headline)
-                        .foregroundColor(themeManager.primaryTextColor)
                     
                     Text("使用系统默认的过渡效果")
                         .font(.caption)
-                        .foregroundColor(themeManager.secondaryTextColor)
+                        .foregroundColor(.secondary)
                     
                     HStack(spacing: 10) {
                         Button(action: { showDirectionalPopup(position: .top) }) {
@@ -365,7 +350,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(themeManager.themeColor.opacity(0.6))
+                            .background(Color.blue.opacity(0.6))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -377,7 +362,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(themeManager.themeColor.opacity(0.6))
+                            .background(Color.blue.opacity(0.6))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -391,7 +376,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(themeManager.themeColor.opacity(0.6))
+                            .background(Color.blue.opacity(0.6))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -403,7 +388,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(themeManager.themeColor.opacity(0.6))
+                            .background(Color.blue.opacity(0.6))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -415,11 +400,10 @@ public struct PreviewPopupDemo: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("绝对位置弹窗预览")
                         .font(.headline)
-                        .foregroundColor(themeManager.primaryTextColor)
                     
                     Text("使用距离边缘的绝对像素距离定位弹窗")
                         .font(.caption)
-                        .foregroundColor(themeManager.secondaryTextColor)
+                        .foregroundColor(.secondary)
                     
                     // 贴边弹窗
                     HStack(spacing: 10) {
@@ -430,7 +414,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(themeManager.themeColor.opacity(0.5))
+                            .background(Color.blue.opacity(0.5))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -442,7 +426,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(themeManager.themeColor.opacity(0.5))
+                            .background(Color.blue.opacity(0.5))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -456,7 +440,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(themeManager.themeColor.opacity(0.5))
+                            .background(Color.blue.opacity(0.5))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -468,7 +452,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(themeManager.themeColor.opacity(0.5))
+                            .background(Color.blue.opacity(0.5))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -483,7 +467,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(themeManager.themeColor.opacity(0.5))
+                            .background(Color.blue.opacity(0.5))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -495,7 +479,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(themeManager.themeColor.opacity(0.5))
+                            .background(Color.blue.opacity(0.5))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -509,7 +493,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(themeManager.themeColor.opacity(0.5))
+                            .background(Color.blue.opacity(0.5))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -521,7 +505,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(themeManager.themeColor.opacity(0.5))
+                            .background(Color.blue.opacity(0.5))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -534,7 +518,7 @@ public struct PreviewPopupDemo: View {
                     .frame(height: 30)
             }
             .frame(maxWidth: .infinity)
-            .background(themeManager.backgroundColor)
+            .background(Color(.systemBackground))
         }
     }
 } #endif

@@ -37,7 +37,7 @@ public extension PreviewPopupDemo {
             offsetY: offsetY,
             showCloseButton: showCloseButton,
             closeButtonPosition: .topTrailing,
-            closeButtonStyle: selectedButtonStyle.toStyle(themeColor: themeManager.themeColor),
+            closeButtonStyle: selectedButtonStyle.toStyle(themeColor: .blue),
             closeOnTapOutside: true
         )
         
@@ -72,7 +72,6 @@ public extension PreviewPopupDemo {
                         Text(getPositionName(selectedPositionOption))
                             .font(.headline)
                             .fontWeight(.bold)
-                            .foregroundColor(themeManager.isDarkMode ? .white : .black)
                             .padding(.top, 4)
                         
                         // 信息区块，增加分隔和背景
@@ -80,10 +79,9 @@ public extension PreviewPopupDemo {
                             if showSizeControls {
                                 HStack {
                                     Image(systemName: "arrow.up.left.and.arrow.down.right")
-                                        .foregroundColor(themeManager.themeColor)
+                                        .foregroundColor(.blue)
                                     Text("尺寸: \(Int(popupWidth ?? 0)) × \(Int(popupHeight ?? 0))")
                                         .font(.subheadline)
-                                        .foregroundColor(themeManager.isDarkMode ? .white : .black)
                                 }
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             }
@@ -91,7 +89,7 @@ public extension PreviewPopupDemo {
                         .padding(12)
                         .background(
                             RoundedRectangle(cornerRadius: 8)
-                                .fill(themeManager.isDarkMode ? Color.white.opacity(0.1) : Color.black.opacity(0.05))
+                                .fill(Color(.systemGray6))
                         )
                         
                         // 动画信息区块
@@ -100,17 +98,16 @@ public extension PreviewPopupDemo {
                                 Text("动画设置")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
-                                    .foregroundColor(themeManager.themeColor)
+                                    .foregroundColor(.blue)
                                     .padding(.bottom, 2)
                                 
                                 HStack {
                                     Text("过渡效果:")
                                         .font(.subheadline)
-                                        .foregroundColor(themeManager.isDarkMode ? Color.white.opacity(0.7) : Color.black.opacity(0.6))
+                                        .foregroundColor(.secondary)
                                     Text(selectedTransitionType.rawValue)
                                         .font(.subheadline)
                                         .fontWeight(.medium)
-                                        .foregroundColor(themeManager.isDarkMode ? .white : .black)
                                 }
                                 
                                 // 高级设置信息
@@ -119,21 +116,19 @@ public extension PreviewPopupDemo {
                                         HStack {
                                             Text("方向:")
                                                 .font(.subheadline)
-                                                .foregroundColor(themeManager.isDarkMode ? Color.white.opacity(0.7) : Color.black.opacity(0.6))
+                                                .foregroundColor(.secondary)
                                             Text(selectedDirection.rawValue)
                                                 .font(.subheadline)
                                                 .fontWeight(.medium)
-                                                .foregroundColor(themeManager.isDarkMode ? .white : .black)
                                         }
                                     } else if selectedTransitionType == .scale {
                                         HStack {
                                             Text("缩放方式:")
                                                 .font(.subheadline)
-                                                .foregroundColor(themeManager.isDarkMode ? Color.white.opacity(0.7) : Color.black.opacity(0.6))
+                                                .foregroundColor(.secondary)
                                             Text(selectedScaleType.rawValue)
                                                 .font(.subheadline)
                                                 .fontWeight(.medium)
-                                                .foregroundColor(themeManager.isDarkMode ? .white : .black)
                                         }
                                     }
                                 }
@@ -141,45 +136,42 @@ public extension PreviewPopupDemo {
                                 HStack {
                                     Text("进入动画:")
                                         .font(.subheadline)
-                                        .foregroundColor(themeManager.isDarkMode ? Color.white.opacity(0.7) : Color.black.opacity(0.6))
+                                        .foregroundColor(.secondary)
                                     Text(selectedEntryAnimation.rawValue)
                                         .font(.subheadline)
                                         .fontWeight(.medium)
-                                        .foregroundColor(themeManager.isDarkMode ? .white : .black)
                                 }
                                 
                                 HStack {
                                     Text("退出动画:")
                                         .font(.subheadline)
-                                        .foregroundColor(themeManager.isDarkMode ? Color.white.opacity(0.7) : Color.black.opacity(0.6))
+                                        .foregroundColor(.secondary)
                                     Text(selectedExitAnimation.rawValue)
                                         .font(.subheadline)
                                         .fontWeight(.medium)
-                                        .foregroundColor(themeManager.isDarkMode ? .white : .black)
                                 }
                                 
                                 HStack {
                                     Text("持续时间:")
                                         .font(.subheadline)
-                                        .foregroundColor(themeManager.isDarkMode ? Color.white.opacity(0.7) : Color.black.opacity(0.6))
+                                        .foregroundColor(.secondary)
                                     Text("\(String(format: "%.1f", animationDuration))秒")
                                         .font(.subheadline)
                                         .fontWeight(.medium)
-                                        .foregroundColor(themeManager.isDarkMode ? .white : .black)
                                 }
                             }
                             .padding(12)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .fill(themeManager.isDarkMode ? Color.white.opacity(0.1) : Color.black.opacity(0.05))
+                                    .fill(Color(.systemGray6))
                             )
                         }
                         
                         // 描述文本区域
                         Text("这是一个基础弹窗示例，您可以选择不同的位置和动画来展示。")
                             .font(.subheadline)
-                            .foregroundColor(themeManager.isDarkMode ? .white : .black)
+                            .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                             .padding(.vertical, 4)
                         
@@ -190,7 +182,7 @@ public extension PreviewPopupDemo {
                         }) {
                             Text("关闭")
                                 .frame(width: 100, height: 40)
-                                .background(themeManager.themeColor)
+                                .background(Color.blue)
                                 .foregroundColor(.white)
                                 .cornerRadius(8)
                         }
@@ -218,7 +210,7 @@ public extension PreviewPopupDemo {
             offsetY: 0, // 初始不偏移
             showCloseButton: showCloseButton,
             closeButtonPosition: .topTrailing,
-            closeButtonStyle: selectedButtonStyle.toStyle(themeColor: themeManager.themeColor),
+            closeButtonStyle: selectedButtonStyle.toStyle(themeColor: .blue),
             closeOnTapOutside: true
         )
         
@@ -237,7 +229,10 @@ public extension PreviewPopupDemo {
                             VStack(spacing: 20) {
                                 ForEach(0..<2) { index in
                                     TextField("输入框 \(index)", text: .constant(""))
-                                        .textFieldStyle(.roundedBorder)
+                                        .textFieldStyle(.plain)
+                                        .padding(8)
+                                        .background(Color(.systemGray6))
+                                        .cornerRadius(8)
                                         .focused($isTextFieldFocused)
                                         .padding(.horizontal)
                                         .disableAutocorrection(true)
@@ -256,11 +251,9 @@ public extension PreviewPopupDemo {
                         // 添加一个完成按钮，方便用户关闭键盘
                         Button(action: {
                             isTextFieldFocused = false
-                            // 使用短延迟更好地配合键盘动画
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                withAnimation {
-                                    popupManager.closePopup(id: popupID)
-                                }
+                            // 直接关闭弹窗，不使用延迟
+                            withAnimation(entryConfig.animation) {
+                                popupManager.closePopup(id: popupID)
                             }
                         }) {
                             Text("完成")
@@ -268,7 +261,7 @@ public extension PreviewPopupDemo {
                                 .foregroundColor(.white)
                                 .frame(height: 44)
                                 .frame(maxWidth: .infinity)
-                                .background(themeManager.themeColor)
+                                .background(Color.blue)
                                 .cornerRadius(8)
                         }
                         .padding(.horizontal)
@@ -327,16 +320,15 @@ public extension PreviewPopupDemo {
                 VStack(spacing: 16) {
                     Text(getPositionName(position))
                         .font(.headline)
-                        .foregroundColor(themeManager.primaryTextColor)
                     
                     Text("使用系统默认的线性动画和滑动效果")
                         .font(.subheadline)
-                        .foregroundColor(themeManager.secondaryTextColor)
+                        .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                     
                     Text("动画过渡效果使用了线性动画和方向性滑动")
                         .font(.caption)
-                        .foregroundColor(themeManager.secondaryTextColor)
+                        .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                     
                     Button(action: {
@@ -344,7 +336,7 @@ public extension PreviewPopupDemo {
                     }) {
                         Text("关闭")
                             .frame(width: 100, height: 40)
-                            .background(themeManager.themeColor)
+                            .background(Color.blue)
                             .foregroundColor(.white)
                             .cornerRadius(8)
                     }
@@ -405,16 +397,15 @@ public extension PreviewPopupDemo {
                 VStack(spacing: 16) {
                     Text(getPositionName(position))
                         .font(.headline)
-                        .foregroundColor(themeManager.primaryTextColor)
                     
                     VStack(spacing: 8) {
                         Text("绝对位置弹窗")
                             .font(.subheadline)
-                            .foregroundColor(themeManager.secondaryTextColor)
+                            .foregroundColor(.secondary)
                         
                         Text(positionDesc)
                             .font(.caption)
-                            .foregroundColor(themeManager.secondaryTextColor)
+                            .foregroundColor(.secondary)
                     }
                     .multilineTextAlignment(.center)
                     
@@ -423,7 +414,7 @@ public extension PreviewPopupDemo {
                     }) {
                         Text("关闭")
                             .frame(width: 100, height: 40)
-                            .background(themeManager.themeColor)
+                            .background(Color.blue)
                             .foregroundColor(.white)
                             .cornerRadius(8)
                     }

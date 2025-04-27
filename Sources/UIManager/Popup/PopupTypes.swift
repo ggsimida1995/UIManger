@@ -196,8 +196,7 @@ public struct PopupConfig {
     
     /// 获取当前环境的默认背景色
     public static var defaultBackgroundColor: Color {
-        // 优先使用主题管理器的背景色
-        UIManagerThemeViewModel.shared.backgroundColor
+        Color(.systemBackground)
     }
     
     /// 初始化方法
