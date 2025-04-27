@@ -20,6 +20,8 @@ public struct SubsectionConfig {
     public var fontSize: CGFloat
     public var bold: Bool
     public var cornerRadius: CGFloat
+    public var height: CGFloat
+    public var width: CGFloat?
     public var activeTextColor: Color
     public var activeBgColor: Color
     public var inactiveTextColor: Color
@@ -32,6 +34,8 @@ public struct SubsectionConfig {
         fontSize: CGFloat = 14,
         bold: Bool = false,
         cornerRadius: CGFloat = 8,
+        height: CGFloat = 30,
+        width: CGFloat? = nil,
         activeTextColor: Color? = nil,
         activeBgColor: Color? = nil,
         inactiveTextColor: Color? = nil,
@@ -43,6 +47,8 @@ public struct SubsectionConfig {
         self.fontSize = fontSize
         self.bold = bold
         self.cornerRadius = cornerRadius
+        self.height = height
+        self.width = width
         
         // 根据系统主题设置颜色
         let isDark = UITraitCollection.current.userInterfaceStyle == .dark
