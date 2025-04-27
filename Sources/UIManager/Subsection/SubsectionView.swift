@@ -2,6 +2,7 @@ import SwiftUI
 
 /// 分段器视图
 public struct SubsectionView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @State private var currentIndex: Int
     private let config: SubsectionConfig
     private let onChange: ((Int) -> Void)?
