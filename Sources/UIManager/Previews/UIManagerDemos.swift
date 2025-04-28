@@ -1,15 +1,18 @@
 #if DEBUG || PREVIEW
 #if canImport(UIKit)
 import SwiftUI
+//import UIManager
 
 /// UIManager 组件预览集合入口点
 public struct UIManagerDemos: View {
+    @State private var selectedDemo: DemoType? = .popup
+    
     public init() {
         // 确保初始化环境
     }
     
     public var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
                 // 标题部分
                 Section {
@@ -29,8 +32,8 @@ public struct UIManagerDemos: View {
                 
                 // 组件导航列表
                 Section {
-                    ForEach(DemoType.allCases, id: \.self) { demo in
-                        NavigationLink(destination: getDemoView(for: demo)) {
+                    ForEach(DemoType.allCases) { demo in
+                        NavigationLink(value: demo) {
                             HStack(spacing: 16) {
                                 Image(systemName: demo.icon)
                                     .font(.system(size: 24))
@@ -77,45 +80,46 @@ public struct UIManagerDemos: View {
             .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle("UI组件")
+            .navigationDestination(for: DemoType.self) { demo in
+                demoView(for: demo)
+            }
             .environmentObject(PopupManager.shared)
             .environmentObject(ToastManager.shared)
             .withUIComponents()
         }
-        .navigationViewStyle(StackNavigationViewStyle())
     }
     
-    /// 根据演示类型获取对应的视图
     @ViewBuilder
-    private func getDemoView(for demoType: DemoType) -> some View {
-        Group {
-            switch demoType {
-            case .popup:
-                PopupDemoScreen()
-            case .toast:
-                ToastDemoScreen()
-            case .loading:
-                LoadingDemoScreen()
-            case .dialog:
-                DialogDemoScreen()
-            case .subsection:
-                SubsectionDemoScreen()
-            case .button:
-                ButtonDemo()
-            }
+    private func demoView(for demo: DemoType) -> some View {
+        switch demo {
+        case .popup:
+            PreviewPopupDemo()
+        case .toast:
+            ToastDemoScreen()
+        case .loading:
+            LoadingDemoScreen()
+        case .dialog:
+            DialogDemoScreen()
+        case .subsection:
+            SubsectionDemoScreen()
+        case .button:
+            ButtonDemo()
+        case .inputPopup:
+            InputPopupDemo()
         }
-        .environmentObject(PopupManager.shared)
-        .environmentObject(ToastManager.shared)
-        .withUIComponents()
     }
     
     /// 可用演示类型
-    enum DemoType: String, CaseIterable {
-        case popup
-        case toast
-        case loading
-        case dialog
-        case subsection
-        case button
+    enum DemoType: String, CaseIterable, Identifiable {
+        case popup = "弹窗演示"
+        case toast = "Toast演示"
+        case loading = "加载动画演示"
+        case dialog = "对话框演示"
+        case subsection = "分段器演示"
+        case button = "按钮演示"
+        case inputPopup = "输入框弹窗演示"
+        
+        var id: String { rawValue }
         
         var title: String {
             switch self {
@@ -125,6 +129,7 @@ public struct UIManagerDemos: View {
             case .dialog: return "对话框"
             case .subsection: return "分段器"
             case .button: return "按钮"
+            case .inputPopup: return "输入框弹窗"
             }
         }
         
@@ -136,6 +141,7 @@ public struct UIManagerDemos: View {
             case .dialog: return "提供用户交互的对话框组件"
             case .subsection: return "灵活的分段选择组件"
             case .button: return "丰富的按钮样式组件"
+            case .inputPopup: return "支持多种输入类型的弹窗组件"
             }
         }
         
@@ -147,6 +153,7 @@ public struct UIManagerDemos: View {
             case .dialog: return "text.bubble.fill"
             case .subsection: return "list.bullet"
             case .button: return "button.programmable"
+            case .inputPopup: return "text.cursor"
             }
         }
     }
@@ -424,9 +431,12 @@ struct DialogDemoScreen: View {
 }
 
 // MARK: - 预览
-#Preview {
-    UIManagerDemos()
-        .environment(\.popupManager, PopupManager.shared) // 确保预览使用相同的实例
+struct UIManagerDemos_Previews: PreviewProvider {
+    static var previews: some View {
+        UIManagerDemos()
+            .environmentObject(PopupManager.shared)
+            .environmentObject(ToastManager.shared)
+    }
 }
 #endif
 #endif
