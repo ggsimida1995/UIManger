@@ -1,6 +1,6 @@
 #if DEBUG || PREVIEW
 import SwiftUI
-import UIManager
+//import UIManager
 
 // 弹窗演示模型和枚举
 public extension PreviewPopupDemo {

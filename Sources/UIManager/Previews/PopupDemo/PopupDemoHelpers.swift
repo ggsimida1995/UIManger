@@ -1,6 +1,6 @@
 #if DEBUG || PREVIEW
 import SwiftUI
-import UIManager
+//import UIManager
 
 // 弹窗演示的帮助方法
 public extension PreviewPopupDemo {
@@ -198,94 +198,6 @@ public extension PreviewPopupDemo {
         }
     }
     
-    // 显示输入框弹窗
-    func showInputPopup() {
-        // 创建一个自定义ID，用于后续更新弹窗
-        let popupID = UUID()
-        
-        // 初始弹窗配置，开始时不设置偏移
-        var entryConfig = PopupConfig(
-            cornerRadius: 16,
-            shadowEnabled: true,
-            offsetY: 0, // 初始不偏移
-            showCloseButton: showCloseButton,
-            closeButtonPosition: .topTrailing,
-            closeButtonStyle: selectedButtonStyle.toStyle(themeColor: .blue),
-            closeOnTapOutside: true
-        )
-        
-        // 设置进入动画 - 使用用户选择的进入动画类型
-        if showAnimationControls {
-            entryConfig.animation = selectedEntryAnimation.toAnimation(duration: animationDuration)
-            entryConfig.customTransition = getEntryTransition()
-        }
-        
-        // 使用进入动画包装显示操作
-        withAnimation(entryConfig.animation) {
-            popupManager.show(
-                content: {
-                    VStack(spacing: 20) {
-                        ScrollView {
-                            VStack(spacing: 20) {
-                                ForEach(0..<2) { index in
-                                    TextField("输入框 \(index)", text: .constant(""))
-                                        .textFieldStyle(.plain)
-                                        .padding(8)
-                                        .background(Color(.systemGray6))
-                                        .cornerRadius(8)
-                                        .focused($isTextFieldFocused)
-                                        .padding(.horizontal)
-                                        .disableAutocorrection(true)
-                                }
-                            }
-                            .padding(.top, 40)
-                            .padding(.bottom, 20)
-                        }
-                        .simultaneousGesture(
-                            TapGesture()
-                                .onEnded { _ in
-                                    // 点击ScrollView内部的空白区域不会关闭键盘
-                                }
-                        )
-                        
-                        // 添加一个完成按钮，方便用户关闭键盘
-                        Button(action: {
-                            isTextFieldFocused = false
-                            // 直接关闭弹窗，不使用延迟
-                            withAnimation(entryConfig.animation) {
-                                popupManager.closePopup(id: popupID)
-                            }
-                        }) {
-                            Text("完成")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .frame(height: 44)
-                                .frame(maxWidth: .infinity)
-                                .background(Color.blue)
-                                .cornerRadius(8)
-                        }
-                        .padding(.horizontal)
-                    }
-                    .onAppear {
-                        // 先等弹窗完全显示
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            // 再聚焦输入框，触发键盘显示
-                            isTextFieldFocused = true
-                        }
-                    }
-                    .onDisappear {
-                        // 确保弹窗关闭时键盘也会收起
-                        isTextFieldFocused = false
-                    }
-                },
-                position: .center,
-                width: 300,
-                height: 280, // 增加高度以容纳按钮
-                config: entryConfig,
-                id: popupID
-            )
-        }
-    }
     
     // 显示标准方向弹窗，使用默认的线性动画和滑动效果
     func showDirectionalPopup(position: PopupPosition) {

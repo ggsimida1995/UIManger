@@ -1,6 +1,6 @@
 #if DEBUG || PREVIEW
 import SwiftUI
-import UIManager
+//import UIManager
 
 // 弹出窗口演示组件
 public struct PreviewPopupDemo: View {
@@ -317,18 +317,6 @@ public struct PreviewPopupDemo: View {
                         .frame(maxWidth: .infinity)
                         .frame(height: 44)
                         .background(Color.blue)
-                        .cornerRadius(10)
-                        .padding(.horizontal)
-                }
-                
-                // 添加输入框弹窗按钮
-                Button(action: showInputPopup) {
-                    Text("显示输入框弹窗")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 44)
-                        .background(Color.blue.opacity(0.8))
                         .cornerRadius(10)
                         .padding(.horizontal)
                 }
