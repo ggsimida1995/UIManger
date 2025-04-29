@@ -34,7 +34,6 @@ public extension PreviewPopupDemo {
         var entryConfig = PopupConfig(
             cornerRadius: 12,
             shadowEnabled: true,
-            offsetY: offsetY,
             showCloseButton: showCloseButton,
             closeButtonPosition: .topTrailing,
             closeButtonStyle: selectedButtonStyle.toStyle(themeColor: .blue),
@@ -333,7 +332,7 @@ public extension PreviewPopupDemo {
                 }
                 .padding()
             },
-            position: position,
+            position: .absolute(left: left, top: top, right: right, bottom: bottom),
             width: popupWidth,
             height: popupHeight,
             config: config,

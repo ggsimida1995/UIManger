@@ -12,7 +12,6 @@ public struct PreviewPopupDemo: View {
     @State var height: CGFloat = 250
     @State var showSizeControls: Bool = false
     @State var showCloseButton: Bool = false  // 是否显示关闭按钮
-    @State var offsetY: CGFloat = 0 // 垂直偏移量
     
     // 更新动画相关状态
     @State var selectedEntryAnimation: AnimationType = .spring
@@ -294,18 +293,6 @@ public struct PreviewPopupDemo: View {
                         .pickerStyle(.segmented)
                         .padding(.top, 4)
                     }
-                }
-                .padding(.horizontal)
-                
-                // 在关闭按钮控制后添加偏移量控制
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("垂直偏移量: \(Int(offsetY))")
-                        .font(.headline)
-                    
-                    Slider(value: $offsetY, in: 0...200, step: 10) {
-                        Text("偏移量")
-                    }
-                    .accentColor(.blue)
                 }
                 .padding(.horizontal)
                 

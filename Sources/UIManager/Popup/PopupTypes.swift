@@ -125,9 +125,6 @@ public struct PopupConfig {
     /// 是否启用阴影
     public var shadowEnabled: Bool
     
-    /// 弹窗垂直偏移量
-    public var offsetY: CGFloat
-    
     // MARK: - 关闭按钮
     
     /// 关闭按钮位置
@@ -225,7 +222,6 @@ public struct PopupConfig {
         self.backgroundColor = backgroundColor
         self.cornerRadius = cornerRadius
         self.shadowEnabled = shadowEnabled
-        self.offsetY = offsetY
         
         self.showCloseButton = showCloseButton
         self.closeButtonPosition = closeButtonPosition

@@ -10,6 +10,7 @@ public struct InputPopupDemo: View {
     
     public var body: some View {
         VStack(spacing: 20) {
+            Spacer()
             Text("输入框弹窗演示")
                 .font(.title)
                 .fontWeight(.bold)
@@ -18,6 +19,15 @@ public struct InputPopupDemo: View {
             // 基本输入框弹窗
             Button(action: showBasicInputPopup) {
                 Text("显示基本输入框")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 44)
+                    .background(Color.blue)
+                    .cornerRadius(10)
+            }
+              Button(action: showBasicPopup) {
+                Text("显示基本弹窗")
                     .font(.headline)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
@@ -47,9 +57,32 @@ public struct InputPopupDemo: View {
                     .background(Color.blue.opacity(0.6))
                     .cornerRadius(10)
             }
+            Spacer()
         }
         .padding()
         .withPopups()
+    }
+     private func showBasicPopup() {
+        let popupID = UUID()
+       
+        
+        popupManager.show(
+            content: {
+                Text("基本弹窗")
+            },
+            position: .center,
+            width: 300,
+            height: 200,
+            config: PopupConfig(
+                cornerRadius: 16,
+                shadowEnabled: true,
+                showCloseButton: false,
+                closeButtonPosition: .topTrailing,
+                closeButtonStyle: .circular,
+                closeOnTapOutside: true
+            ),
+            id: popupID
+        )
     }
     
     // 显示基本输入框弹窗
@@ -82,7 +115,6 @@ public struct InputPopupDemo: View {
             config: PopupConfig(
                 cornerRadius: 16,
                 shadowEnabled: true,
-                offsetY: 0,
                 showCloseButton: false,
                 closeButtonPosition: .topTrailing,
                 closeButtonStyle: .circular,
@@ -130,7 +162,6 @@ public struct InputPopupDemo: View {
             config: PopupConfig(
                 cornerRadius: 16,
                 shadowEnabled: true,
-                offsetY: 0,
                 showCloseButton: false,
                 closeButtonPosition: .topTrailing,
                 closeButtonStyle: .circular,
@@ -178,7 +209,6 @@ public struct InputPopupDemo: View {
             config: PopupConfig(
                 cornerRadius: 16,
                 shadowEnabled: true,
-                offsetY: 0,
                 showCloseButton: false,
                 closeButtonPosition: .topTrailing,
                 closeButtonStyle: .circular,
