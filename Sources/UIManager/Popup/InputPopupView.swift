@@ -169,32 +169,40 @@ public enum InputFieldType {
 
 /// 输入字段配置
 public struct InputField: Identifiable {
-    public var id = UUID()
-    public var label: String?
-    public var placeholder: String?
-    public var value: String?
-    public var type: InputFieldType
-    public var required: Bool
-    public var maxLength: Int?
-    public var validator: ((String) -> Bool)?
+    /// 字段ID（内部使用）
+    public let id: String
+    /// 字段标签
+    public let label: String
+    /// 提示文本
+    public let placeholder: String
+    /// 键（用于结果字典的键）
+    public let key: String
+    /// 默认值
+    public let defaultValue: String
+    /// 是否必填
+    public let isRequired: Bool
+    /// 输入类型
+    public let inputType: InputFieldType
+    /// 验证器
+    public let validator: ((String) -> (isValid: Bool, message: String?))?
     
     public init(
-        id: UUID = UUID(),
-        label: String? = nil,
-        placeholder: String? = nil,
-        value: String? = nil,
-        type: InputFieldType = .text,
-        required: Bool = false,
-        maxLength: Int? = nil,
-        validator: ((String) -> Bool)? = nil
+        id: String = UUID().uuidString,
+        label: String,
+        placeholder: String = "",
+        key: String,
+        defaultValue: String = "",
+        isRequired: Bool = false,
+        inputType: InputFieldType = .text,
+        validator: ((String) -> (isValid: Bool, message: String?))? = nil
     ) {
         self.id = id
-        self.label = label ?? ""
-        self.placeholder = placeholder ?? "请输入"
-        self.value = value ?? ""
-        self.type = type
-        self.required = required
-        self.maxLength = maxLength
+        self.label = label
+        self.placeholder = placeholder
+        self.key = key
+        self.defaultValue = defaultValue
+        self.isRequired = isRequired
+        self.inputType = inputType
         self.validator = validator
     }
 }
@@ -237,7 +245,7 @@ public struct InputPopupConfig {
         appearance: InputPopupAppearance = InputPopupAppearance()
     ) {
         self.title = title ?? "请输入"
-        self.fields = fields ?? [InputField(label: "", placeholder: "请输入内容")]
+        self.fields = fields ?? [InputField(label: "内容", placeholder: "请输入内容", key: "value")]
         self.confirmText = confirmText ?? "确定"
         self.cancelText = cancelText ?? "取消"
         self.autoShowKeyboard = autoShowKeyboard
@@ -318,10 +326,10 @@ public struct InputPopupView: View {
     private let onCancel: () -> Void
     
     // 状态变量
-    @State private var values: [UUID: String] = [:]
-    @State private var validationErrors: [UUID: String] = [:]
-    @State private var currentFocusField: UUID?
-    @FocusState private var focusedField: UUID?
+    @State private var values: [String: String] = [:]
+    @State private var validationErrors: [String: String] = [:]
+    @State private var currentFocusField: String?
+    @FocusState private var focusedField: String?
     
     public init(
         config: InputPopupConfig,
@@ -333,9 +341,9 @@ public struct InputPopupView: View {
         self.onCancel = onCancel
         
         // 初始化值
-        var initialValues: [UUID: String] = [:]
+        var initialValues: [String: String] = [:]
         for field in config.fields {
-            initialValues[field.id] = field.value ?? ""
+            initialValues[field.id] = field.defaultValue
         }
         self._values = State(initialValue: initialValues)
     }
@@ -403,14 +411,14 @@ public struct InputPopupView: View {
     private func inputField(for field: InputField) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             // 标签
-            if let label = field.label, !label.isEmpty {
-                Text(label)
+            if !field.label.isEmpty {
+                Text(field.label)
                     .font(config.appearance.labelFont)
                     .foregroundColor(config.appearance.labelColor)
             }
             
             // 根据类型选择不同的输入控件
-            switch field.type {
+            switch field.inputType {
             case .multiline:
                 multilineTextField(for: field)
             case .password:
@@ -432,9 +440,9 @@ public struct InputPopupView: View {
     // 标准文本输入框
     private func standardTextField(for field: InputField) -> some View {
         GroupsTextField(
-            placeholder: field.placeholder ?? "",
+            placeholder: field.placeholder,
             text: binding(for: field.id),
-            keyboardType: field.type.keyboardType,
+            keyboardType: field.inputType.keyboardType,
             submitLabel: nextSubmitLabel(for: field),
             onSubmit: { moveToNextField(after: field) }
         )
@@ -448,7 +456,7 @@ public struct InputPopupView: View {
     // 密码输入框
     private func secureTextField(for field: InputField) -> some View {
         GroupsSecureField(
-            placeholder: field.placeholder ?? "", 
+            placeholder: field.placeholder, 
             text: binding(for: field.id),
             submitLabel: nextSubmitLabel(for: field),
             onSubmit: { moveToNextField(after: field) }
@@ -471,17 +479,10 @@ public struct InputPopupView: View {
     }
     
     // 创建绑定
-    private func binding(for id: UUID) -> Binding<String> {
+    private func binding(for id: String) -> Binding<String> {
         Binding(
             get: { values[id] ?? "" },
-            set: { 
-                values[id] = $0
-                if let field = config.fields.first(where: { $0.id == id }),
-                   let maxLength = field.maxLength, 
-                    $0.count > maxLength {
-                    values[id] = String($0.prefix(maxLength))
-                }
-            }
+            set: { values[id] = $0 }
         )
     }
     
@@ -514,16 +515,12 @@ public struct InputPopupView: View {
         var error = ""
         
         // 检查必填
-        if field.required && value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        if field.isRequired && value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             error = "此项不能为空"
         } 
-        // 检查最大长度
-        else if let maxLength = field.maxLength, value.count > maxLength {
-            error = "不能超过\(maxLength)个字符"
-        }
         // 自定义验证
-        else if let validator = field.validator, !validator(value) {
-            error = "输入格式不正确"
+        else if let validator = field.validator, !validator(value).isValid {
+            error = validator(value).message ?? "输入格式不正确"
         }
         
         // 更新验证错误
@@ -558,9 +555,8 @@ public struct InputPopupView: View {
         // 准备数据
         var result: [String: String] = [:]
         for field in config.fields {
-            if let label = field.label {
-                result[label] = values[field.id] ?? ""
-            }
+            // 使用key作为标识符
+            result[field.key] = values[field.id] ?? field.defaultValue
         }
         
         // 提交
@@ -574,6 +570,7 @@ public extension View {
     func showInputPopup(
         title: String? = nil,
         field: InputField? = nil,
+        key: String? = nil,
         confirmText: String? = nil,
         cancelText: String? = nil,
         width: CGFloat? = nil,
@@ -582,7 +579,11 @@ public extension View {
         onCancel: @escaping () -> Void = {}
     ) {
         // 创建默认字段
-        let defaultField = field ?? InputField(label: "", placeholder: "请输入内容")
+        let defaultField = field ?? InputField(
+            label: "内容", 
+            placeholder: "请输入内容",
+            key: key ?? "value"
+        )
         
         let config = InputPopupConfig(
             title: title,
@@ -592,7 +593,9 @@ public extension View {
         )
         
         showInputPopup(config: config, width: width, height: height) { result in
-            if let value = result[defaultField.label ?? ""] {
+            // 使用key作为标识符
+            let identifier = defaultField.key
+            if let value = result[identifier] {
                 onConfirm(value)
             } else {
                 onConfirm("")
