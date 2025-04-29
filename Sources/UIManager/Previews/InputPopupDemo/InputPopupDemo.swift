@@ -96,10 +96,15 @@ public struct InputPopupDemo: View {
         showInputPopup(
             title: "修改用户名",
             field: InputField(
+                label: "用户名",
                 placeholder: "请输入新的用户名",
-                value: userName,
-                required: true,
-                maxLength: 20
+                key: "username",
+                defaultValue: userName,
+                isRequired: true,
+                validator: { value in
+                    return (value.count >= 2 && value.count <= 20, 
+                            value.count < 2 ? "用户名至少需要2个字符" : nil)
+                }
             ),
             confirmText: "保存",
             cancelText: "取消",
@@ -118,14 +123,16 @@ public struct InputPopupDemo: View {
                 InputField(
                     label: "用户名",
                     placeholder: "请输入用户名",
-                    value: userName,
-                    required: true
+                    key: "username",
+                    defaultValue: userName,
+                    isRequired: true
                 ),
                 InputField(
                     label: "电子邮箱",
                     placeholder: "请输入邮箱",
-                    value: email,
-                    type: .email
+                    key: "email",
+                    defaultValue: email,
+                    inputType: .email
                 )
             ],
             confirmText: "保存",
@@ -136,9 +143,9 @@ public struct InputPopupDemo: View {
         )
         
         showInputPopup(config: config) { values in
-            // 更新状态
-            userName = values["用户名"] ?? userName
-            email = values["电子邮箱"] ?? email
+            // 更新状态 - 使用key获取值
+            userName = values["username"] ?? userName
+            email = values["email"] ?? email
         }
     }
     
@@ -150,13 +157,15 @@ public struct InputPopupDemo: View {
                 InputField(
                     label: "账号",
                     placeholder: "请输入账号/邮箱",
-                    required: true
+                    key: "account",
+                    isRequired: true
                 ),
                 InputField(
                     label: "密码",
                     placeholder: "请输入密码",
-                    type: .password,
-                    required: true
+                    key: "password",
+                    isRequired: true,
+                    inputType: .password
                 )
             ],
             confirmText: "登录",
@@ -170,8 +179,8 @@ public struct InputPopupDemo: View {
         )
         
         showInputPopup(config: config) { values in
-            print("登录账号: \(values["账号"] ?? "")")
-            print("输入密码: \(values["密码"] ?? "")")
+            print("登录账号: \(values["account"] ?? "")")
+            print("输入密码: \(values["password"] ?? "")")
         }
     }
     
@@ -183,35 +192,40 @@ public struct InputPopupDemo: View {
                 InputField(
                     label: "姓名",
                     placeholder: "请输入姓名",
-                    value: userName,
-                    required: true
+                    key: "name",
+                    defaultValue: userName,
+                    isRequired: true
                 ),
                 InputField(
                     label: "邮箱",
                     placeholder: "请输入邮箱",
-                    value: email,
-                    type: .email,
+                    key: "email",
+                    defaultValue: email,
+                    inputType: .email,
                     validator: { email in
-                        email.contains("@") && email.contains(".")
+                        let isValid = email.contains("@") && email.contains(".")
+                        return (isValid, isValid ? nil : "请输入正确的邮箱格式")
                     }
                 ),
                 InputField(
                     label: "手机号",
                     placeholder: "请输入手机号",
-                    value: phoneNumber,
-                    type: .number,
-                    maxLength: 11
+                    key: "phone",
+                    defaultValue: phoneNumber,
+                    inputType: .number
                 ),
                 InputField(
                     label: "地址",
                     placeholder: "请输入地址",
-                    value: address
+                    key: "address",
+                    defaultValue: address
                 ),
                 InputField(
                     label: "备注",
                     placeholder: "请输入备注信息",
-                    value: remark,
-                    type: .multiline
+                    key: "remark",
+                    defaultValue: remark,
+                    inputType: .multiline
                 )
             ],
             confirmText: "提交",
@@ -222,11 +236,11 @@ public struct InputPopupDemo: View {
         )
         
         showInputPopup(config: config) { values in
-            userName = values["姓名"] ?? userName
-            email = values["邮箱"] ?? email
-            phoneNumber = values["手机号"] ?? phoneNumber
-            address = values["地址"] ?? address
-            remark = values["备注"] ?? remark
+            userName = values["name"] ?? userName
+            email = values["email"] ?? email
+            phoneNumber = values["phone"] ?? phoneNumber
+            address = values["address"] ?? address
+            remark = values["remark"] ?? remark
         }
     }
 }
