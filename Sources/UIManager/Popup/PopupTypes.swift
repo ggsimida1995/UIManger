@@ -191,15 +191,10 @@ public struct PopupConfig {
     
     // MARK: - 构造方法
     
-    /// 获取当前环境的默认背景色
-    public static var defaultBackgroundColor: Color {
-        Color(.systemBackground)
-    }
-    
     /// 初始化方法
     public init(
         // 视觉属性
-        backgroundColor: Color = defaultBackgroundColor,
+        backgroundColor: Color = Color.customBackground,
         cornerRadius: CGFloat = 12,
         shadowEnabled: Bool = true,
         offsetY: CGFloat = 0,
@@ -332,3 +327,14 @@ public class PopupModel: Identifiable, ObservableObject {
         self.onClose = onClose
     }
 } 
+
+
+extension Color {
+    public static var customBackground: Color {
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .dark
+                ? UIColor(red: 28/255, green: 28/255, blue: 28/255, alpha: 1)  // 深灰 #1C1C1C
+                : UIColor.white
+        })
+    }
+}
