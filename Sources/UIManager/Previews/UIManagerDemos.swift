@@ -85,7 +85,7 @@ public struct UIManagerDemos: View {
             }
             .environmentObject(PopupManager.shared)
             .environmentObject(ToastManager.shared)
-            .withUIComponents()
+            
         }
     }
     
@@ -94,12 +94,10 @@ public struct UIManagerDemos: View {
         switch demo {
         case .popup:
             PreviewPopupDemo()
+            .withUIComponents()
         case .toast:
             ToastDemoScreen()
-        case .loading:
-            LoadingDemoScreen()
-        case .dialog:
-            DialogDemoScreen()
+            .withUIComponents()
         case .subsection:
             SubsectionDemoScreen()
         case .button:
@@ -113,8 +111,6 @@ public struct UIManagerDemos: View {
     enum DemoType: String, CaseIterable, Identifiable {
         case popup = "弹窗演示"
         case toast = "Toast演示"
-        case loading = "加载动画演示"
-        case dialog = "对话框演示"
         case subsection = "分段器演示"
         case button = "按钮演示"
         case inputPopup = "输入框弹窗演示"
@@ -125,8 +121,6 @@ public struct UIManagerDemos: View {
             switch self {
             case .popup: return "弹窗"
             case .toast: return "Toast提示"
-            case .loading: return "加载动画"
-            case .dialog: return "对话框"
             case .subsection: return "分段器"
             case .button: return "按钮"
             case .inputPopup: return "输入框弹窗"
@@ -137,8 +131,6 @@ public struct UIManagerDemos: View {
             switch self {
             case .popup: return "灵活的自定义弹窗系统"
             case .toast: return "轻量级的文本提示组件"
-            case .loading: return "各种加载状态显示组件"
-            case .dialog: return "提供用户交互的对话框组件"
             case .subsection: return "灵活的分段选择组件"
             case .button: return "丰富的按钮样式组件"
             case .inputPopup: return "支持多种输入类型的弹窗组件"
@@ -149,8 +141,6 @@ public struct UIManagerDemos: View {
             switch self {
             case .popup: return "rectangle.on.rectangle"
             case .toast: return "text.bubble.fill"
-            case .loading: return "arrow.clockwise.circle"
-            case .dialog: return "text.bubble.fill"
             case .subsection: return "list.bullet"
             case .button: return "button.programmable"
             case .inputPopup: return "text.cursor"
@@ -170,265 +160,6 @@ struct PopupDemoScreen: View {
     }
 }
 
-/// Toast演示屏幕
-struct ToastDemoScreen: View {
-    @EnvironmentObject var toastManager: ToastManager
-    
-    var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                headerSection
-                
-                styleSection
-                
-                customizationSection
-            }
-            .padding()
-        }
-        .navigationTitle("Toast提示")
-        .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
-    }
-    
-    // MARK: - UI组件
-    private var headerSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Toast提示组件")
-                .font(.title)
-                .fontWeight(.bold)
-            
-            Text("轻量级、非阻断式的简短消息通知")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.bottom)
-    }
-    
-    private var styleSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Toast样式")
-                .font(.headline)
-            
-            // 普通提示按钮
-            toastButton(
-                title: "信息提示",
-                icon: "info.circle.fill",
-                color: .blue
-            ) {
-                toastManager.showToast(message: "这是一条信息提示")
-            }
-            
-            // 成功提示按钮
-            toastButton(
-                title: "成功提示",
-                icon: "checkmark.circle.fill",
-                color: .green
-            ) {
-                toastManager.showSuccess(message: "操作已成功完成")
-            }
-            
-            // 警告提示按钮
-            toastButton(
-                title: "警告提示",
-                icon: "exclamationmark.triangle.fill",
-                color: .orange
-            ) {
-                toastManager.showWarning(message: "请注意，这是一个警告")
-            }
-            
-            // 错误提示按钮
-            toastButton(
-                title: "错误提示",
-                icon: "xmark.circle.fill",
-                color: .red
-            ) {
-                toastManager.showError(message: "操作失败，请重试")
-            }
-        }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemBackground))
-                .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
-        )
-    }
-    
-    private var customizationSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("自定义持续时间")
-                .font(.headline)
-            
-            // 长时间显示
-            toastButton(
-                title: "长时间Toast (5秒)",
-                icon: "clock.fill",
-                color: .purple
-            ) {
-                toastManager.showToast(message: "这条Toast会显示5秒钟", duration: 5.0)
-            }
-            
-            // 短时间显示
-            toastButton(
-                title: "短时间Toast (1秒)",
-                icon: "clock",
-                color: .blue
-            ) {
-                toastManager.showToast(message: "这条Toast会很快消失", duration: 1.0)
-            }
-        }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemBackground))
-                .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
-        )
-    }
-    
-    // 创建统一样式的Toast按钮
-    private func toastButton(
-        title: String,
-        icon: String,
-        color: Color,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            HStack(spacing: 12) {
-                Image(systemName: icon)
-                    .font(.system(size: 18))
-                    .foregroundColor(.white)
-                    .frame(width: 28, height: 28)
-                    .background(
-                        Circle()
-                            .fill(color)
-                    )
-                
-                Text(title)
-                    .font(.system(size: 16))
-                
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 14))
-                    .foregroundColor(Color.gray.opacity(0.5))
-            }
-            .padding(.vertical, 12)
-            .padding(.horizontal, 16)
-            .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color(.systemGray6))
-            )
-        }
-    }
-}
-
-/// 加载动画演示屏幕
-struct LoadingDemoScreen: View {
-    var body: some View {
-        VStack(spacing: 20) {
-            Text("加载指示器演示")
-                .font(.title)
-            
-            Text("此功能正在开发中，敬请期待...")
-                .font(.headline)
-                .multilineTextAlignment(.center)
-                .foregroundColor(.secondary)
-                .padding()
-            
-            // 示例加载动画
-            VStack(spacing: 24) {
-                ProgressView()
-                    .scaleEffect(1.5)
-                    .padding()
-                
-                Text("模拟加载中")
-                    .foregroundColor(.secondary)
-            }
-            .frame(width: 200, height: 200)
-            .background(
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(Color(.systemBackground))
-                    .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
-            )
-            
-            Button("显示加载动画") {
-                // 实际功能将在后续实现
-            }
-            .padding()
-            .background(Color.blue)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-            .padding(.top, 40)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
-        .navigationTitle("加载动画")
-    }
-}
-
-/// 对话框演示屏幕
-struct DialogDemoScreen: View {
-    var body: some View {
-        VStack(spacing: 20) {
-            Text("对话框演示")
-                .font(.title)
-            
-            Text("此功能正在开发中，敬请期待...")
-                .font(.headline)
-                .multilineTextAlignment(.center)
-                .foregroundColor(.secondary)
-                .padding()
-            
-            // 对话框示例UI
-            VStack(spacing: 24) {
-                Image(systemName: "text.bubble.fill")
-                    .font(.system(size: 40))
-                    .foregroundColor(.blue)
-                
-                Text("确认操作")
-                    .font(.headline)
-                
-                Text("您确定要执行此操作吗？")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                
-                HStack(spacing: 12) {
-                    Button("取消") {}
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(8)
-                    
-                    Button("确认") {}
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
-            }
-            .padding(24)
-            .frame(width: 280)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(.systemBackground))
-                    .shadow(color: Color.black.opacity(0.1), radius: 20, x: 0, y: 10)
-            )
-            
-            Button("显示对话框示例") {
-                // 实际功能将在后续实现
-            }
-            .padding()
-            .background(Color.blue)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-            .padding(.top, 40)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
-        .navigationTitle("对话框")
-    }
-}
 
 // MARK: - 预览
 struct UIManagerDemos_Previews: PreviewProvider {

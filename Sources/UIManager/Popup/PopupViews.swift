@@ -52,9 +52,7 @@ public struct PopupContainerView: View {
                 }
             }
             .padding(getPadding())
-            // 应用垂直偏移，确保不是NaN
-            .offset(y: popup.config.offsetY.isNaN ? 0 : -popup.config.offsetY)
-            // 添加动画修饰符
+        // 添加动画修饰符
             .animation(popup.config.animation, value: true)
         
         if case .absolute(let left, let top, let right, let bottom) = popup.position {
@@ -67,8 +65,7 @@ public struct PopupContainerView: View {
                             right: right,
                             bottom: bottom,
                             screenSize: geo.size,
-                            contentSize: estimateContentSize(geo: geo),
-                            offsetY: popup.config.offsetY.isNaN ? 0 : popup.config.offsetY
+                            contentSize: estimateContentSize(geo: geo)
                         )
                     )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -97,8 +94,7 @@ public struct PopupContainerView: View {
         right: CGFloat?,
         bottom: CGFloat?,
         screenSize: CGSize,
-        contentSize: CGSize,
-        offsetY: CGFloat = 0
+        contentSize: CGSize
     ) -> CGPoint {
         let halfWidth = contentSize.width / 2
         let halfHeight = contentSize.height / 2
@@ -132,9 +128,6 @@ public struct PopupContainerView: View {
         // 确保弹窗显示在屏幕内
         xPos = min(max(halfWidth, xPos), screenSize.width - halfWidth)
         yPos = min(max(halfHeight, yPos), screenSize.height - halfHeight)
-        
-        // 应用垂直偏移，确保不是NaN
-        yPos -= offsetY.isNaN ? 0 : offsetY
         
         return CGPoint(x: xPos, y: yPos)
     }
@@ -192,54 +185,50 @@ public struct PopupViewModifier: ViewModifier {
     @Environment(\.colorScheme) private var colorScheme
     
     public func body(content: Content) -> some View {
-        ZStack {
-            content
-            
-            if popupManager.popupCount > 0 {
-                // 背景遮罩，无需依赖于特定弹窗的动画
-                Color.black.opacity(0.4)
-                    .ignoresSafeArea()
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        // 点击蒙层时关闭顶部弹窗(如果允许)
-                        if let popup = popupManager.popup(at: popupManager.popupCount - 1),
-                           popup.config.closeOnTapOutside {
-                            // 先尝试隐藏键盘
-                            #if canImport(UIKit)
-                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                            #endif
-                            
-                            // 延迟一小段时间再关闭弹窗
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                withAnimation(popup.config.animation) {
-                                    popupManager.closePopup(id: popup.id)
+        GeometryReader { geo in
+            ZStack {
+                content
+                
+                if popupManager.popupCount > 0 {
+                    // 背景遮罩，无需依赖于特定弹窗的动画
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            // 点击蒙层时关闭顶部弹窗(如果允许)
+                            if let popup = popupManager.popup(at: popupManager.popupCount - 1),
+                               popup.config.closeOnTapOutside {
+                                // 先尝试隐藏键盘
+#if canImport(UIKit)
+                                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+#endif
+                                
+                                // 延迟一小段时间再关闭弹窗
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    withAnimation(popup.config.animation) {
+                                        popupManager.closePopup(id: popup.id)
+                                    }
                                 }
                             }
                         }
-                    }
-                    .transition(.opacity)
-                    .animation(.easeInOut(duration: 0.2), value: popupManager.popupCount > 0)
-                    .zIndex(900)
-                
-                // 逐个显示弹窗
-                ForEach(popupManager.getActivePopups(), id: \.id) { popup in
-                    // 使用独立的ZStack包装每个弹窗，确保动画独立
-                    ZStack {
-                        GeometryReader { geo in
+                        .transition(.opacity)
+                        .animation(.easeInOut(duration: 0.2), value: popupManager.popupCount > 0)
+                        .zIndex(900)
+                    
+                    // 逐个显示弹窗
+                    ForEach(popupManager.getActivePopups(), id: \.id) { popup in
                             PopupContainerView(
                                 popup: popup,
                                 screenSize: geo.size,
                                 safeArea: geo.safeAreaInsets
                             )
-                        }
-                        .ignoresSafeArea()
+                        .explicitTransition(popup: popup)
+                        .zIndex(999)
                     }
-                    // 使用explicitTransition确保过渡动画被显式应用
-                    .explicitTransition(popup: popup)
-                    .zIndex(999)
                 }
             }
         }
+        .ignoresSafeArea()
     }
 }
 
@@ -257,9 +246,9 @@ private struct ExplicitTransitionModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            // 1. 应用过渡效果 - 使用自定义过渡效果或位置相关的默认过渡效果
+        // 1. 应用过渡效果 - 使用自定义过渡效果或位置相关的默认过渡效果
             .transition(popup.config.customTransition ?? popup.position.getEntryTransition())
-            // 2. 应用动画 - 确保动画与过渡效果相协调
+        // 2. 应用动画 - 确保动画与过渡效果相协调
             .animation(popup.config.animation, value: true)
     }
 }
@@ -269,7 +258,7 @@ public extension View {
     /// 在视图中添加 Popup 显示功能
     func withPopups() -> some View {
         self.modifier(PopupViewModifier())
-            // 禁用默认动画，使用我们自定义的动画控制
+        // 禁用默认动画，使用我们自定义的动画控制
             .animation(nil, value: PopupManager.shared.popupCount)
     }
     
@@ -294,7 +283,7 @@ public extension View {
             )
         }
     }
-   
+    
     
     /// 关闭所有弹窗
     func uiCloseAllPopups() {
@@ -302,7 +291,7 @@ public extension View {
             PopupManager.shared.closeAllPopups()
         }
     }
-
+    
     /// 通过uuid关闭指定的弹窗
     func uiClosePopup(id: UUID) {
         withAnimation {

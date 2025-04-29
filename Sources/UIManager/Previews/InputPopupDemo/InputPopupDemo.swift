@@ -82,7 +82,6 @@ public struct InputPopupDemo: View {
             config: PopupConfig(
                 cornerRadius: 16,
                 shadowEnabled: true,
-                offsetY: 0,
                 showCloseButton: false,
                 closeButtonPosition: .topTrailing,
                 closeButtonStyle: .circular,
@@ -130,7 +129,6 @@ public struct InputPopupDemo: View {
             config: PopupConfig(
                 cornerRadius: 16,
                 shadowEnabled: true,
-                offsetY: 0,
                 showCloseButton: false,
                 closeButtonPosition: .topTrailing,
                 closeButtonStyle: .circular,
@@ -178,7 +176,6 @@ public struct InputPopupDemo: View {
             config: PopupConfig(
                 cornerRadius: 16,
                 shadowEnabled: true,
-                offsetY: 0,
                 showCloseButton: false,
                 closeButtonPosition: .topTrailing,
                 closeButtonStyle: .circular,
