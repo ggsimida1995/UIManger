@@ -59,27 +59,37 @@ public class ToastManager: ObservableObject {
     
     /// 显示一个普通Toast
     public func showToast(message: String, duration: Double = 2.0) {
-        currentToast = ToastData(message: message, style: .info, duration: duration)
+        DispatchQueue.main.async {
+            self.currentToast = ToastData(message: message, style: .info, duration: duration)
+        }
     }
     
     /// 显示一个成功Toast
     public func showSuccess(message: String, duration: Double = 2.0) {
-        currentToast = ToastData(message: message, style: .success, duration: duration)
+        DispatchQueue.main.async {
+            self.currentToast = ToastData(message: message, style: .success, duration: duration)
+        }
     }
     
     /// 显示一个错误Toast
     public func showError(message: String, duration: Double = 2.0) {
-        currentToast = ToastData(message: message, style: .error, duration: duration)
+        DispatchQueue.main.async {
+            self.currentToast = ToastData(message: message, style: .error, duration: duration)
+        }
     }
     
     /// 显示一个警告Toast
     public func showWarning(message: String, duration: Double = 2.0) {
-        currentToast = ToastData(message: message, style: .warning, duration: duration)
+        DispatchQueue.main.async {
+            self.currentToast = ToastData(message: message, style: .warning, duration: duration)
+        }
     }
     
     /// 隐藏当前显示的 Toast
     public func hideCurrentToast() {
-        currentToast = nil
+        DispatchQueue.main.async {
+            self.currentToast = nil
+        }
     }
 }
 
@@ -105,21 +115,29 @@ public extension View {
     
     /// 便捷方法：显示信息Toast
     func uiToast(_ message: String, duration: Double = 2.0) {
-        ToastManager.shared.showToast(message: message, duration: duration)
+        DispatchQueue.main.async {
+            ToastManager.shared.showToast(message: message, duration: duration)
+        }
     }
     
     /// 便捷方法：显示成功Toast
     func uiSuccess(_ message: String, duration: Double = 2.0) {
-        ToastManager.shared.showSuccess(message: message, duration: duration)
+        DispatchQueue.main.async {
+            ToastManager.shared.showSuccess(message: message, duration: duration)
+        }
     }
     
     /// 便捷方法：显示错误Toast
     func uiError(_ message: String, duration: Double = 2.0) {
-        ToastManager.shared.showError(message: message, duration: duration)
+        DispatchQueue.main.async {
+            ToastManager.shared.showError(message: message, duration: duration)
+        }
     }
     
     /// 便捷方法：显示警告Toast
     func uiWarning(_ message: String, duration: Double = 2.0) {
-        ToastManager.shared.showWarning(message: message, duration: duration)
+        DispatchQueue.main.async {
+            ToastManager.shared.showWarning(message: message, duration: duration)
+        }
     }
 } 
