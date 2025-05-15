@@ -75,15 +75,3 @@ public struct ToastViewModifier: ViewModifier {
             .modifier(ToastModifier(toast: $toastManager.currentToast))
     }
 }
-
-/// 扩展View以便使用Toast
-public extension View {
-    func toast(toast: Binding<ToastData?>) -> some View {
-        self.modifier(ToastModifier(toast: toast))
-    }
-    
-    /// 便捷方法：显示默认Toast
-    func showToast(message: String, style: ToastStyle = .info, duration: Double = 2.0, in toast: Binding<ToastData?>) {
-        toast.wrappedValue = ToastData(message: message, style: style, duration: duration)
-    }
-} 
