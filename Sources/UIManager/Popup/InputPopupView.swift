@@ -292,17 +292,17 @@ public struct InputPopupAppearance {
     
     /// 初始化方法
     public init(
-        backgroundColor: Color = Color(.systemBackground),
-        titleColor: Color = .primary,
+        backgroundColor: Color = .backgroundColor,
+        titleColor: Color = .textColor,
         titleFont: Font = .headline,
-        fieldBackgroundColor: Color = Color(.secondarySystemBackground),
-        fieldBorderColor: Color = Color.gray.opacity(0.2),
-        fieldTextColor: Color = .primary,
+        fieldBackgroundColor: Color = .secondaryBackgroundColor,
+        fieldBorderColor: Color = .borderColor,
+        fieldTextColor: Color = .textColor,
         fieldFont: Font = .body,
-        labelColor: Color = .secondary,
+        labelColor: Color = .secondaryTextColor,
         labelFont: Font = .subheadline,
-        confirmButtonColor: Color = .accentColor,
-        cancelButtonColor: Color = Color.gray.opacity(0.15)
+        confirmButtonColor: Color = .primaryButtonBackground,
+        cancelButtonColor: Color = .secondaryButtonBackground
     ) {
         self.backgroundColor = backgroundColor
         self.titleColor = titleColor
@@ -376,7 +376,7 @@ public struct InputPopupView: View {
                         .padding(.vertical, 12)
                         .background(config.appearance.cancelButtonColor)
                         .cornerRadius(8)
-                        .foregroundColor(.primary)
+                        .foregroundColor(.secondaryButtonText)
                 }
                 
                 // 确认按钮
@@ -388,7 +388,7 @@ public struct InputPopupView: View {
                         .padding(.vertical, 12)
                         .background(config.appearance.confirmButtonColor)
                         .cornerRadius(8)
-                        .foregroundColor(.white)
+                        .foregroundColor(.primaryButtonText)
                 }
             }
             .padding(.horizontal, 16)

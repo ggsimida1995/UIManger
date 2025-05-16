@@ -210,13 +210,13 @@ public extension PreviewPopupDemo {
         public var id: String { self.rawValue }
         
         // 转换为PopupConfig.CloseButtonStyle
-        func toStyle(themeColor: Color) -> PopupConfig.CloseButtonStyle {
-            switch self {
-            case .circular: return .circular
-            case .square: return .square
-            case .minimal: return .minimal
-            case .custom: return .custom(themeColor, Color.white)
-            }
-        }
+//        func toStyle(themeColor: Color) -> PopupConfig.CloseButtonStyle {
+//            switch self {
+//            case .circular: return .circular
+//            case .square: return .square
+//            case .minimal: return .minimal
+//            case .custom: return .custom(themeColor, Color.white)
+//            }
+//        }
     }
 } #endif

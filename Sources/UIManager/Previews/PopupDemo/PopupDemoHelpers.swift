@@ -36,7 +36,6 @@ public extension PreviewPopupDemo {
             shadowEnabled: true,
             showCloseButton: showCloseButton,
             closeButtonPosition: .topTrailing,
-            closeButtonStyle: selectedButtonStyle.toStyle(themeColor: .blue),
             closeOnTapOutside: true
         )
         
