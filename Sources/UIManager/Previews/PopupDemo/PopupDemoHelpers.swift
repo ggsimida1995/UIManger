@@ -34,6 +34,7 @@ public extension PreviewPopupDemo {
         var entryConfig = PopupConfig(
             cornerRadius: 12,
             shadowEnabled: true,
+            title: "基础弹窗",
             showCloseButton: showCloseButton,
             closeButtonPosition: .topTrailing,
             closeOnTapOutside: true

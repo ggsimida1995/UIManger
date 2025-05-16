@@ -42,27 +42,39 @@ public struct PopupContainerView: View {
     
     // 弹窗内容
     private var popupContent: some View {
-        popup.content
-            .padding()
-            .frame(width: getWidth(), height: getHeight())
-            .background(Color.backgroundColor)
-            .clipShape(RoundedRectangle(cornerRadius: popup.config.cornerRadius))
-            .shadow(
-                color: getShadowColor(),
-                radius: popup.config.shadowEnabled ? 10 : 0,
-                x: 0,
-                y: popup.config.shadowEnabled ? 5 : 0
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: popup.config.cornerRadius)
-                    .stroke(Color.borderColor, lineWidth: 1)
-            )
-            .overlay(alignment: getCloseButtonAlignment()) {
-                if popup.config.showCloseButton {
-                    closeButton
-                }
+        VStack(spacing: 0) {
+            if let title = popup.config.title {
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(.textColor)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 16)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
             }
-            .padding(getPadding())
+            
+            popup.content
+                .padding()
+                .frame(width: getWidth(), height: getHeight())
+        }
+        .background(Color.backgroundColor)
+        .clipShape(RoundedRectangle(cornerRadius: popup.config.cornerRadius))
+        .shadow(
+            color: getShadowColor(),
+            radius: popup.config.shadowEnabled ? 10 : 0,
+            x: 0,
+            y: popup.config.shadowEnabled ? 5 : 0
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: popup.config.cornerRadius)
+                .stroke(Color.borderColor, lineWidth: 1)
+        )
+        .overlay(alignment: getCloseButtonAlignment()) {
+            if popup.config.showCloseButton {
+                closeButton
+            }
+        }
+        .padding(getPadding())
     }
     
     // 获取尺寸
