@@ -122,6 +122,11 @@ public struct PopupConfig {
     /// 是否启用阴影
     public var shadowEnabled: Bool
     
+    // MARK: - 标题
+    
+    /// 标题文本
+    public var title: String?
+    
     // MARK: - 关闭按钮
     
     /// 关闭按钮位置
@@ -171,6 +176,9 @@ public struct PopupConfig {
         cornerRadius: CGFloat = 12,
         shadowEnabled: Bool = true,
         
+        // 标题
+        title: String? = nil,
+        
         // 关闭按钮
         showCloseButton: Bool = false,
         closeButtonPosition: CloseButtonPosition = .topTrailing,
@@ -188,6 +196,8 @@ public struct PopupConfig {
     ) {
         self.cornerRadius = cornerRadius
         self.shadowEnabled = shadowEnabled
+        
+        self.title = title
         
         self.showCloseButton = showCloseButton
         self.closeButtonPosition = closeButtonPosition
