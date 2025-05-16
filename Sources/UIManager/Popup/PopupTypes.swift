@@ -116,9 +116,6 @@ public enum PopupSize {
 public struct PopupConfig {
     // MARK: - 视觉属性
     
-    /// 弹窗背景色
-    public var backgroundColor: Color
-    
     /// 弹窗圆角半径
     public var cornerRadius: CGFloat
     
@@ -137,29 +134,6 @@ public struct PopupConfig {
         case circular     // 圆形按钮
         case square       // 方形按钮
         case minimal      // 仅图标
-        case custom(Color, Color) // 自定义按钮样式 (背景色, 图标色)
-        
-        // 获取背景颜色
-        var backgroundColor: Color {
-            switch self {
-            case .circular, .square:
-                return Color.gray.opacity(0.1)
-            case .minimal:
-                return Color.clear
-            case .custom(_, let iconColor):
-                return iconColor.opacity(0.1)
-            }
-        }
-        
-        // 获取图标颜色
-        var iconColor: Color {
-            switch self {
-            case .circular, .square, .minimal:
-                return Color.gray
-            case .custom(let bgColor, _):
-                return bgColor
-            }
-        }
     }
     
     /// 是否显示关闭按钮
@@ -194,10 +168,8 @@ public struct PopupConfig {
     /// 初始化方法
     public init(
         // 视觉属性
-        backgroundColor: Color = Color.customBackground,
         cornerRadius: CGFloat = 12,
         shadowEnabled: Bool = true,
-        offsetY: CGFloat = 0,
         
         // 关闭按钮
         showCloseButton: Bool = false,
@@ -214,7 +186,6 @@ public struct PopupConfig {
         // 回调
         onClose: (() -> Void)? = nil
     ) {
-        self.backgroundColor = backgroundColor
         self.cornerRadius = cornerRadius
         self.shadowEnabled = shadowEnabled
         
@@ -327,14 +298,3 @@ public class PopupModel: Identifiable, ObservableObject {
         self.onClose = onClose
     }
 } 
-
-
-extension Color {
-    public static var customBackground: Color {
-        Color(UIColor { trait in
-            trait.userInterfaceStyle == .dark
-                ? UIColor(red: 28/255, green: 28/255, blue: 28/255, alpha: 1)  // 深灰 #1C1C1C
-                : UIColor.white
-        })
-    }
-}

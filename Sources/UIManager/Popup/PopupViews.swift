@@ -45,7 +45,7 @@ public struct PopupContainerView: View {
         popup.content
             .padding()
             .frame(width: getWidth(), height: getHeight())
-            .background(popup.config.backgroundColor)
+            .background(Color.backgroundColor)
             .clipShape(RoundedRectangle(cornerRadius: popup.config.cornerRadius))
             .shadow(
                 color: getShadowColor(),
@@ -55,7 +55,7 @@ public struct PopupContainerView: View {
             )
             .overlay(
                 RoundedRectangle(cornerRadius: popup.config.cornerRadius)
-                    .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                    .stroke(Color.borderColor, lineWidth: 1)
             )
             .overlay(alignment: getCloseButtonAlignment()) {
                 if popup.config.showCloseButton {
@@ -138,7 +138,7 @@ public struct PopupContainerView: View {
         } label: {
             Image(systemName: "xmark")
                 .font(.system(size: 17, weight: .bold))
-                .foregroundColor(popup.config.closeButtonStyle.iconColor)
+                .foregroundColor(.textColor)
                 .padding(8)
                 .background(closeButtonBackground)
         }
@@ -151,12 +151,12 @@ public struct PopupContainerView: View {
     private var closeButtonBackground: some View {
         switch popup.config.closeButtonStyle {
         case .circular:
-            Circle().fill(popup.config.closeButtonStyle.backgroundColor)
+            Circle().fill(Color.secondaryBackgroundColor)
         case .square:
             RoundedRectangle(cornerRadius: 4)
-                .fill(popup.config.closeButtonStyle.backgroundColor)
-        case .minimal, .custom:
-            popup.config.closeButtonStyle.backgroundColor.clipShape(Circle())
+                .fill(Color.secondaryBackgroundColor)
+        case .minimal:
+            Color.clear.clipShape(Circle())
         }
     }
     
@@ -201,7 +201,7 @@ public struct PopupViewModifier: ViewModifier {
     
     // 背景遮罩层
     private var backgroundOverlay: some View {
-        Color.black.opacity(0.4)
+        Color.overlayColor
             .ignoresSafeArea()
             .contentShape(Rectangle())
             .onTapGesture(perform: handleBackgroundTap)
@@ -287,7 +287,6 @@ public extension View {
         }
     }
     
-
     /// 关闭所有弹窗
     func uiCloseAllPopups() {
         withAnimation {

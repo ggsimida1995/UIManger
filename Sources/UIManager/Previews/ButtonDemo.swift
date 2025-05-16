@@ -22,7 +22,8 @@ public struct ButtonDemo: View {
             .padding()
         }
         .navigationTitle("按钮组件")
-        .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
+        .background(Color.backgroundColor)
+        .edgesIgnoringSafeArea(.all)
     }
     
     // MARK: - UI组件

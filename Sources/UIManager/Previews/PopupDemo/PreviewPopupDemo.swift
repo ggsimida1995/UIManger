@@ -78,11 +78,11 @@ public struct PreviewPopupDemo: View {
                                     width = 250
                                 }
                                 .font(.caption)
-                                .foregroundColor(.blue)
+                                .foregroundColor(Color.textColor)
                             }
                             
                             Slider(value: $width, in: 100...350, step: 10)
-                                .accentColor(.blue)
+                                .accentColor(Color.accentColor)
                         }
                         
                         // 高度滑块
@@ -97,17 +97,17 @@ public struct PreviewPopupDemo: View {
                                     height = 250
                                 }
                                 .font(.caption)
-                                .foregroundColor(.blue)
+                                .foregroundColor(Color.textColor)
                             }
                             
                             Slider(value: $height, in: 100...350, step: 10)
-                                .accentColor(.blue)
+                                .accentColor(Color.accentColor)
                         }
                         
                         // 尺寸预览
                         ZStack {
                             RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.blue, lineWidth: 1)
+                                .stroke(Color.borderColor, lineWidth: 1)
                                 .frame(
                                     width: width * 0.3,
                                     height: height * 0.3
@@ -118,6 +118,7 @@ public struct PreviewPopupDemo: View {
                                 .foregroundColor(.secondary)
                         }
                         .frame(height: 100)
+                        .background(Color.accentColor)
                     }
                     .padding(.horizontal)
                 }
@@ -164,7 +165,7 @@ public struct PreviewPopupDemo: View {
                                     Button(action: { showAdvancedAnimation.toggle() }) {
                                         Label(showAdvancedAnimation ? "收起" : "展开", systemImage: showAdvancedAnimation ? "chevron.up" : "chevron.down")
                                             .font(.caption)
-                                            .foregroundColor(.blue)
+                                            .foregroundColor(Color.textColor)
                                     }
                                 }
                                 
@@ -269,11 +270,11 @@ public struct PreviewPopupDemo: View {
                                     animationDuration = 0.3
                                 }
                                 .font(.caption)
-                                .foregroundColor(.blue)
+                                .foregroundColor(Color.textColor)
                             }
                             
                             Slider(value: $animationDuration, in: 0.1...2.0, step: 0.1)
-                                .accentColor(.blue)
+                                .accentColor(Color.accentColor)
                         }
                     }
                     .padding(.horizontal)
@@ -303,7 +304,7 @@ public struct PreviewPopupDemo: View {
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .frame(height: 44)
-                        .background(Color.blue)
+                        .background(Color.accentColor)
                         .cornerRadius(10)
                         .padding(.horizontal)
                 }
@@ -326,7 +327,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(Color.blue.opacity(0.6))
+                            .background(Color.accentColor.opacity(0.6))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -338,7 +339,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(Color.blue.opacity(0.6))
+                            .background(Color.accentColor.opacity(0.6))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -352,7 +353,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(Color.blue.opacity(0.6))
+                            .background(Color.accentColor.opacity(0.6))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -364,7 +365,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(Color.blue.opacity(0.6))
+                            .background(Color.accentColor.opacity(0.6))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -390,7 +391,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(Color.blue.opacity(0.5))
+                            .background(Color.accentColor.opacity(0.5))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -402,7 +403,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(Color.blue.opacity(0.5))
+                            .background(Color.accentColor.opacity(0.5))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -416,7 +417,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(Color.blue.opacity(0.5))
+                            .background(Color.accentColor.opacity(0.5))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -428,7 +429,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(Color.blue.opacity(0.5))
+                            .background(Color.accentColor.opacity(0.5))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -443,7 +444,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(Color.blue.opacity(0.5))
+                            .background(Color.accentColor.opacity(0.5))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -455,7 +456,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(Color.blue.opacity(0.5))
+                            .background(Color.accentColor.opacity(0.5))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -469,7 +470,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(Color.blue.opacity(0.5))
+                            .background(Color.accentColor.opacity(0.5))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
@@ -481,7 +482,7 @@ public struct PreviewPopupDemo: View {
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(Color.blue.opacity(0.5))
+                            .background(Color.accentColor.opacity(0.5))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                         }
