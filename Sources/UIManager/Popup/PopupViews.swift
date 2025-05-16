@@ -50,7 +50,6 @@ public struct PopupContainerView: View {
                     .multilineTextAlignment(.center)
                     .padding(.top, 16)
                     .padding(.horizontal, 16)
-                    .padding(.bottom, 8)
             }
             
             popup.content
