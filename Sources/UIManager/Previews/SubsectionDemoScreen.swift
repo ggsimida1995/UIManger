@@ -36,8 +36,18 @@ struct SubsectionDemoScreen: View {
             SubsectionItem(title: "选项3", value: "3")
         ],
         current: 1,
-        fontSize: 16,
-        bold: true
+        fontSize: 16
+    )
+    
+    private let fontWeightExampleConfig = SubsectionConfig(
+        title: "自定义粗细",
+        items: [
+            SubsectionItem(title: "常规字体", value: "regular"),
+            SubsectionItem(title: "中等字体", value: "medium"),
+            SubsectionItem(title: "粗体字体", value: "bold")
+        ],
+        current: 1,
+        fontSize: 15
     )
     
     private let customCornerConfig = SubsectionConfig(
@@ -155,6 +165,53 @@ struct SubsectionDemoScreen: View {
                 SubsectionView(config: customFontConfig) { index in
                     print("自定义字体选中: \(index)")
                 }
+            }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.systemBackground))
+                    .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
+            )
+            
+            // 字体粗细
+            VStack(alignment: .leading, spacing: 8) {
+                Text("字体粗细")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                
+                SubsectionView(config: fontWeightExampleConfig) { index in
+                    print("字体粗细选中: \(index)")
+                }
+                
+                HStack(spacing: 12) {
+                    Text("可用粗细:")
+                        .font(.caption)
+                    
+                    Text("ultraLight")
+                        .font(.system(size: 12, weight: .ultraLight))
+                    
+                    Text("light")
+                        .font(.system(size: 12, weight: .light))
+                    
+                    Text("regular")
+                        .font(.system(size: 12, weight: .regular))
+                    
+                    Text("medium")
+                        .font(.system(size: 12, weight: .medium))
+                    
+                    Text("semibold")
+                        .font(.system(size: 12, weight: .semibold))
+                    
+                    Text("bold")
+                        .font(.system(size: 12, weight: .bold))
+                    
+                    Text("heavy")
+                        .font(.system(size: 12, weight: .heavy))
+                    
+                    Text("black")
+                        .font(.system(size: 12, weight: .black))
+                }
+                .padding(.top, 4)
             }
             .padding()
             .background(

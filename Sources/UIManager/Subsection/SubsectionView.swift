@@ -56,7 +56,7 @@ public struct SubsectionView: View {
                     // 显示选中的文字
                     if let selectedItem = config.items[safe: currentIndex] {
                         Text(selectedItem.title)
-                            .font(.system(size: config.fontSize, weight: config.bold ? .bold : .regular))
+                            .font(.system(size: config.fontSize, weight: .medium))
                             .foregroundColor(config.colorConfig.activeTextColor)
                             .frame(width: proxy.size.width / CGFloat(config.items.count) - 2 * padding, height: proxy.size.height - 4)
                             .offset(x: CGFloat(currentIndex) * (proxy.size.width / CGFloat(config.items.count)) + padding, y: 0)
@@ -94,7 +94,7 @@ private struct SubsectionButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: config.fontSize, weight: config.bold ? .bold : .regular))
+                .font(.system(size: config.fontSize, weight: .medium))
                 .foregroundColor(isSelected ? colorConfig.activeTextColor : colorConfig.inactiveTextColor)
                 .frame(width: width, height: height - 4)
         }
