@@ -40,7 +40,6 @@ public struct SubsectionConfig {
     public var items: [SubsectionItem]
     public var current: Int
     public var fontSize: CGFloat
-    public var bold: Bool
     public var cornerRadius: CGFloat
     public var height: CGFloat
     public var width: CGFloat?
@@ -51,7 +50,6 @@ public struct SubsectionConfig {
         items: [SubsectionItem],
         current: Int = 0,
         fontSize: CGFloat = 14,
-        bold: Bool = false,
         cornerRadius: CGFloat = 5,
         height: CGFloat = 30,
         width: CGFloat? = nil,
@@ -61,7 +59,6 @@ public struct SubsectionConfig {
         self.items = items
         self.current = current
         self.fontSize = fontSize
-        self.bold = bold
         self.cornerRadius = cornerRadius
         self.height = height
         self.width = width
