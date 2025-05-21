@@ -1,8 +1,8 @@
 import SwiftUI
+import UIKit
 
 /// 分段器视图
 public struct SubsectionView: View {
-    @Environment(\.colorScheme) private var colorScheme
     @State private var currentIndex: Int
     private let config: SubsectionConfig
     private let onChange: ((Int) -> Void)?
@@ -11,11 +11,6 @@ public struct SubsectionView: View {
     private let animation: Animation = .spring(response: 0.3, dampingFraction: 0.8)
     private let spacing: CGFloat = 0
     private let padding: CGFloat = 2
-    
-    // 当前颜色配置
-    private var currentColorConfig: SubsectionColorConfig.ColorMode {
-        colorScheme == .dark ? config.colorConfig.darkMode : config.colorConfig.lightMode
-    }
     
     public init(
         config: SubsectionConfig? = nil,
@@ -46,14 +41,14 @@ public struct SubsectionView: View {
                                 width: proxy.size.width / CGFloat(config.items.count),
                                 height: proxy.size.height,
                                 config: config,
-                                currentColorConfig: currentColorConfig
+                                colorConfig: config.colorConfig
                             )
                         }
                     }
                     
                     // 滑动指示器
                     Rectangle()
-                        .foregroundColor(currentColorConfig.activeBgColor)
+                        .foregroundColor(config.colorConfig.activeBgColor)
                         .frame(width: proxy.size.width / CGFloat(config.items.count) - 2 * padding, height: proxy.size.height - 4)
                         .cornerRadius(config.cornerRadius)
                         .offset(x: CGFloat(currentIndex) * (proxy.size.width / CGFloat(config.items.count)) + padding, y: 0)
@@ -62,14 +57,14 @@ public struct SubsectionView: View {
                     if let selectedItem = config.items[safe: currentIndex] {
                         Text(selectedItem.title)
                             .font(.system(size: config.fontSize, weight: config.bold ? .bold : .regular))
-                            .foregroundColor(currentColorConfig.activeTextColor)
+                            .foregroundColor(config.colorConfig.activeTextColor)
                             .frame(width: proxy.size.width / CGFloat(config.items.count) - 2 * padding, height: proxy.size.height - 4)
                             .offset(x: CGFloat(currentIndex) * (proxy.size.width / CGFloat(config.items.count)) + padding, y: 0)
                             .zIndex(1)
                     }
                 }
                 .frame(height: proxy.size.height)
-                .background(currentColorConfig.inactiveBgColor)
+                .background(config.colorConfig.inactiveBgColor)
                 .clipShape(RoundedRectangle(cornerRadius: config.cornerRadius))
             }
             .frame(height: config.height)
@@ -94,13 +89,13 @@ private struct SubsectionButton: View {
     let width: CGFloat
     let height: CGFloat
     let config: SubsectionConfig
-    let currentColorConfig: SubsectionColorConfig.ColorMode
+    let colorConfig: ColorMode
     
     var body: some View {
         Button(action: action) {
             Text(title)
                 .font(.system(size: config.fontSize, weight: config.bold ? .bold : .regular))
-                .foregroundColor(isSelected ? currentColorConfig.activeTextColor : currentColorConfig.inactiveTextColor)
+                .foregroundColor(isSelected ? colorConfig.activeTextColor : colorConfig.inactiveTextColor)
                 .frame(width: width, height: height - 4)
         }
     }
