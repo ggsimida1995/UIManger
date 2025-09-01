@@ -10,13 +10,13 @@ public enum ToastStyle {
     var themeColor: Color {
         switch self {
         case .info:
-            return Color.blue
+            return Color.primaryColor
         case .success:
-            return Color.green
+            return Color.successColor
         case .error:
-            return Color.red
+            return Color.errorColor
         case .warning:
-            return Color.orange
+            return Color.warningColor
         }
     }
     
@@ -114,30 +114,30 @@ public extension View {
     }
     
     /// 便捷方法：显示信息Toast
-    func uiToast(_ message: String, duration: Double = 2.0) {
+    func toast(_ message: String, duration: Double = 2.0) {
         DispatchQueue.main.async {
             ToastManager.shared.showToast(message: message, duration: duration)
         }
     }
     
     /// 便捷方法：显示成功Toast
-    func uiSuccess(_ message: String, duration: Double = 2.0) {
+    func success(_ message: String, duration: Double = 2.0) {
         DispatchQueue.main.async {
             ToastManager.shared.showSuccess(message: message, duration: duration)
         }
     }
     
     /// 便捷方法：显示错误Toast
-    func uiError(_ message: String, duration: Double = 2.0) {
+    func error(_ message: String, duration: Double = 2.0) {
         DispatchQueue.main.async {
             ToastManager.shared.showError(message: message, duration: duration)
         }
     }
     
     /// 便捷方法：显示警告Toast
-    func uiWarning(_ message: String, duration: Double = 2.0) {
+    func warning(_ message: String, duration: Double = 2.0) {
         DispatchQueue.main.async {
             ToastManager.shared.showWarning(message: message, duration: duration)
         }
     }
-} 
+}

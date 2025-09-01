@@ -8,19 +8,24 @@ public struct ToastView: View {
         HStack(spacing: 12) {
             Image(systemName: toast.style.icon)
                 .foregroundColor(.white)
+                .font(.system(size: 16, weight: .semibold))
             
             Text(toast.message)
-                .font(.system(size: 14, weight: .semibold))
+                .font(.system(size: 14, weight: .medium))
                 .foregroundColor(.white)
+                .multilineTextAlignment(.leading)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background(
             Capsule()
-                .fill(toast.style.themeColor.opacity(0.9))
-                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+                .fill(toast.style.themeColor)
+                .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
         )
-        .transition(.move(edge: .top).combined(with: .opacity))
+        .transition(.asymmetric(
+            insertion: .move(edge: .top).combined(with: .opacity),
+            removal: .opacity.combined(with: .scale(scale: 0.95))
+        ))
     }
 }
 
@@ -36,16 +41,16 @@ public struct ToastModifier: ViewModifier {
                     if let toast = toast {
                         VStack {
                             ToastView(toast: toast)
-                                .padding(.top, 40)
-                                .padding(.horizontal, 16)
+                                .padding(.top, 50)
+                                .padding(.horizontal, 20)
                             Spacer()
                         }
                         .transition(.opacity)
-                        .animation(.easeInOut(duration: 0.2), value: toast)
+                        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: toast)
                     }
                 }
-                .animation(.easeInOut(duration: 0.2), value: toast != nil)
-                .zIndex(1500)
+                .animation(.spring(response: 0.4, dampingFraction: 0.8), value: toast != nil)
+                .zIndex(2000)
             )
             .onChange(of: toast) { newValue in
                 if newValue != nil {
@@ -54,7 +59,7 @@ public struct ToastModifier: ViewModifier {
                     
                     // 创建新的计时器
                     let task = DispatchWorkItem {
-                        withAnimation {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.9)) {
                             self.toast = nil
                         }
                     }

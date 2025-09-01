@@ -1,46 +1,40 @@
 import SwiftUI
 
-/// UIManager 是一个集成弹窗和提示系统的UI管理工具
+/// UIManager - UI管理工具
+/// 包含弹窗、Toast、筛选器等组件
 public struct UIManager {
     // 版本号
-    public static let version = "1.0.0"
-    
-    // 内部单例实例
-    private static let shared = UIManager()
-    
-    // Toast管理器实例
-    public static var toastManager: ToastManager {
-        return ToastManager.shared
-    }
+    public static let version = "2.0.0"
     
     // 弹窗管理器实例
-    public static var popupManager: PopupManager {
+    public static var popup: PopupManager {
         return PopupManager.shared
     }
     
-    /// 初始化 UIManager（在 App 启动时调用）
-    public static func initialize() {
-        // 未来可能会添加初始化代码
-        print("UIManager v\(version) 已初始化")
+    // Toast管理器实例
+    public static var toast: ToastManager {
+        return ToastManager.shared
     }
     
-    /// 清理所有当前显示的 UI 组件
-    public static func clearAll() {
-        popupManager.closeAllPopups()
-        toastManager.hideCurrentToast()
+    /// 初始化 UIManager
+    public static func initialize() {
+        print("UIManager v\(version) 已初始化")
+        print("包含组件: 弹窗、Toast、筛选器、系统组件演示")
     }
-
-    /// 通过uuid关闭指定的弹窗
-    public static func closePopup(id: UUID) {
-        popupManager.closePopup(id: id)
+    
+    /// 清理所有当前显示的弹窗和Toast
+    public static func clearAll() {
+        popup.closeAll()
+        toast.hideCurrentToast()
     }
 }
 
 // MARK: - View 扩展
 public extension View {
-    /// 应用所有 UI 组件修饰器
-    func withUIComponents() -> some View {
-        self.withPopups().withToast()
+    /// 应用UI组件修饰器（包含弹窗和Toast）
+    func withUI() -> some View {
+        self.withPopups()
+            .withToast()
     }
 }
 
@@ -51,4 +45,4 @@ public extension SwiftUI.App {
         UIManager.initialize()
         return self
     }
-} 
+}

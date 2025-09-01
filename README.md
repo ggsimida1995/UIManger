@@ -1,31 +1,41 @@
 # UIManager
 
-UIManager 是一个用于 SwiftUI 的轻量级用户界面组件管理库，它集成了弹窗和提示系统，可以帮助您更轻松地构建现代化、美观的用户界面。
+UIManager 是一个用于 SwiftUI 的现代化、轻量级用户界面组件库，提供了完整的筛选器、弹窗、Toast 提示等组件，以及与系统组件的对比演示。
 
 ## 功能特性
 
-- **全新设计的界面**：现代化、美观的用户界面，支持亮色/暗色模式
-- **统一的颜色系统**：内置完整的颜色主题，自动适应深色/浅色模式
-- **Popup 弹窗系统**：
-  - 支持多种位置：中心、顶部、底部、左侧、右侧以及自定义位置
-  - 强大的动画支持：缩放、滑动、淡入淡出等多种过渡效果
-  - 完全自定义的尺寸、圆角、阴影和内容
-  - 支持关闭按钮自定义和点击外部关闭
-- **Toast 提示系统**：
-  - 支持信息、成功、警告和错误四种类型的轻量级提示
-  - 可自定义持续时间和样式
-- **单例管理器**：使用全局单例管理所有UI组件，避免状态混乱
-- **完整的环境集成**：通过SwiftUI环境变量轻松访问所有管理器
-- **链式API**：简洁明了的API设计，易于使用和集成
+- **🔍 筛选组件系统**：
+  - 多按钮筛选器，支持复杂下拉面板
+  - 简单下拉面板，支持单选和多选
+  - 缓存机制，记住用户选择
+  - 自定义颜色系统，支持深浅色模式
+- **📱 弹窗系统**：
+  - 简单弹窗管理器，支持多种动画效果
+  - 自定义内容和样式
+  - 统一的颜色主题
+- **🍞 Toast 提示系统**：
+  - 支持信息、成功、警告和错误四种类型
+  - 自动消失和手动控制
+  - 统一的视觉设计
+- **🔄 系统组件对比**：
+  - 系统原生输入弹窗演示
+  - 系统菜单组件演示
+  - 系统分段器演示
+  - 系统Toast对比演示
+- **🎨 统一颜色系统**：
+  - 完整的深浅色模式适配
+  - 跨平台兼容（iOS/macOS）
+  - 语义化颜色命名
 
-## 最新更新 (v1.1.0)
+## 最新更新 (v2.0.0)
 
-- 新增统一的颜色系统，支持深色/浅色模式自动切换
-- 优化弹窗背景色和文本颜色，提高可读性
-- 改进关闭按钮样式，提供更好的视觉反馈
-- 优化弹窗边框和阴影效果
-- 更新演示界面，展示新的颜色系统
-- 改进组件API，使其更加易用和灵活
+- 🔄 **重构架构**：完全重写为 SimpleUIManager，移除复杂的旧组件
+- 🔍 **新增筛选组件**：多按钮筛选器，支持复杂下拉面板和缓存
+- 📱 **简化弹窗系统**：保留核心功能，提升易用性
+- 🍞 **优化Toast系统**：统一视觉设计，支持多种类型
+- 🔄 **系统组件对比**：新增系统原生组件演示，便于选择合适方案
+- 🎨 **颜色系统升级**：完整的深浅色模式适配，跨平台兼容
+- 📦 **项目结构优化**：清理冗余代码，提升维护性
 
 ## 颜色系统
 
@@ -56,30 +66,35 @@ UIManager/
 │   └── UIManager/
 │       ├── UIManager.swift              # 核心管理类
 │       ├── Extensions/                  # 扩展功能
-│       │   └── View+Extensions.swift    # View扩展
-│       ├── Popup/                       # 弹窗相关组件
+│       │   └── Color+UIManager.swift    # 颜色系统
+│       ├── Filter/                      # 筛选组件
+│       │   ├── MultiButtonFilterView.swift    # 多按钮筛选器
+│       │   ├── ComplexDropdownPanel.swift     # 复杂下拉面板
+│       │   └── DropdownPanel.swift            # 下拉面板
+│       ├── Popup/                       # 弹窗组件
 │       │   ├── PopupManager.swift       # 弹窗管理器
-│       │   ├── PopupTypes.swift         # 弹窗类型和配置
-│       │   └── PopupViews.swift         # 弹窗视图
-│       ├── Toast/                       # Toast相关组件
+│       │   └── PopupView.swift          # 弹窗视图
+│       ├── Toast/                       # Toast组件
 │       │   ├── ToastManager.swift       # Toast管理器
 │       │   └── ToastView.swift          # Toast视图
-│       └── Previews/                    # 预览和演示组件
-│           ├── UIManagerDemos.swift     # 组件演示入口
-│           ├── UIManagerThemeViewModel.swift # 主题管理器
-│           └── PopupDemo/               # 弹窗演示
-│               ├── PreviewPopupDemo.swift   # 弹窗演示视图
-│               ├── PopupDemoHelpers.swift   # 弹窗演示辅助方法
-│               ├── PopupDemoModels.swift    # 弹窗演示模型
-│               └── PopupDemoAnimations.swift # 弹窗动画
+│       └── Previews/                    # 演示组件
+│           ├── UIManagerDemos.swift     # 主演示入口
+│           ├── MultiButtonFilterDemo.swift    # 筛选器演示
+│           ├── PopupPreview.swift       # 弹窗演示
+│           ├── ToastDemo.swift          # Toast演示
+│           ├── SystemInputAlertDemo.swift     # 系统输入演示
+│           ├── SystemLikeMenuDemo.swift       # 系统菜单演示
+│           ├── SystemSegmentedDemo.swift      # 系统分段器演示
+│           └── SystemToastDemo.swift          # 系统Toast演示
 └── DemoApp.swift                         # 示例应用入口
 ```
 
 ## 要求
 
-- iOS 15.0+
-- Swift 5.5+
-- Xcode 13.0+
+- iOS 16.0+
+- macOS 13.0+
+- Swift 5.7+
+- Xcode 14.0+
 
 ## 安装
 
@@ -95,7 +110,7 @@ https://github.com/ggsimida1995/UiManager.git
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ggsimida1995/UiManager.git", from: "1.0.0")
+    .package(url: "https://github.com/ggsimida1995/UiManager.git", from: "2.0.0")
 ]
 ```
 
@@ -106,6 +121,8 @@ dependencies: [
 在 SwiftUI App 中初始化 UIManager：
 
 ```swift
+import UIManager
+
 @main
 struct MyApp: App {
     init() {
@@ -116,7 +133,7 @@ struct MyApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .withUIComponents() // 同时应用 Toast 和 Popup 修饰器
+                .withUI() // 应用 Toast 和 Popup 修饰器
         }
     }
 }
@@ -126,38 +143,29 @@ struct MyApp: App {
 
 ```swift
 struct ContentView: View {
-    @Environment(\.toastManager) var toastManager
-    
     var body: some View {
         VStack(spacing: 20) {
             Button("显示信息提示") {
-                toastManager.showToast(message: "这是一条信息提示")
+                UIManager.toast.showToast(message: "这是一条信息提示")
             }
             
             Button("显示成功提示") {
-                toastManager.showSuccess(message: "操作成功完成")
+                UIManager.toast.showSuccess(message: "操作成功完成")
             }
             
             Button("显示警告提示") {
-                toastManager.showWarning(message: "请注意，这是一个警告")
+                UIManager.toast.showWarning(message: "请注意，这是一个警告")
             }
             
             Button("显示错误提示") {
-                toastManager.showError(message: "发生错误，请重试")
+                UIManager.toast.showError(message: "发生错误，请重试")
             }
             
             Button("显示自定义时长提示") {
-                toastManager.showToast(message: "这条提示会显示5秒", duration: 5.0)
+                UIManager.toast.showToast(message: "这条提示会显示5秒", duration: 5.0)
             }
         }
         .padding()
-    }
-}
-
-// 便捷扩展方法
-extension View {
-    func showToast(_ message: String, duration: Double = 2.0) {
-        ToastManager.shared.showToast(message: message, duration: duration)
     }
 }
 ```
@@ -166,83 +174,60 @@ extension View {
 
 ```swift
 struct ContentView: View {
-    @Environment(\.popupManager) var popupManager
-    
     var body: some View {
         VStack(spacing: 20) {
-            // 基本居中弹窗
-            Button("显示中心弹窗") {
-                popupManager.show {
+            // 基本弹窗
+            Button("显示弹窗") {
+                UIManager.popup.show {
                     VStack {
-                        Text("这是一个居中弹窗")
+                        Text("这是一个弹窗")
                             .font(.headline)
                             .padding()
                         
                         Button("关闭") {
-                            // 获取最上方弹窗ID并关闭
-                            if let popup = popupManager.popup(at: popupManager.popupCount - 1) {
-                                popupManager.closePopup(id: popup.id)
-                            }
+                            UIManager.popup.closeAll()
                         }
                         .padding()
-                        .background(Color.blue)
+                        .background(Color.primaryColor)
                         .foregroundColor(.white)
                         .cornerRadius(8)
                     }
                     .padding()
                 }
             }
-            
-            // 顶部弹窗
-            Button("显示顶部弹窗") {
-                popupManager.show(
-                    content: {
-                        Text("顶部提示信息")
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                    },
-                    position: .top
-                )
-            }
-            
-            // 底部弹窗，带关闭按钮
-            Button("显示底部弹窗") {
-                let config = PopupBaseConfig(
-                    shadowEnabled: true,
-                    showCloseButton: true,
-                    closeButtonPosition: .topTrailing
-                )
-                
-                popupManager.show(
-                    content: {
-                        VStack {
-                            Text("底部操作菜单")
-                                .font(.headline)
-                                .padding(.top)
-                            
-                            Divider()
-                            
-                            Button("选项1") {
-                                // 处理操作
-                            }
-                            .padding()
-                            
-                            Button("选项2") {
-                                // 处理操作
-                            }
-                            .padding()
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                    },
-                    position: .bottom,
-                    config: config
-                )
-            }
         }
         .padding()
+    }
+}
+```
+
+### 使用筛选组件
+
+```swift
+struct ContentView: View {
+    var body: some View {
+        MultiButtonFilterView(
+            buttons: [
+                FilterButton(title: "分类") { titleBinding, closePanel, setCacheData, getCacheData in
+                    DropdownPanel(
+                        options: [
+                            DropdownOption(title: "全部", key: "all", val: "all"),
+                            DropdownOption(title: "新品", key: "new", val: "new")
+                        ],
+                        selectedTitle: titleBinding,
+                        onSelect: { option in
+                            print("选择了：\(option.title)")
+                            closePanel()
+                        },
+                        setCacheData: setCacheData,
+                        getCacheData: getCacheData
+                    )
+                }
+            ]
+        ) {
+            // 内容区域
+            Text("这里是筛选后的内容")
+                .padding()
     }
 }
 ```
