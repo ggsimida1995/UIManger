@@ -164,7 +164,7 @@ private struct FilterButtonView: View {
     
     var body: some View {
         Button(action: onTap) {
-            HStack(spacing: 8) {
+            HStack(spacing: 2) {
                 Text(title)
                     .font(.system(size: style.fontSize, weight: .medium))
                     .foregroundColor(isExpanded ? style.selectedColor : Color.textColor)
@@ -175,7 +175,6 @@ private struct FilterButtonView: View {
                     .rotationEffect(.degrees(isExpanded ? 180 : 0))
                     .animation(.easeInOut(duration: 0.35), value: isExpanded)
             }
-            .padding(.horizontal, style.horizontalPadding)
             .padding(.vertical, style.verticalPadding)
             .frame(maxWidth: .infinity)
             .contentShape(Rectangle())
@@ -190,14 +189,6 @@ public enum FilterButtonStyle {
     case compact
     case large
     
-    var horizontalPadding: CGFloat {
-        switch self {
-        case .default: return 16
-        case .compact: return 12
-        case .large: return 20
-        }
-    }
-    
     var verticalPadding: CGFloat {
         switch self {
         case .default: return 12
@@ -208,9 +199,9 @@ public enum FilterButtonStyle {
     
     var fontSize: CGFloat {
         switch self {
-        case .default: return 16
-        case .compact: return 14
-        case .large: return 18
+        case .default: return 14
+        case .compact: return 12
+        case .large: return 16
         }
     }
     

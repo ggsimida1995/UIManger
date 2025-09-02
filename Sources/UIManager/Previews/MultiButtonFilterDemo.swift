@@ -187,12 +187,12 @@ struct MultiButtonFilterDemo: View {
                                 DropdownPanel(
                                     options: [
                                         DropdownOption(title: "默认排序", key: "isTop", val: "Desc"),
-                                        DropdownOption(title: "名称降序", key: "siteName", val: "Desc"),
-                                        DropdownOption(title: "名称升序", key: "siteName", val: "Asc"),
-                                        DropdownOption(title: "更新降序", key: "updateTime", val: "Desc"),
-                                        DropdownOption(title: "更新升序", key: "updateTime", val: "Asc"),
-                                        DropdownOption(title: "添加降序", key: "time", val: "Desc"),
-                                        DropdownOption(title: "添加升序", key: "time", val: "Asc")
+                                        DropdownOption(title: "名称降序", key: "siteName_desc", val: "Desc"),
+                                        DropdownOption(title: "名称升序", key: "siteName_asc", val: "Asc"),
+                                        DropdownOption(title: "更新降序", key: "updateTime_desc", val: "Desc"),
+                                        DropdownOption(title: "更新升序", key: "updateTime_asc", val: "Asc"),
+                                        DropdownOption(title: "添加降序", key: "time_desc", val: "Desc"),
+                                        DropdownOption(title: "添加升序", key: "time_asc", val: "Asc")
                                     ],
                                     selectedTitle: titleBinding,
                                     onSelect: { option in
