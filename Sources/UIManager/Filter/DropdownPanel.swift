@@ -43,12 +43,12 @@ public struct DropdownPanel: View {
                 }) {
                     HStack {
                         Text(option.title)
-                            .font(.system(size: 15, weight: .medium))
+                            .font(.system(size: 13, weight: .medium))
                             .foregroundColor(Color.textColor)
                         Spacer()
                         if option.key == currentSelection.key {
                             Image(systemName: "checkmark")
-                                .font(.system(size: 14, weight: .bold))
+                                .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(Color.primaryButtonText)
                         }
                     }

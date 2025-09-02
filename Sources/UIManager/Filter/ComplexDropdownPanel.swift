@@ -91,13 +91,13 @@ public struct ComplexDropdownPanel: View {
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
                                 Text(section.title)
-                                    .font(.system(size: 16, weight: .semibold))
+                                    .font(.system(size: 14, weight: .semibold))
                                     .foregroundColor(Color.textColor)
                                 
                                 Spacer()
                                 
                                 Text(getEffectiveSelectionMode(for: section) == .single ? "单选" : "多选")
-                                    .font(.system(size: 12, weight: .medium))
+                                    .font(.system(size: 11, weight: .medium))
                                     .foregroundColor(Color.secondaryTextColor)
                                     .padding(.horizontal, 8)
                                     .padding(.vertical, 2)
@@ -130,7 +130,7 @@ public struct ComplexDropdownPanel: View {
                         onReset()
                     }) {
                         Text("重置")
-                            .font(.system(size: 14, weight: .medium))
+                            .font(.system(size: 13, weight: .medium))
                             .foregroundColor(Color.secondaryButtonText)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
@@ -149,7 +149,7 @@ public struct ComplexDropdownPanel: View {
                         onConfirm(selectedItems)
                     }) {
                         Text("确定")
-                            .font(.system(size: 14, weight: .medium))
+                            .font(.system(size: 13, weight: .medium))
                             .foregroundColor(.white)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
@@ -258,7 +258,7 @@ private struct TagButton: View {
     var body: some View {
         Button(action: onTap) {
             Text(title)
-                .font(.system(size: 14, weight: .medium))
+                .font(.system(size: 13, weight: .medium))
                 .foregroundColor(isSelected ? .white : Color.textColor)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
