@@ -188,8 +188,8 @@ public class PopupManager: ObservableObject {
             userInfo: ["popupId": id]
         )
         
-        // 延迟关闭，让退出动画完成
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        // 延迟关闭，让退出动画和蒙层动画完成
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             withAnimation(
                 .spring(
                     response: 0.2,        // 快速响应
@@ -217,8 +217,8 @@ public class PopupManager: ObservableObject {
             userInfo: ["popupId": activePopups[index].id]
         )
         
-        // 延迟关闭，让退出动画完成
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        // 延迟关闭，让退出动画和蒙层动画完成
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             withAnimation(
                 .spring(
                     response: 0.2,        // 快速响应
@@ -257,8 +257,8 @@ public class PopupManager: ObservableObject {
             }
         }
         
-        // 延迟关闭，让退出动画完成
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        // 延迟关闭，让退出动画和蒙层动画完成
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             withAnimation(
                 .spring(
                     response: 0.2,        // 快速响应
