@@ -75,6 +75,8 @@ private struct PopupContentView: View {
                     .fill(Color.backgroundColor)
             )
             .clipped()
+            .allowsHitTesting(true) // 确保弹窗内容能接收触摸事件
+            .contentShape(Rectangle()) // 确保整个内容区域都能接收触摸事件
     }
 }
 
@@ -90,10 +92,12 @@ public struct PopupContainer: View {
             if !popupManager.activePopups.filter({ !$0.isClosing }).isEmpty {
                 Color.overlayColor
                     .ignoresSafeArea(.all, edges: .all)
+                    .contentShape(Rectangle()) // 确保整个区域都能接收触摸事件
                     .onTapGesture {
                         // 点击蒙层关闭所有弹窗
                         popupManager.closeAll()
                     }
+                    .allowsHitTesting(true) // 确保蒙层能接收触摸事件
             }
             
             // 渲染所有弹窗
@@ -107,8 +111,14 @@ public struct PopupContainer: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: popupData.position.alignment)
                 .offset(x: popupData.offset.x, y: popupData.offset.y)
                 .zIndex(popupData.zIndex)
+                .allowsHitTesting(true) // 确保弹窗能接收触摸事件
             }
         }
         .ignoresSafeArea(.all, edges: .all)
+        .allowsHitTesting(true) // 确保整个容器能接收触摸事件
+        .onTapGesture {
+            // 防止触摸事件穿透到下层
+            // 这个手势处理器会拦截所有触摸事件
+        }
     }
 }

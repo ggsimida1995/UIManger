@@ -63,7 +63,7 @@ public extension View {
             .environment(\.toastManager, ToastManager.shared)
             .overlay(
                 PopupContainer()
-                    .allowsHitTesting(false) // 防止弹窗容器拦截触摸事件
+                    .allowsHitTesting(true) // 允许弹窗容器接收触摸事件，拦截蒙层点击
             )
             .modifier(ToastViewModifier())
     }
