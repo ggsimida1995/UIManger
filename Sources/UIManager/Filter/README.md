@@ -1,4 +1,4 @@
-# SimpleUIManager - Filter 组件
+# UIManager - Filter 组件
 
 Filter 组件提供了强大的多按钮下拉筛选功能，支持多种筛选条件、下拉面板、蒙层和动画效果，完全符合iOS设计规范。
 
