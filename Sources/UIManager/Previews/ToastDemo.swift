@@ -50,7 +50,7 @@ public struct ToastDemo: View {
             Spacer()
         }
         .padding()
-        .withToast() // 添加 Toast 支持
+        .withUI() // 添加 Toast 支持
     }
 }
 

@@ -59,8 +59,13 @@ public extension View {
         if !UIManager.initialized {
             UIManager.initialize()
         }
-        return self.withPopups()
-            .withToast()
+        return self.environment(\.popup, PopupManager.shared)
+            .environment(\.toastManager, ToastManager.shared)
+            .overlay(
+                PopupContainer()
+                    .allowsHitTesting(false) // 防止弹窗容器拦截触摸事件
+            )
+            .modifier(ToastViewModifier())
     }
 }
 

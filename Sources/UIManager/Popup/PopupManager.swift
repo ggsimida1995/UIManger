@@ -175,7 +175,7 @@ public class PopupManager: ObservableObject {
     
     /// 关闭指定弹窗
     public func close(id: UUID) {
-        // 检查弹窗是否存在
+        // 检查弹窗是否存在并获取其索引
         guard let index = activePopups.firstIndex(where: { $0.id == id }) else { return }
         
         // 标记弹窗为正在关闭状态
@@ -189,11 +189,11 @@ public class PopupManager: ObservableObject {
         )
         
         // 延迟关闭，让退出动画完成
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             withAnimation(
                 .spring(
-                    response: 0.5,        // 统一使用相同的动画参数
-                    dampingFraction: 0.9, // 统一使用相同的阻尼系数
+                    response: 0.2,        // 快速响应
+                    dampingFraction: 0.9, // 保持阻尼系数
                     blendDuration: 0
                 )
             ) {
@@ -218,11 +218,11 @@ public class PopupManager: ObservableObject {
         )
         
         // 延迟关闭，让退出动画完成
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             withAnimation(
                 .spring(
-                    response: 0.5,        // 统一使用相同的动画参数
-                    dampingFraction: 0.9, // 统一使用相同的阻尼系数
+                    response: 0.2,        // 快速响应
+                    dampingFraction: 0.9, // 保持阻尼系数
                     blendDuration: 0
                 )
             ) {
@@ -244,15 +244,25 @@ public class PopupManager: ObservableObject {
     
     /// 关闭所有弹窗
     public func closeAll() {
-        // 先发送关闭通知，让弹窗执行退出动画
-        NotificationCenter.default.post(name: NSNotification.Name("ClosePopup"), object: nil)
+        // 逐个关闭弹窗，让每个弹窗执行退出动画
+        for (index, _) in activePopups.enumerated() {
+            if !activePopups[index].isClosing {
+                activePopups[index].isClosing = true
+                // 发送关闭通知，传递弹窗ID
+                NotificationCenter.default.post(
+                    name: NSNotification.Name("ClosePopup"), 
+                    object: nil, 
+                    userInfo: ["popupId": activePopups[index].id]
+                )
+            }
+        }
         
         // 延迟关闭，让退出动画完成
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             withAnimation(
                 .spring(
-                    response: 0.5,        // 统一使用相同的动画参数
-                    dampingFraction: 0.9, // 统一使用相同的阻尼系数
+                    response: 0.2,        // 快速响应
+                    dampingFraction: 0.9, // 保持阻尼系数
                     blendDuration: 0
                 )
             ) {
@@ -278,12 +288,5 @@ public extension EnvironmentValues {
     var popup: PopupManager {
         get { self[PopupManagerKey.self] }
         set { self[PopupManagerKey.self] = newValue }
-    }
-}
-
-// MARK: - View 修饰器
-public extension View {
-    func withPopups() -> some View {
-        self.environment(\.popup, PopupManager.shared)
     }
 }
