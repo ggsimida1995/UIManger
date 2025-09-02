@@ -37,6 +37,9 @@ public struct PopupPreview: View {
                                             }
                                             .padding()
                                             .frame(width: 300, height: 200)
+                                            .background(Color.backgroundColor)
+                                            .cornerRadius(12)
+                                            .shadow(radius: 8)
                                         },
                                         position: .center
                                     )
@@ -57,6 +60,9 @@ public struct PopupPreview: View {
                                             .frame(maxWidth: .infinity)
                                             .background(Color.primaryColor.opacity(0.1))
                                             .frame(height: 120)
+                                            .background(Color.backgroundColor)
+                                            .cornerRadius(8)
+                                            .shadow(radius: 4)
                                         },
                                         position: .top,
                                         showCloseButton: false
@@ -87,6 +93,9 @@ public struct PopupPreview: View {
                                             }
                                             .padding()
                                             .frame(height: 200)
+                                            .background(Color.backgroundColor)
+                                            .cornerRadius(12)
+                                            .shadow(radius: 8)
                                         },
                                         position: .bottom
                                     )
@@ -110,6 +119,9 @@ public struct PopupPreview: View {
                                                     .foregroundColor(Color.textColor)
                                             }
                                             .frame(height: 120)
+                                            .background(Color.backgroundColor)
+                                            .cornerRadius(8)
+                                            .shadow(radius: 4)
                                         },
                                         position: .top,
                                         width: nil,
@@ -143,6 +155,9 @@ public struct PopupPreview: View {
                                                                                 .foregroundColor(Color.textColor)
                                                                         }
                                                                         .frame(height: 150)
+                                                                        .background(Color.backgroundColor)
+                                                                        .cornerRadius(12)
+                                                                        .shadow(radius: 8)
                                                                     },
                                                                     position: .bottom,
                                                                     width: nil,
@@ -164,6 +179,9 @@ public struct PopupPreview: View {
                                                                                 .foregroundColor(Color.textColor)
                                                                         }
                                                                         .frame(height: 100)
+                                                                        .background(Color.backgroundColor)
+                                                                        .cornerRadius(12)
+                                                                        .shadow(radius: 8)
                                                                     },
                                                                     position: .bottom,
                                                                     width: nil,
@@ -178,6 +196,9 @@ public struct PopupPreview: View {
                                                 }
                                             }
                                             .frame(height: 150)
+                                            .background(Color.backgroundColor)
+                                            .cornerRadius(12)
+                                            .shadow(radius: 8)
                                         },
                                         position: .bottom,
                                         width: nil,
@@ -194,6 +215,9 @@ public struct PopupPreview: View {
                                                     .foregroundColor(Color.textColor)
                                             }
                                             .frame(height: 100)
+                                            .background(Color.backgroundColor)
+                                            .cornerRadius(12)
+                                            .shadow(radius: 8)
                                         },
                                         position: .bottom,
                                         width: nil,
@@ -225,6 +249,8 @@ public struct PopupPreview: View {
                                                     }
                                                 }
                                                 .frame(height: 100)
+                                                .cornerRadius(12)
+                                                .shadow(radius: 8)
                                             },
                                             position: .bottom,
                                             width: nil,
@@ -249,6 +275,8 @@ public struct PopupPreview: View {
                                                     }
                                                 }
                                                 .frame(height: 100)
+                                                .cornerRadius(12)
+                                                .shadow(radius: 8)
                                             },
                                             position: .bottom,
                                             width: nil,
@@ -273,6 +301,8 @@ public struct PopupPreview: View {
                                                     }
                                                 }
                                                 .frame(height: 100)
+                                                .cornerRadius(12)
+                                                .shadow(radius: 8)
                                             },
                                             position: .bottom,
                                             width: nil,
@@ -313,6 +343,9 @@ public struct PopupPreview: View {
                                             }
                                             .padding()
                                             .frame(width: 300, height: 200)
+                                            .background(Color.backgroundColor)
+                                            .cornerRadius(12)
+                                            .shadow(radius: 8)
                                         },
                                         position: .center,
                                         width: 300,
@@ -346,6 +379,9 @@ public struct PopupPreview: View {
                                             }
                                             .padding()
                                             .frame(width: 300, height: 150)
+                                            .background(Color.backgroundColor)
+                                            .cornerRadius(12)
+                                            .shadow(radius: 8)
                                         },
                                         position: .center,
                                         width: 300,

@@ -70,10 +70,6 @@ private struct PopupContentView: View {
         popup.content
             .padding(.horizontal, 16)
             .frame(width: popup.width)
-            .background(
-                Rectangle()
-                    .fill(Color.backgroundColor)
-            )
             .clipped()
             .allowsHitTesting(true) // 确保弹窗内容能接收触摸事件
             .contentShape(Rectangle()) // 确保整个内容区域都能接收触摸事件
@@ -88,7 +84,7 @@ public struct PopupContainer: View {
     
     public var body: some View {
         ZStack {
-            // 统一的蒙层，只在有可见弹窗时显示（无动画）
+            // 统一的蒙层，只在有可见弹窗时显示（带淡入淡出动画）
             if !popupManager.activePopups.filter({ !$0.isClosing }).isEmpty {
                 Color.overlayColor
                     .ignoresSafeArea(.all, edges: .all)
@@ -98,6 +94,8 @@ public struct PopupContainer: View {
                         popupManager.closeAll()
                     }
                     .allowsHitTesting(true) // 确保蒙层能接收触摸事件
+                    .transition(.opacity) // 添加淡入淡出过渡效果
+                    .animation(.easeInOut(duration: 0.2), value: !popupManager.activePopups.filter({ !$0.isClosing }).isEmpty) // 添加动画
             }
             
             // 渲染所有弹窗
