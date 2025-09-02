@@ -6,6 +6,7 @@ public struct PopupView: View {
     let onClose: () -> Void
     
     @State private var isVisible = false
+    @State private var isClosing = false
     
     public init(popup: PopupData, onClose: @escaping () -> Void) {
         self.popup = popup
@@ -30,10 +31,7 @@ public struct PopupView: View {
                 )
                 .animation(.easeInOut(duration: 0.35), value: isVisible)
         }
-        .zIndex(
-            isVisible ? popup.zIndex : 
-            popup.position == .bottom ? popup.zIndex - 100 : popup.zIndex - 50
-        )
+        .zIndex(popup.zIndex)
         .onAppear {
             withAnimation(.easeInOut(duration: 0.35)) {
                 isVisible = true
@@ -44,17 +42,20 @@ public struct PopupView: View {
                 if popupId == popup.id {
                     closePopup()
                 }
-            } else {
-                closePopup()
             }
+            // 移除了无ID通知的处理，避免重复关闭
         }
     }
     
     private func closePopup() {
-        withAnimation(.easeInOut(duration: 0.35)) {
+        guard !isClosing else { return } // 防止重复关闭
+        
+        isClosing = true
+        withAnimation(.easeInOut(duration: 0.25)) {
             isVisible = false
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
             onClose()
         }
     }
@@ -80,44 +81,34 @@ private struct PopupContentView: View {
 /// 弹窗容器视图
 public struct PopupContainer: View {
     @StateObject private var popupManager = PopupManager.shared
-    @State private var isMaskVisible = true
-    @State private var isClosing = false
     
     public init() {}
     
     public var body: some View {
         ZStack {
-            if !popupManager.activePopups.isEmpty && isMaskVisible && !isClosing {
+            // 统一的蒙层，只在有可见弹窗时显示（无动画）
+            if !popupManager.activePopups.filter({ !$0.isClosing }).isEmpty {
                 Color.overlayColor
                     .ignoresSafeArea(.all, edges: .all)
                     .onTapGesture {
-                        isClosing = true
-                        withAnimation(.easeOut(duration: 0.35)) {
-                            isMaskVisible = false
-                        }
+                        // 点击蒙层关闭所有弹窗
                         popupManager.closeAll()
                     }
             }
             
-            ForEach(Array(popupManager.activePopups.enumerated()), id: \.element.id) { index, popup in
+            // 渲染所有弹窗
+            ForEach(popupManager.activePopups) { popupData in
                 PopupView(
-                    popup: popup,
+                    popup: popupData,
                     onClose: { 
-                        popupManager.close(id: popup.id)
+                        popupManager.close(id: popupData.id)
                     }
                 )
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: popup.position.alignment)
-                .offset(x: popup.offset.x, y: popup.offset.y)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: popupData.position.alignment)
+                .offset(x: popupData.offset.x, y: popupData.offset.y)
+                .zIndex(popupData.zIndex)
             }
         }
         .ignoresSafeArea(.all, edges: .all)
-        .onReceive(popupManager.$activePopups) { popups in
-            if popups.isEmpty {
-                isClosing = false
-                isMaskVisible = true
-            } else if !isClosing {
-                isMaskVisible = true
-            }
-        }
     }
 }

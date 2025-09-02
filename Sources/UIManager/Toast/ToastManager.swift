@@ -105,39 +105,3 @@ public extension EnvironmentValues {
         set { self[ToastManagerKey.self] = newValue }
     }
 }
-
-// 扩展View，添加方便的方法用于显示Toast
-public extension View {
-    /// 在视图中添加Toast显示功能
-    func withToast() -> some View {
-        self.modifier(ToastViewModifier())
-    }
-    
-    /// 便捷方法：显示信息Toast
-    func toast(_ message: String, duration: Double = 2.0) {
-        DispatchQueue.main.async {
-            ToastManager.shared.showToast(message: message, duration: duration)
-        }
-    }
-    
-    /// 便捷方法：显示成功Toast
-    func success(_ message: String, duration: Double = 2.0) {
-        DispatchQueue.main.async {
-            ToastManager.shared.showSuccess(message: message, duration: duration)
-        }
-    }
-    
-    /// 便捷方法：显示错误Toast
-    func error(_ message: String, duration: Double = 2.0) {
-        DispatchQueue.main.async {
-            ToastManager.shared.showError(message: message, duration: duration)
-        }
-    }
-    
-    /// 便捷方法：显示警告Toast
-    func warning(_ message: String, duration: Double = 2.0) {
-        DispatchQueue.main.async {
-            ToastManager.shared.showWarning(message: message, duration: duration)
-        }
-    }
-}
