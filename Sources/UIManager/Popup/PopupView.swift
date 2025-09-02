@@ -68,7 +68,6 @@ private struct PopupContentView: View {
     
     var body: some View {
         popup.content
-            .padding(.horizontal, 16)
             .frame(width: popup.width)
             .clipped()
             .allowsHitTesting(true) // 确保弹窗内容能接收触摸事件
