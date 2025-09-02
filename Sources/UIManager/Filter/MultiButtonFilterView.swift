@@ -63,11 +63,12 @@ public struct MultiButtonFilterView<Content: View>: View {
                             }
                         }
                         
-                        if index < buttons.count - 1 {
-                            Divider()
-                                .frame(height: 20)
-                                .foregroundColor(.secondary.opacity(0.3))
-                        }
+                        // 移除按钮之间的竖线分隔符
+                        // if index < buttons.count - 1 {
+                        //     Divider()
+                        //         .frame(height: 20)
+                        //         .foregroundColor(.secondary.opacity(0.3))
+                        // }
                     }
                 }
                 .background(Color.backgroundColor)
@@ -98,11 +99,6 @@ public struct MultiButtonFilterView<Content: View>: View {
                         }
                     )
                     .background(Color.backgroundColor)
-                    .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
-                    .overlay(
-                        Rectangle()
-                            .stroke(Color.borderColor, lineWidth: 0.5)
-                    )
                     .transition(.asymmetric(
                         insertion: .opacity.combined(with: .offset(y: -20)),
                         removal: .opacity.combined(with: .offset(y: -20))
