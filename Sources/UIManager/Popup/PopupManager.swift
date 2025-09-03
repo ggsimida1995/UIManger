@@ -104,9 +104,9 @@ public class PopupManager: ObservableObject {
         // 计算z-index：对于底部弹窗，先显示的层级更高，后显示的层级更低
         let calculatedZIndex: Double
         if position == .bottom {
-            // 底部弹窗：先显示的层级高，后显示的层级低
+            // 底部弹窗：先显示的层级高，新弹窗层级更低（在下方显示和隐藏）
             let bottomPopups = activePopups.filter { $0.position == .bottom && !$0.isClosing }
-            calculatedZIndex = zIndex + Double(bottomPopups.count) * 10
+            calculatedZIndex = zIndex - Double(bottomPopups.count) * 10
         } else {
             // 其他位置：保持原有逻辑
             calculatedZIndex = zIndex + Double(activePopups.count) * 10
@@ -244,9 +244,12 @@ public class PopupManager: ObservableObject {
     
     /// 关闭所有弹窗
     public func closeAll() {
+        // 记录当前需要关闭的弹窗ID，避免后续添加的弹窗被误删
+        let popupsToClose = activePopups.filter { !$0.isClosing }.map { $0.id }
+        
         // 逐个关闭弹窗，让每个弹窗执行退出动画
         for (index, _) in activePopups.enumerated() {
-            if !activePopups[index].isClosing {
+            if !activePopups[index].isClosing && popupsToClose.contains(activePopups[index].id) {
                 activePopups[index].isClosing = true
                 // 发送关闭通知，传递弹窗ID
                 NotificationCenter.default.post(
@@ -258,6 +261,7 @@ public class PopupManager: ObservableObject {
         }
         
         // 延迟关闭，让退出动画和蒙层动画完成
+        // 只删除调用closeAll时标记的弹窗，不删除后续添加的新弹窗
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             withAnimation(
                 .spring(
@@ -266,7 +270,7 @@ public class PopupManager: ObservableObject {
                     blendDuration: 0
                 )
             ) {
-                self.activePopups.removeAll()
+                self.activePopups.removeAll { popupsToClose.contains($0.id) }
             }
         }
     }
