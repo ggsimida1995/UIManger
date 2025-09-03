@@ -26,7 +26,7 @@ public struct PopupView: View {
                     x: 0, 
                     y: isVisible ? 0 : (
                         popup.position == .top ? -300 : 
-                        popup.position == .bottom ? 200 : 0
+                        popup.position == .bottom ? 300 : 0  // 增加底部弹窗的滑入距离
                     )
                 )
                 .animation(.easeInOut(duration: 0.35), value: isVisible)

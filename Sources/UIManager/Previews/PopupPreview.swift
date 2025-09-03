@@ -17,6 +17,146 @@ public struct PopupPreview: View {
                     
                     VStack(spacing: 16) {
                         // 基本弹窗
+                        // closeAll 测试用例
+                        GroupBox("closeAll 测试") {
+                            VStack(spacing: 12) {
+                                Button("测试 closeAll + 新弹窗") {
+                                    // 先显示一个弹窗
+                                    popup.show(
+                                        content: {
+                                            VStack {
+                                                Text("第一个弹窗")
+                                                    .font(.headline)
+                                                Text("即将被关闭")
+                                                    .foregroundColor(.secondary)
+                                            }
+                                            .padding()
+                                            .frame(width: 200, height: 100)
+                                            .background(Color.red.opacity(0.1))
+                                            .cornerRadius(8)
+                                        },
+                                        position: .top
+                                    )
+                                    
+                                    // 立即关闭所有弹窗并显示新弹窗
+                                    popup.closeAll()
+                                    withAnimation(.easeInOut(duration: 0.5)) {
+                                        popup.show(
+                                            content: {
+                                                VStack {
+                                                    Text("新弹窗")
+                                                        .font(.headline)
+                                                    Text("应该保持显示")
+                                                        .foregroundColor(.green)
+                                                    Button("关闭") {
+                                                        popup.closeAll()
+                                                    }
+                                                    .buttonStyle(.borderedProminent)
+                                                }
+                                                .padding()
+                                                .frame(width: 250, height: 150)
+                                                .background(Color.green.opacity(0.1))
+                                                .cornerRadius(8)
+                                            },
+                                            position: .center
+                                        )
+                                    }
+                                }
+                                .buttonStyle(.bordered)
+                            }
+                        }
+                        
+                        // 底部弹窗堆叠测试
+                        GroupBox("底部弹窗堆叠测试") {
+                            VStack(spacing: 12) {
+                                Button("显示底部弹窗1") {
+                                    popup.show(
+                                        content: {
+                                            VStack {
+                                                Text("底部弹窗1")
+                                                    .font(.headline)
+                                                Text("基础弹窗 - 应该在上层")
+                                                    .foregroundColor(.blue)
+                                                Button("关闭") {
+                                                    popup.close(customId: "bottom1")
+                                                }
+                                                .buttonStyle(.borderedProminent)
+                                            }
+                                            .padding()
+                                            .frame(maxWidth: .infinity)
+                                            .frame(height: 120)
+                                            .background(Color.blue.opacity(0.1))
+                                            .cornerRadius(8)
+                                        },
+                                        position: .bottom,
+                                        height: 120,
+                                        id: "bottom1"
+                                    )
+                                }
+                                .buttonStyle(.bordered)
+                                
+                                Button("显示底部弹窗2") {
+                                    popup.show(
+                                        content: {
+                                            VStack {
+                                                Text("底部弹窗2")
+                                                    .font(.headline)
+                                                Text("新弹窗 - 从下方滑入")
+                                                    .foregroundColor(.green)
+                                                Button("关闭") {
+                                                    popup.close(customId: "bottom2")
+                                                }
+                                                .buttonStyle(.borderedProminent)
+                                            }
+                                            .padding()
+                                            .frame(maxWidth: .infinity)
+                                            .frame(height: 100)
+                                            .background(Color.green.opacity(0.1))
+                                            .cornerRadius(8)
+                                        },
+                                        position: .bottom,
+                                        height: 100,
+                                        id: "bottom2"
+                                    )
+                                }
+                                .buttonStyle(.bordered)
+                                
+                                Button("显示底部弹窗3") {
+                                    popup.show(
+                                        content: {
+                                            VStack {
+                                                Text("底部弹窗3")
+                                                    .font(.headline)
+                                                Text("第三个弹窗 - 也从下方滑入")
+                                                    .foregroundColor(.orange)
+                                                Button("关闭") {
+                                                    popup.close(customId: "bottom3")
+                                                }
+                                                .buttonStyle(.borderedProminent)
+                                            }
+                                            .padding()
+                                            .frame(maxWidth: .infinity)
+                                            .frame(height: 90)
+                                            .background(Color.orange.opacity(0.1))
+                                            .cornerRadius(8)
+                                        },
+                                        position: .bottom,
+                                        height: 90,
+                                        id: "bottom3"
+                                    )
+                                }
+                                .buttonStyle(.bordered)
+                                
+                                Button("关闭所有底部弹窗") {
+                                    popup.close(customId: "bottom1")
+                                    popup.close(customId: "bottom2")
+                                    popup.close(customId: "bottom3")
+                                }
+                                .buttonStyle(.bordered)
+                                .foregroundColor(.red)
+                            }
+                        }
+                        
                         GroupBox("基本弹窗") {
                             VStack(spacing: 12) {
                                 Button("中心弹窗") {
