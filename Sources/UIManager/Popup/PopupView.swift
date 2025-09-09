@@ -24,12 +24,12 @@ public struct PopupView: View {
                 )
                 .offset(
                     x: 0, 
-                    y: isVisible ? 0 : (
-                        popup.position == .top ? -300 : 
-                        popup.position == .bottom ? 300 : 0  // 增加底部弹窗的滑入距离
+                    y: popup.position == .center ? 0 : (
+                        isVisible ? 0 : (
+                            popup.position == .top ? -300 : 300  // 顶部从上方滑入，底部从下方滑入
+                        )
                     )
                 )
-                .animation(.easeInOut(duration: 0.35), value: isVisible)
         }
         .zIndex(popup.zIndex)
         .onAppear {
@@ -51,13 +51,21 @@ public struct PopupView: View {
         guard !isClosing else { return } // 防止重复关闭
         
         isClosing = true
-        withAnimation(.easeInOut(duration: 0.25)) {
-            isVisible = false
+        
+        // 根据弹窗位置使用不同的关闭动画
+        if popup.position == .center {
+            // 中心弹窗：缩放动画（使用系统默认时间）
+            withAnimation(.easeInOut(duration: 0.25)) {
+                isVisible = false
+            }
+        } else {
+            // 顶部和底部弹窗：弹簧动画（增加回弹效果）
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.6, blendDuration: 0)) {
+                isVisible = false
+            }
         }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-            onClose()
-        }
+        // PopupManager 会自动处理弹窗的移除，不需要调用 onClose()
     }
 }
 
@@ -72,8 +80,10 @@ private struct PopupContentView: View {
             .clipped()
             .allowsHitTesting(true) // 确保弹窗内容能接收触摸事件
             .contentShape(Rectangle()) // 确保整个内容区域都能接收触摸事件
+            // 
     }
 }
+
 
 /// 弹窗容器视图
 public struct PopupContainer: View {
@@ -83,8 +93,8 @@ public struct PopupContainer: View {
     
     public var body: some View {
         ZStack {
-            // 统一的蒙层，只在有可见弹窗时显示（带淡入淡出动画）
-            if !popupManager.activePopups.filter({ !$0.isClosing }).isEmpty {
+            // 统一的蒙层，使用独立的控制字段
+            if popupManager.showOverlay {
                 Color.overlayColor
                     .ignoresSafeArea(.all, edges: .all)
                     .contentShape(Rectangle()) // 确保整个区域都能接收触摸事件
@@ -94,21 +104,49 @@ public struct PopupContainer: View {
                     }
                     .allowsHitTesting(true) // 确保蒙层能接收触摸事件
                     .transition(.opacity) // 添加淡入淡出过渡效果
-                    .animation(.easeInOut(duration: 0.2), value: !popupManager.activePopups.filter({ !$0.isClosing }).isEmpty) // 添加动画
+                    .animation(.easeInOut(duration: 0.2), value: popupManager.showOverlay) // 添加动画
             }
             
-            // 渲染所有弹窗
-            ForEach(popupManager.activePopups) { popupData in
-                PopupView(
-                    popup: popupData,
-                    onClose: { 
-                        popupManager.close(id: popupData.id)
+            // 使用 GlassEffectContainer 来让多个弹窗视觉融合
+            GlassEffectContainer(spacing: 8) {
+                VStack(spacing: 0) {
+                    // 顶部弹窗
+                    let topPopups = popupManager.activePopups.filter { $0.position == .top }
+                    ForEach(topPopups.sorted(by: { $0.zIndex < $1.zIndex })) { popupData in
+                        PopupView(
+                            popup: popupData,
+                            onClose: { 
+                                popupManager.close(id: popupData.id)
+                            }
+                        )
+                        .allowsHitTesting(true)
                     }
-                )
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: popupData.position.alignment)
-                .offset(x: popupData.offset.x, y: popupData.offset.y)
-                .zIndex(popupData.zIndex)
-                .allowsHitTesting(true) // 确保弹窗能接收触摸事件
+                    
+                    // 中心弹窗（只有一个）
+                    Spacer()
+                    if let centerPopup = popupManager.activePopups.first(where: { $0.position == .center }) {
+                        PopupView(
+                            popup: centerPopup,
+                            onClose: { 
+                                popupManager.close(id: centerPopup.id)
+                            }
+                        )
+                        .allowsHitTesting(true)
+                    }
+                    Spacer()
+                    
+                    // 底部弹窗
+                    let bottomPopups = popupManager.activePopups.filter { $0.position == .bottom }
+                    ForEach(bottomPopups.sorted(by: { $0.zIndex > $1.zIndex })) { popupData in
+                        PopupView(
+                            popup: popupData,
+                            onClose: { 
+                                popupManager.close(id: popupData.id)
+                            }
+                        )
+                        .allowsHitTesting(true)
+                    }
+                }
             }
         }
         .ignoresSafeArea(.all, edges: .all)
@@ -117,5 +155,7 @@ public struct PopupContainer: View {
             // 防止触摸事件穿透到下层
             // 这个手势处理器会拦截所有触摸事件
         }
+
     }
 }
+

@@ -81,7 +81,7 @@ public extension Color {
     /// 遮罩层颜色
     static var overlayColor: Color {
         Color(
-            light: Color.black.opacity(0.05),                            // 浅色模式更透明的黑色
+            light: Color.black.opacity(0.3),                            // 浅色模式更透明的黑色
             dark: Color.black.opacity(0.2)                               // 深色模式更透明的黑色
         )
     }
