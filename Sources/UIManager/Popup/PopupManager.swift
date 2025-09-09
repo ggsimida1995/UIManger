@@ -73,6 +73,7 @@ public struct PopupData: Identifiable {
 /// 弹窗管理器
 public class PopupManager: ObservableObject {
     @Published var activePopups: [PopupData] = []
+    @Published var showOverlay: Bool = false // 独立控制蒙层显示
     
     public static let shared = PopupManager()
     private init() {}
@@ -98,19 +99,8 @@ public class PopupManager: ObservableObject {
         #endif
         let finalWidth = width ?? screenWidth
         
-        // 计算弹窗偏移量，避免重叠
-        let offset = calculateOffset(for: position, existingPopups: activePopups, height: height)
-        
-        // 计算z-index：对于底部弹窗，先显示的层级更高，后显示的层级更低
-        let calculatedZIndex: Double
-        if position == .bottom {
-            // 底部弹窗：先显示的层级高，新弹窗层级更低（在下方显示和隐藏）
-            let bottomPopups = activePopups.filter { $0.position == .bottom && !$0.isClosing }
-            calculatedZIndex = zIndex - Double(bottomPopups.count) * 10
-        } else {
-            // 其他位置：保持原有逻辑
-            calculatedZIndex = zIndex + Double(activePopups.count) * 10
-        }
+        // 使用 VStack + Spacer 布局，不需要复杂的偏移和层级计算
+        let calculatedZIndex = zIndex
         
         let popup = PopupData(
             content: content(),
@@ -120,76 +110,34 @@ public class PopupManager: ObservableObject {
             showCloseButton: showCloseButton,
             closeOnTapOutside: closeOnTapOutside,
             zIndex: calculatedZIndex,
-            offset: offset,
+            offset: .zero,
             customId: id
         )
         
         // 直接在主线程更新，不使用 DispatchQueue.main.async
         withAnimation(.easeInOut(duration: 0.3)) {
             self.activePopups.append(popup)
+            // 显示弹窗时同时显示蒙层
+            self.showOverlay = true
         }
     }
     
-    /// 计算弹窗偏移量，避免重叠
-    private func calculateOffset(for position: PopupPosition, existingPopups: [PopupData], height: CGFloat?) -> CGPoint {
-        // 只考虑不在关闭状态的弹窗
-        let samePositionPopups = existingPopups.filter { $0.position == position && !$0.isClosing }
-        
-        switch position {
-        case .top:
-            // 顶部弹窗向下垂直堆叠
-            let spacing: CGFloat = 20 // 弹窗之间的间距
-            
-            // 计算之前弹窗的总高度
-            var previousHeight: CGFloat = 0
-            for popup in samePositionPopups {
-                let popupHeight = popup.height ?? 120
-                previousHeight += popupHeight + spacing
-            }
-            
-            // 向下偏移，让新弹窗堆叠在之前弹窗的下方
-            let offsetY = previousHeight
-            return CGPoint(x: 0, y: offsetY)
-            
-        case .bottom:
-            // 底部弹窗向上拼接，形成连续的整体
-            let spacing: CGFloat = 0 // 弹窗之间的间距为0
-            
-            // 计算之前弹窗的总高度（不包括当前正在添加的弹窗）
-            var previousHeight: CGFloat = 0
-            for popup in samePositionPopups {
-                let popupHeight = popup.height ?? 150
-                previousHeight += popupHeight + spacing
-            }
-            
-            // 向上偏移，让新弹窗拼接在之前弹窗的上方
-            let offsetY = -previousHeight
-            
-            return CGPoint(x: 0, y: offsetY)
-            
-        case .center:
-            // 中心弹窗居中显示，不支持多个
-            return .zero
-        }
-    }
+
     
     /// 关闭指定弹窗
     public func close(id: UUID) {
-        // 检查弹窗是否存在并获取其索引
-        guard let index = activePopups.firstIndex(where: { $0.id == id }) else { return }
+        // 检查弹窗是否存在
+        guard activePopups.contains(where: { $0.id == id }) else { return }
         
-        // 标记弹窗为正在关闭状态
-        activePopups[index].isClosing = true
-        
-        // 发送关闭通知，传递弹窗ID
+        // 发送关闭通知，传递弹窗ID（让 PopupView 执行关闭动画）
         NotificationCenter.default.post(
             name: NSNotification.Name("ClosePopup"), 
             object: nil, 
             userInfo: ["popupId": id]
         )
         
-        // 延迟关闭，让退出动画和蒙层动画完成
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+        // 延迟关闭，让退出动画完成（匹配 PopupView 中最长的 0.5 秒弹簧动画）
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
             withAnimation(
                 .spring(
                     response: 0.2,        // 快速响应
@@ -205,20 +153,17 @@ public class PopupManager: ObservableObject {
     /// 根据自定义ID关闭弹窗
     public func close(customId: String) {
         // 检查弹窗是否存在并获取其索引
-        guard let index = activePopups.firstIndex(where: { $0.customId == customId }) else { return }
+        guard let popup = activePopups.first(where: { $0.customId == customId }) else { return }
         
-        // 标记弹窗为正在关闭状态
-        activePopups[index].isClosing = true
-        
-        // 发送关闭通知，传递弹窗ID
+        // 发送关闭通知，传递弹窗ID（让 PopupView 执行关闭动画）
         NotificationCenter.default.post(
             name: NSNotification.Name("ClosePopup"), 
             object: nil, 
-            userInfo: ["popupId": activePopups[index].id]
+            userInfo: ["popupId": popup.id]
         )
         
-        // 延迟关闭，让退出动画和蒙层动画完成
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+        // 延迟关闭，让退出动画完成（匹配 PopupView 中最长的 0.5 秒弹簧动画）
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
             withAnimation(
                 .spring(
                     response: 0.2,        // 快速响应
@@ -244,34 +189,25 @@ public class PopupManager: ObservableObject {
     
     /// 关闭所有弹窗
     public func closeAll() {
-        // 记录当前需要关闭的弹窗ID，避免后续添加的弹窗被误删
-        let popupsToClose = activePopups.filter { !$0.isClosing }.map { $0.id }
+        // 获取所有需要关闭的弹窗ID
+        let popupsToClose = activePopups.map { $0.id }
         
-        // 逐个关闭弹窗，让每个弹窗执行退出动画
-        for (index, _) in activePopups.enumerated() {
-            if !activePopups[index].isClosing && popupsToClose.contains(activePopups[index].id) {
-                activePopups[index].isClosing = true
-                // 发送关闭通知，传递弹窗ID
-                NotificationCenter.default.post(
-                    name: NSNotification.Name("ClosePopup"), 
-                    object: nil, 
-                    userInfo: ["popupId": activePopups[index].id]
-                )
+        // 如果没有弹窗需要关闭，直接隐藏蒙层
+        guard !popupsToClose.isEmpty else {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                showOverlay = false
             }
+            return
         }
         
-        // 延迟关闭，让退出动画和蒙层动画完成
-        // 只删除调用closeAll时标记的弹窗，不删除后续添加的新弹窗
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-            withAnimation(
-                .spring(
-                    response: 0.2,        // 快速响应
-                    dampingFraction: 0.9, // 保持阻尼系数
-                    blendDuration: 0
-                )
-            ) {
-                self.activePopups.removeAll { popupsToClose.contains($0.id) }
-            }
+        // 先立即关闭蒙层，给用户即时反馈
+        withAnimation(.easeInOut(duration: 0.2)) {
+            showOverlay = false
+        }
+        
+        // 逐个调用 close(id:) 方法，确保每个弹窗都有正确的关闭动画
+        for popupId in popupsToClose {
+            close(id: popupId)
         }
     }
     

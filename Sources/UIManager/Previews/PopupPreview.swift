@@ -7,9 +7,8 @@ public struct PopupPreview: View {
     public init() {}
     
     public var body: some View {
-        ZStack {
-            // 主要内容
-            NavigationView {
+        NavigationStack {
+            ScrollView {
                 VStack(spacing: 20) {
                     Text("弹窗预览")
                         .font(.largeTitle)
@@ -17,169 +16,24 @@ public struct PopupPreview: View {
                     
                     VStack(spacing: 16) {
                         // 基本弹窗
-                        // closeAll 测试用例
-                        GroupBox("closeAll 测试") {
-                            VStack(spacing: 12) {
-                                Button("测试 closeAll + 新弹窗") {
-                                    // 先显示一个弹窗
-                                    popup.show(
-                                        content: {
-                                            VStack {
-                                                Text("第一个弹窗")
-                                                    .font(.headline)
-                                                Text("即将被关闭")
-                                                    .foregroundColor(.secondary)
-                                            }
-                                            .padding()
-                                            .frame(width: 200, height: 100)
-                                            .background(Color.red.opacity(0.1))
-                                            .cornerRadius(8)
-                                        },
-                                        position: .top
-                                    )
-                                    
-                                    // 立即关闭所有弹窗并显示新弹窗
-                                    popup.closeAll()
-                                    withAnimation(.easeInOut(duration: 0.5)) {
-                                        popup.show(
-                                            content: {
-                                                VStack {
-                                                    Text("新弹窗")
-                                                        .font(.headline)
-                                                    Text("应该保持显示")
-                                                        .foregroundColor(.green)
-                                                    Button("关闭") {
-                                                        popup.closeAll()
-                                                    }
-                                                    .buttonStyle(.borderedProminent)
-                                                }
-                                                .padding()
-                                                .frame(width: 250, height: 150)
-                                                .background(Color.green.opacity(0.1))
-                                                .cornerRadius(8)
-                                            },
-                                            position: .center
-                                        )
-                                    }
-                                }
-                                .buttonStyle(.bordered)
-                            }
-                        }
-                        
-                        // 底部弹窗堆叠测试
-                        GroupBox("底部弹窗堆叠测试") {
-                            VStack(spacing: 12) {
-                                Button("显示底部弹窗1") {
-                                    popup.show(
-                                        content: {
-                                            VStack {
-                                                Text("底部弹窗1")
-                                                    .font(.headline)
-                                                Text("基础弹窗 - 应该在上层")
-                                                    .foregroundColor(.blue)
-                                                Button("关闭") {
-                                                    popup.close(customId: "bottom1")
-                                                }
-                                                .buttonStyle(.borderedProminent)
-                                            }
-                                            .padding()
-                                            .frame(maxWidth: .infinity)
-                                            .frame(height: 120)
-                                            .background(Color.blue.opacity(0.1))
-                                            .cornerRadius(8)
-                                        },
-                                        position: .bottom,
-                                        height: 120,
-                                        id: "bottom1"
-                                    )
-                                }
-                                .buttonStyle(.bordered)
-                                
-                                Button("显示底部弹窗2") {
-                                    popup.show(
-                                        content: {
-                                            VStack {
-                                                Text("底部弹窗2")
-                                                    .font(.headline)
-                                                Text("新弹窗 - 从下方滑入")
-                                                    .foregroundColor(.green)
-                                                Button("关闭") {
-                                                    popup.close(customId: "bottom2")
-                                                }
-                                                .buttonStyle(.borderedProminent)
-                                            }
-                                            .padding()
-                                            .frame(maxWidth: .infinity)
-                                            .frame(height: 100)
-                                            .background(Color.green.opacity(0.1))
-                                            .cornerRadius(8)
-                                        },
-                                        position: .bottom,
-                                        height: 100,
-                                        id: "bottom2"
-                                    )
-                                }
-                                .buttonStyle(.bordered)
-                                
-                                Button("显示底部弹窗3") {
-                                    popup.show(
-                                        content: {
-                                            VStack {
-                                                Text("底部弹窗3")
-                                                    .font(.headline)
-                                                Text("第三个弹窗 - 也从下方滑入")
-                                                    .foregroundColor(.orange)
-                                                Button("关闭") {
-                                                    popup.close(customId: "bottom3")
-                                                }
-                                                .buttonStyle(.borderedProminent)
-                                            }
-                                            .padding()
-                                            .frame(maxWidth: .infinity)
-                                            .frame(height: 90)
-                                            .background(Color.orange.opacity(0.1))
-                                            .cornerRadius(8)
-                                        },
-                                        position: .bottom,
-                                        height: 90,
-                                        id: "bottom3"
-                                    )
-                                }
-                                .buttonStyle(.bordered)
-                                
-                                Button("关闭所有底部弹窗") {
-                                    popup.close(customId: "bottom1")
-                                    popup.close(customId: "bottom2")
-                                    popup.close(customId: "bottom3")
-                                }
-                                .buttonStyle(.bordered)
-                                .foregroundColor(.red)
-                            }
-                        }
-                        
                         GroupBox("基本弹窗") {
                             VStack(spacing: 12) {
                                 Button("中心弹窗") {
                                     popup.show(
                                         content: {
                                             VStack(spacing: 16) {
-                                                Text("这是一个弹窗")
+                                                Text("中心弹窗")
                                                     .font(.headline)
-                                                
-                                                Text("支持多种位置和自定义内容")
-                                                    .font(.subheadline)
-                                                    .foregroundColor(Color.secondaryTextColor)
-                                                
+                                                Text("这是一个居中显示的弹窗")
+                                                    .foregroundColor(.secondary)
                                                 Button("关闭") {
-                                                    popup.closeAll()
+                                                    // 弹窗会自动处理关闭
                                                 }
                                                 .buttonStyle(.borderedProminent)
                                             }
                                             .padding()
-                                            .frame(width: 300, height: 200)
-                                            .background(Color.backgroundColor)
+                                            .background(Color.white.opacity(0.95))
                                             .cornerRadius(12)
-                                            .shadow(radius: 8)
                                         },
                                         position: .center
                                     )
@@ -189,23 +43,17 @@ public struct PopupPreview: View {
                                 Button("顶部弹窗") {
                                     popup.show(
                                         content: {
-                                            HStack {
-                                                Image(systemName: "info.circle.fill")
-                                                    .foregroundColor(Color.primaryColor)
-                                                Text("顶部提示信息")
+                                            VStack(spacing: 16) {
+                                                Text("顶部弹窗")
                                                     .font(.headline)
-                                                    .foregroundColor(Color.textColor)
+                                                Text("从顶部滑入的弹窗")
+                                                    .foregroundColor(.secondary)
                                             }
                                             .padding()
-                                            .frame(maxWidth: .infinity)
-                                            .background(Color.primaryColor.opacity(0.1))
-                                            .frame(height: 120)
-                                            .background(Color.backgroundColor)
-                                            .cornerRadius(8)
-                                            .shadow(radius: 4)
+                                            .background(Color.white.opacity(0.95))
+                                            .cornerRadius(12)
                                         },
-                                        position: .top,
-                                        showCloseButton: false
+                                        position: .top
                                     )
                                 }
                                 .buttonStyle(.bordered)
@@ -214,356 +62,191 @@ public struct PopupPreview: View {
                                     popup.show(
                                         content: {
                                             VStack(spacing: 16) {
-                                                Text("底部操作菜单")
+                                                Text("底部弹窗")
                                                     .font(.headline)
-                                                    .foregroundColor(Color.textColor)
+                                                Text("从底部滑入的弹窗")
+                                                    .foregroundColor(.secondary)
                                                 
-                                                Divider()
-                                                    .background(Color.separatorColor)
-                                                
-                                                Button("选项1") {
-                                                    popup.closeAll()
+                                                HStack(spacing: 12) {
+                                                    Button("选项1") {
+                                                        print("选择了选项1")
+                                                    }
+                                                    .buttonStyle(.borderedProminent)
+                                                    
+                                                    Button("选项2") {
+                                                        print("选择了选项2")
+                                                    }
+                                                    .buttonStyle(.bordered)
                                                 }
-                                                .buttonStyle(.bordered)
-                                                
-                                                Button("选项2") {
-                                                    popup.closeAll()
-                                                }
-                                                .buttonStyle(.bordered)
                                             }
                                             .padding()
-                                            .frame(height: 200)
-                                            .background(Color.backgroundColor)
+                                            .background(Color.white.opacity(0.95))
                                             .cornerRadius(12)
-                                            .shadow(radius: 8)
                                         },
                                         position: .bottom
                                     )
                                 }
                                 .buttonStyle(.bordered)
                             }
+                            .padding()
                         }
                         
                         // 多弹窗演示
                         GroupBox("多弹窗演示") {
                             VStack(spacing: 12) {
                                 Button("显示多个弹窗") {
-                                    // 同时显示三个弹窗：一个在顶部，两个在底部
-                                    
-                                    // 1. 先显示顶部弹窗
+                                    // 显示顶部弹窗
                                     popup.show(
                                         content: {
-                                            VStack(spacing: 12) {
-                                                Text("顶部弹窗1")
+                                            VStack {
+                                                Text("顶部弹窗 1")
                                                     .font(.headline)
-                                                    .foregroundColor(Color.textColor)
+                                                Text("这是第一个顶部弹窗")
+                                                    .foregroundColor(.secondary)
                                             }
-                                            .frame(height: 120)
-                                            .background(Color.backgroundColor)
-                                            .cornerRadius(8)
-                                            .shadow(radius: 4)
+                                            .padding()
+                                            .background(Color.white.opacity(0.95))
+                                            .cornerRadius(12)
                                         },
                                         position: .top,
-                                        width: nil,
-                                        height: 120,
-                                        id: "top-popup"
+                                        id: "top1"
                                     )
                                     
-                                    // 2. 显示底部弹窗1（绿色，作为基础弹窗）
-                                    popup.show(
-                                        content: {
-                                            VStack(spacing: 12) {
-                                                Text("底部弹窗1")
-                                                    .font(.headline)
-                                                    .foregroundColor(Color.textColor)
-
-                                                // 控制按钮
-                                                HStack(spacing: 12) {
-                                                    Button("切换弹窗2/3") {
-                                                        // 检查当前显示的是哪个弹窗
-                                                        if popup.activePopups.contains(where: { $0.customId == "bottom-popup-2" }) {
-                                                            // 当前显示的是弹窗2，切换到弹窗3
-                                                            popup.close(customId: "bottom-popup-2")
-                                                            
-                                                            // 等待0.35秒后显示弹窗3
-                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                                                                popup.show(
-                                                                    content: {
-                                                                        VStack(spacing: 12) {
-                                                                            Text("底部弹窗3")
-                                                                                .font(.headline)
-                                                                                .foregroundColor(Color.textColor)
-                                                                        }
-                                                                        .frame(height: 150)
-                                                                        .background(Color.backgroundColor)
-                                                                        .cornerRadius(12)
-                                                                        .shadow(radius: 8)
-                                                                    },
-                                                                    position: .bottom,
-                                                                    width: nil,
-                                                                    height: 150,
-                                                                    id: "bottom-popup-3"
-                                                                )
-                                                            }
-                                                        } else if popup.activePopups.contains(where: { $0.customId == "bottom-popup-3" }) {
-                                                            // 当前显示的是弹窗3，切换到弹窗2
-                                                            popup.close(customId: "bottom-popup-3")
-                                                            
-                                                            // 等待0.35秒后显示弹窗2
-                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                                                                popup.show(
-                                                                    content: {
-                                                                        VStack(spacing: 12) {
-                                                                            Text("底部弹窗2")
-                                                                                .font(.headline)
-                                                                                .foregroundColor(Color.textColor)
-                                                                        }
-                                                                        .frame(height: 100)
-                                                                        .background(Color.backgroundColor)
-                                                                        .cornerRadius(12)
-                                                                        .shadow(radius: 8)
-                                                                    },
-                                                                    position: .bottom,
-                                                                    width: nil,
-                                                                    height: 100,
-                                                                    id: "bottom-popup-2"
-                                                                )
-                                                            }
-                                                        }
-                                                    }
-                                                    .buttonStyle(.bordered)
-                                                    .font(.caption)
+                                    // 显示第二个顶部弹窗
+                                        popup.show(
+                                            content: {
+                                                VStack {
+                                                    Text("顶部弹窗 2")
+                                                        .font(.headline)
+                                                    Text("这是第二个顶部弹窗")
+                                                        .foregroundColor(.secondary)
                                                 }
-                                            }
-                                            .frame(height: 150)
-                                            .background(Color.backgroundColor)
-                                            .cornerRadius(12)
-                                            .shadow(radius: 8)
-                                        },
-                                        position: .bottom,
-                                        width: nil,
-                                        height: 150,
-                                        id: "bottom-popup-1"
-                                    )
+                                                .padding()
+                                                .background(Color.white.opacity(0.95))
+                                                .cornerRadius(12)
+                                            },
+                                            position: .top,
+                                            id: "top2"
+                                        )
                                     
-                                    // 3. 显示底部弹窗2（橙色，拼接在弹窗1上方）
-                                    popup.show(
-                                        content: {
-                                            VStack(spacing: 12) {
-                                                Text("底部弹窗2")
-                                                    .font(.headline)
-                                                    .foregroundColor(Color.textColor)
-                                            }
-                                            .frame(height: 100)
-                                            .background(Color.backgroundColor)
-                                            .cornerRadius(12)
-                                            .shadow(radius: 8)
-                                        },
-                                        position: .bottom,
-                                        width: nil,
-                                        height: 100,
-                                        id: "bottom-popup-2"
-                                    )
+                                   
+                                    
+                                    // 显示底部弹窗
+                                        popup.show(
+                                            content: {
+                                                VStack {
+                                                    Text("底部弹窗 1")
+                                                        .font(.headline)
+                                                    Text("多个弹窗会自动融合")
+                                                        .foregroundColor(.secondary)
+                                                }
+                                                .padding()
+                                                .background(Color.white.opacity(0.95))
+                                                .cornerRadius(12)
+                                            },
+                                            position: .bottom,
+                                            id: "bottom1"
+                                        )
+                                    
+                                    // 显示第二个底部弹窗
+                                        popup.show(
+                                            content: {
+                                                VStack {
+                                                    Text("底部弹窗 2")
+                                                        .font(.headline)
+                                                    Text("玻璃效果融合演示")
+                                                        .foregroundColor(.secondary)
+                                                }
+                                                .padding()
+                                                .background(Color.white.opacity(0.95))
+                                                .cornerRadius(12)
+                                            },
+                                            position: .bottom,
+                                            id: "bottom2"
+                                        )
                                 }
                                 .buttonStyle(.borderedProminent)
                                 
-                                // 添加专门的拼接测试按钮
-                                Button("测试弹窗拼接") {
-                                    // 清空现有弹窗
-                                    popup.closeAll()
-                                    
-                                    // 按顺序显示底部弹窗，测试拼接效果
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                                        popup.show(
-                                            content: {
-                                                ZStack {
-                                                    Rectangle()
-                                                        .fill(Color.primaryColor)
-                                                    VStack(spacing: 4) {
-                                                        Text("弹窗A")
-                                                            .font(.headline)
-                                                            .foregroundColor(.white)
-                                                        Text("高度: 100")
-                                                            .font(.caption)
-                                                            .foregroundColor(.white.opacity(0.8))
-                                                    }
-                                                }
-                                                .frame(height: 100)
-                                                .cornerRadius(12)
-                                                .shadow(radius: 8)
-                                            },
-                                            position: .bottom,
-                                            width: nil,
-                                            height: 100,
-                                            id: "popup-a"
-                                        )
-                                    }
-                                    
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                        popup.show(
-                                            content: {
-                                                ZStack {
-                                                    Rectangle()
-                                                        .fill(Color.successColor)
-                                                    VStack(spacing: 4) {
-                                                        Text("弹窗B")
-                                                            .font(.headline)
-                                                            .foregroundColor(.white)
-                                                        Text("高度: 100")
-                                                            .font(.caption)
-                                                            .foregroundColor(.white.opacity(0.8))
-                                                    }
-                                                }
-                                                .frame(height: 100)
-                                                .cornerRadius(12)
-                                                .shadow(radius: 8)
-                                            },
-                                            position: .bottom,
-                                            width: nil,
-                                            height: 100,
-                                            id: "popup-b"
-                                        )
-                                    }
-                                    
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                        popup.show(
-                                            content: {
-                                                ZStack {
-                                                    Rectangle()
-                                                        .fill(Color.primaryButtonText)
-                                                    VStack(spacing: 4) {
-                                                        Text("弹窗C")
-                                                            .font(.headline)
-                                                            .foregroundColor(.white)
-                                                        Text("高度: 100")
-                                                            .font(.caption)
-                                                            .foregroundColor(.white.opacity(0.8))
-                                                    }
-                                                }
-                                                .frame(height: 100)
-                                                .cornerRadius(12)
-                                                .shadow(radius: 8)
-                                            },
-                                            position: .bottom,
-                                            width: nil,
-                                            height: 100,
-                                            id: "popup-c"
-                                        )
-                                    }
-                                }
-                                .buttonStyle(.bordered)
-                                
-                                                                                Text("弹窗3中包含控制弹窗2显示隐藏的按钮")
-                                                    .font(.caption)
-                                                    .foregroundColor(Color.secondaryTextColor)
-                            }
-                        }
-                        
-                        // 自定义弹窗
-                        GroupBox("自定义弹窗") {
-                            VStack(spacing: 12) {
-                                Button("表单弹窗") {
+                                Button("测试弹窗融合") {
+                                    // 快速显示多个相邻弹窗，观察融合效果
                                     popup.show(
                                         content: {
-                                            VStack(spacing: 16) {
-                                                Text("用户信息")
+                                            VStack {
+                                                Text("融合测试 1")
                                                     .font(.headline)
-                                                    .foregroundColor(Color.textColor)
-                                                
-                                                TextField("姓名", text: .constant(""))
-                                                    .textFieldStyle(.roundedBorder)
-                                                
-                                                TextField("邮箱", text: .constant(""))
-                                                    .textFieldStyle(.roundedBorder)
-                                                
-                                                Button("保存") {
-                                                    popup.closeAll()
-                                                }
-                                                .buttonStyle(.borderedProminent)
+                                                Text("观察玻璃效果融合")
+                                                    .foregroundColor(.secondary)
                                             }
                                             .padding()
-                                            .frame(width: 300, height: 200)
-                                            .background(Color.backgroundColor)
+                                            .background(Color.white.opacity(0.95))
                                             .cornerRadius(12)
-                                            .shadow(radius: 8)
                                         },
-                                        position: .center,
-                                        width: 300,
-                                        height: 200
+                                        position: .bottom,
+                                        id: "merge1"
                                     )
-                                }
-                                .buttonStyle(.bordered)
-                                
-                                Button("确认弹窗") {
+                                    
                                     popup.show(
                                         content: {
-                                            VStack(spacing: 16) {
-                                                Text("确认删除")
+                                            VStack {
+                                                Text("融合测试 2")
                                                     .font(.headline)
-                                                    .foregroundColor(Color.textColor)
-                                                Text("此操作不可撤销")
-                                                    .font(.subheadline)
-                                                    .foregroundColor(Color.secondaryTextColor)
-                                                
-                                                HStack(spacing: 12) {
-                                                    Button("取消") {
-                                                        popup.closeAll()
-                                                    }
-                                                    .buttonStyle(.bordered)
-                                                    
-                                                    Button("删除") {
-                                                        popup.closeAll()
-                                                    }
-                                                    .buttonStyle(.borderedProminent)
-                                                }
+                                                Text("应该与上方融合")
+                                                    .foregroundColor(.secondary)
                                             }
                                             .padding()
-                                            .frame(width: 300, height: 150)
-                                            .background(Color.backgroundColor)
+                                            .background(Color.white.opacity(0.95))
                                             .cornerRadius(12)
-                                            .shadow(radius: 8)
                                         },
-                                        position: .center,
-                                        width: 300,
-                                        height: 150
+                                        position: .bottom,
+                                        id: "merge2"
+                                    )
+                                    
+                                    popup.show(
+                                        content: {
+                                            VStack {
+                                                Text("融合测试 3")
+                                                    .font(.headline)
+                                                Text("三个弹窗融合效果")
+                                                    .foregroundColor(.secondary)
+                                            }
+                                            .padding()
+                                            .background(Color.white.opacity(0.95))
+                                            .cornerRadius(12)
+                                        },
+                                        position: .bottom,
+                                        id: "merge3"
                                     )
                                 }
                                 .buttonStyle(.bordered)
                             }
+                            .padding()
                         }
                         
-                        // 控制按钮
+                        // 控制
                         GroupBox("控制") {
-                            VStack(spacing: 8) {
-                                Text("当前弹窗数量: \(popup.count)")
+                            VStack(spacing: 12) {
+                                Text("弹窗数量：\(PopupManager.shared.count)")
                                     .font(.caption)
-                                    .foregroundColor(Color.secondaryTextColor)
+                                    .foregroundColor(.secondary)
                                 
                                 Button("关闭所有弹窗") {
-                                    popup.closeAll()
+                                    PopupManager.shared.closeAll()
                                 }
-                                .buttonStyle(.bordered)
-                                .font(.caption)
+                                .buttonStyle(.borderedProminent)
                             }
+                            .padding()
                         }
                     }
                     .padding()
-                    
-                    Spacer()
                 }
             }
-            
-            // 弹窗容器
-            PopupContainer()
+            .navigationTitle("弹窗演示")
         }
-        .withUI()
     }
 }
 
-#if DEBUG
-struct PopupPreview_Previews: PreviewProvider {
-    static var previews: some View {
-        PopupPreview()
-    }
+// MARK: - 预览
+#Preview {
+    PopupPreview()
+        .withUI() // 添加弹窗支持
 }
-#endif
