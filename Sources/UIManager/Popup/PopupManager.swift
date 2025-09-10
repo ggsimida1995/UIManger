@@ -16,20 +16,6 @@ public enum PopupPosition: Equatable {
         case .bottom: return .bottom
         }
     }
-    
-    // 实现Equatable协议
-    public static func == (lhs: PopupPosition, rhs: PopupPosition) -> Bool {
-        switch (lhs, rhs) {
-        case (.center, .center):
-            return true
-        case (.top, .top):
-            return true
-        case (.bottom, .bottom):
-            return true
-        case (.center, _), (.top, _), (.bottom, _):
-            return false
-        }
-    }
 }
 
 /// 弹窗数据
@@ -39,34 +25,23 @@ public struct PopupData: Identifiable {
     public let position: PopupPosition
     public let width: CGFloat?
     public let height: CGFloat?
-    public let showCloseButton: Bool
-    public let closeOnTapOutside: Bool
     public let zIndex: Double
-    public let offset: CGPoint  // 添加偏移量，用于多个弹窗的堆叠
-    public let customId: String? // 添加自定义ID
-    public var isClosing: Bool = false // 标记弹窗是否正在关闭
+    public let customId: String?
     
     public init<Content: View>(
         content: Content,
         position: PopupPosition = .center,
         width: CGFloat? = nil,
         height: CGFloat? = nil,
-        showCloseButton: Bool = true,
-        closeOnTapOutside: Bool = true,
         zIndex: Double = 1000,
-        offset: CGPoint = .zero,
         customId: String? = nil
     ) {
         self.content = AnyView(content)
         self.position = position
         self.width = width
         self.height = height
-        self.showCloseButton = showCloseButton
-        self.closeOnTapOutside = closeOnTapOutside
         self.zIndex = zIndex
-        self.offset = offset
         self.customId = customId
-        self.isClosing = false
     }
 }
 
@@ -86,31 +61,20 @@ public class PopupManager: ObservableObject {
         position: PopupPosition = .center,
         width: CGFloat? = nil,
         height: CGFloat? = nil,
-        showCloseButton: Bool = true,
-        closeOnTapOutside: Bool = true,
         zIndex: Double = 1000,
-        id: String? = nil // 添加可选的ID参数
+        id: String? = nil
     ) {
-        // 获取屏幕宽度，如果width为nil则使用屏幕宽度
-        #if canImport(UIKit)
-        let screenWidth = UIScreen.main.bounds.width
-        #else
-        let screenWidth: CGFloat = 375 // macOS默认宽度
-        #endif
-        let finalWidth = width ?? screenWidth
-        
-        // 使用 VStack + Spacer 布局，不需要复杂的偏移和层级计算
-        let calculatedZIndex = zIndex
+        // 防重复弹窗：如果指定了ID且该ID已存在，则不创建新弹窗
+        if let customId = id, activePopups.contains(where: { $0.customId == customId }) {
+            return
+        }
         
         let popup = PopupData(
             content: content(),
             position: position,
-            width: finalWidth,
+            width: width,
             height: height,
-            showCloseButton: showCloseButton,
-            closeOnTapOutside: closeOnTapOutside,
-            zIndex: calculatedZIndex,
-            offset: .zero,
+            zIndex: zIndex,
             customId: id
         )
         
@@ -216,6 +180,15 @@ public class PopupManager: ObservableObject {
         activePopups.count
     }
     
+    /// 检查指定ID的弹窗是否已存在
+    public func isShowing(id: String) -> Bool {
+        return activePopups.contains(where: { $0.customId == id })
+    }
+    
+    /// 检查是否有任何弹窗在显示
+    public var hasActivePopups: Bool {
+        return !activePopups.isEmpty
+    }
 
 }
 
