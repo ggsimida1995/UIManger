@@ -108,7 +108,7 @@ public struct PopupContainer: View {
                     let topPopups = popupManager.activePopups.filter { $0.position == .top }
                     if !topPopups.isEmpty {
                         
-                            ForEach(topPopups.sorted(by: { $0.zIndex < $1.zIndex })) { popupData in
+                            ForEach(topPopups.sorted(by: { $0.zIndex > $1.zIndex })) { popupData in
                                 PopupView(
                                     popup: popupData,
                                     onClose: { 
@@ -135,7 +135,7 @@ public struct PopupContainer: View {
                     let bottomPopups = popupManager.activePopups.filter { $0.position == .bottom }
                     if !bottomPopups.isEmpty {
                       
-                            ForEach(bottomPopups.sorted(by: { $0.zIndex > $1.zIndex })) { popupData in
+                            ForEach(bottomPopups.sorted(by: { $0.zIndex < $1.zIndex })) { popupData in
                                 PopupView(
                                     popup: popupData,
                                     onClose: { 
