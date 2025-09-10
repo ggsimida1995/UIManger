@@ -48,12 +48,13 @@ public struct PopupPreview: View {
                                                 .buttonStyle(.borderedProminent)
                                             }
                                             .padding()
-                                            .background(Color.white.opacity(0.95))
-                                            .cornerRadius(12)
+                                            .frame(maxWidth: .infinity, alignment: .center)
+                                            .glassEffect(in: .rect(cornerRadius: 16.0))
+                                            
                                         },
                                         position: .center,
-                                        width: nil,  // 使用屏幕宽度
-                                        height: 200
+                                        width: 300,
+                                        height: nil
                                     )
                                 }
                                 .buttonStyle(.bordered)
@@ -81,8 +82,8 @@ public struct PopupPreview: View {
                                                 }
                                             }
                                             .padding()
-                                            .background(Color.white.opacity(0.95))
-                                            .cornerRadius(12)
+                                            .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
+                                            .glassEffect(in: .rect(cornerRadius: 16.0))
                                         },
                                         position: .top,
                                         width: nil,
@@ -123,12 +124,12 @@ public struct PopupPreview: View {
                                                 }
                                             }
                                             .padding()
-                                            .background(Color.white.opacity(0.95))
-                                            .cornerRadius(12)
+                                            .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
+                                            .glassEffect(in: .rect(cornerRadius: 16.0))
                                         },
                                         position: .bottom,
                                         width: nil,
-                                        height: nil  // 高度自适应
+                                        height: 450  // 高度自适应
                                     )
                                 }
                                 .buttonStyle(.bordered)
@@ -160,82 +161,16 @@ public struct PopupPreview: View {
                                                 .buttonStyle(.borderedProminent)
                                             }
                                             .padding()
-                                            .background(Color.white.opacity(0.95))
-                                            .cornerRadius(12)
+                                            .frame(width: 280, height: 200, alignment: .center)
+                                            .border(Color.red, width: 1)
                                         },
                                         position: .center,
                                         width: 280,
-                                        height: nil
+                                        height: 200
                                     )
                                 }
                                 .buttonStyle(.bordered)
                                 
-                                // 2. 宽度和高度都自适应
-                                Button("宽度高度都自适应") {
-                                    popup.show(
-                                        content: {
-                                            VStack(spacing: 12) {
-                                                Text("完全自适应弹窗")
-                                                    .font(.headline)
-                                                Text("width: nil, height: nil")
-                                                    .foregroundColor(.secondary)
-                                                    .font(.caption)
-                                                
-                                                Text("短内容")
-                                                    .font(.body)
-                                                
-                                                HStack(spacing: 8) {
-                                                    Button("取消") { }
-                                                        .buttonStyle(.bordered)
-                                                    Button("确定") { }
-                                                        .buttonStyle(.borderedProminent)
-                                                }
-                                            }
-                                            .padding()
-                                            .background(Color.white.opacity(0.95))
-                                            .cornerRadius(12)
-                                        },
-                                        position: .center,
-                                        width: nil,
-                                        height: nil
-                                    )
-                                }
-                                .buttonStyle(.bordered)
-                                
-                                // 3. 动态内容高度自适应
-                                Button("动态内容高度自适应") {
-                                    popup.show(
-                                        content: {
-                                            VStack(spacing: 12) {
-                                                Text("动态内容弹窗")
-                                                    .font(.headline)
-                                                Text("width: 300, height: nil")
-                                                    .foregroundColor(.secondary)
-                                                    .font(.caption)
-                                                
-                                                VStack(alignment: .leading, spacing: 6) {
-                                                    ForEach(1...Int.random(in: 3...7), id: \.self) { i in
-                                                        Text("• 动态生成的第 \(i) 行内容")
-                                                            .font(.body)
-                                                    }
-                                                }
-                                                
-                                                Button("刷新内容") {
-                                                    // 这会关闭当前弹窗并重新生成
-                                                    PopupManager.shared.closeAll()
-                                                }
-                                                .buttonStyle(.borderedProminent)
-                                            }
-                                            .padding()
-                                            .background(Color.white.opacity(0.95))
-                                            .cornerRadius(12)
-                                        },
-                                        position: .center,
-                                        width: 300,
-                                        height: nil
-                                    )
-                                }
-                                .buttonStyle(.bordered)
                             }
                             .padding()
                         }

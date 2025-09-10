@@ -101,7 +101,7 @@ public class PopupManager: ObservableObject {
         )
         
         // 延迟关闭，让退出动画完成（匹配 PopupView 中最长的 0.5 秒弹簧动画）
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+        // DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
             withAnimation(
                 .spring(
                     response: 0.2,        // 快速响应
@@ -111,7 +111,7 @@ public class PopupManager: ObservableObject {
             ) {
                 self.activePopups.removeAll { $0.id == id }
             }
-        }
+        // }
     }
     
     /// 根据自定义ID关闭弹窗
@@ -127,7 +127,7 @@ public class PopupManager: ObservableObject {
         )
         
         // 延迟关闭，让退出动画完成（匹配 PopupView 中最长的 0.5 秒弹簧动画）
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+        // DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
             withAnimation(
                 .spring(
                     response: 0.2,        // 快速响应
@@ -137,7 +137,7 @@ public class PopupManager: ObservableObject {
             ) {
                 self.activePopups.removeAll { $0.customId == customId }
             }
-        }
+        // }
     }
     
     /// 根据自定义ID切换弹窗显示状态

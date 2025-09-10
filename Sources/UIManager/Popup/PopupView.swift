@@ -14,23 +14,31 @@ public struct PopupView: View {
     }
     
     public var body: some View {
-        ZStack {
-            PopupContentView(popup: popup, onClose: closePopup)
-                .opacity(isVisible ? 1 : 0)
-                .scaleEffect(
-                    isVisible ? 1 : (
-                        popup.position == .center ? 0.3 : 1
-                    )
-                )
-                .offset(
-                    x: 0, 
-                    y: popup.position == .center ? 0 : (
-                        isVisible ? 0 : (
-                            popup.position == .top ? -300 : 300  // 顶部从上方滑入，底部从下方滑入
-                        )
-                    )
-                )
+        // 直接处理content，避免中间层干扰
+        Group {
+            if popup.width != nil || popup.height != nil {
+                popup.content
+                    .frame(width: popup.width, height: popup.height)
+            } else {
+                popup.content
+            }
         }
+        .clipped()
+        .allowsHitTesting(true)
+        .contentShape(Rectangle())
+
+        .opacity(isVisible ? 1 : 0)
+        .offset(
+            x: 0,
+            y: popup.position == .center ? 0 : (
+                isVisible ? 0 : (
+                    popup.position == .top ? 
+                        -(popup.height ?? 300) - 100 : 
+                        (popup.height ?? 300) + 100
+                )
+            )
+        )
+
         .zIndex(popup.zIndex)
         .onAppear {
             withAnimation(.easeInOut(duration: 0.35)) {
@@ -69,24 +77,6 @@ public struct PopupView: View {
     }
 }
 
-/// 弹窗内容视图
-private struct PopupContentView: View {
-    let popup: PopupData
-    let onClose: () -> Void
-    
-    var body: some View {
-        popup.content
-            .frame(
-                width: popup.width,
-                height: popup.height,
-                alignment: .center
-            )
-            .frame(maxWidth: popup.width == nil ? .infinity : nil)
-            .clipped()
-            .allowsHitTesting(true)
-            .contentShape(Rectangle())
-    }
-}
 
 
 /// 弹窗容器视图
