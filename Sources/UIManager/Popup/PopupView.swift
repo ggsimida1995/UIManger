@@ -76,11 +76,15 @@ private struct PopupContentView: View {
     
     var body: some View {
         popup.content
-            .frame(width: popup.width)
+            .frame(
+                width: popup.width,
+                height: popup.height,
+                alignment: .center
+            )
+            .frame(maxWidth: popup.width == nil ? .infinity : nil)
             .clipped()
-            .allowsHitTesting(true) // 确保弹窗内容能接收触摸事件
-            .contentShape(Rectangle()) // 确保整个内容区域都能接收触摸事件
-            // 
+            .allowsHitTesting(true)
+            .contentShape(Rectangle())
     }
 }
 
@@ -107,19 +111,22 @@ public struct PopupContainer: View {
                     .animation(.easeInOut(duration: 0.2), value: popupManager.showOverlay) // 添加动画
             }
             
-            // 使用 GlassEffectContainer 来让多个弹窗视觉融合
+            // 使用官方 GlassEffectContainer API 来让多个弹窗视觉融合
             GlassEffectContainer(spacing: 8) {
                 VStack(spacing: 0) {
-                    // 顶部弹窗
+                    // 顶部弹窗 - 添加安全区域padding
                     let topPopups = popupManager.activePopups.filter { $0.position == .top }
-                    ForEach(topPopups.sorted(by: { $0.zIndex < $1.zIndex })) { popupData in
-                        PopupView(
-                            popup: popupData,
-                            onClose: { 
-                                popupManager.close(id: popupData.id)
+                    if !topPopups.isEmpty {
+                        
+                            ForEach(topPopups.sorted(by: { $0.zIndex < $1.zIndex })) { popupData in
+                                PopupView(
+                                    popup: popupData,
+                                    onClose: { 
+                                        popupManager.close(id: popupData.id)
+                                    }
+                                )
                             }
-                        )
-                        .allowsHitTesting(true)
+                 
                     }
                     
                     // 中心弹窗（只有一个）
@@ -131,31 +138,31 @@ public struct PopupContainer: View {
                                 popupManager.close(id: centerPopup.id)
                             }
                         )
-                        .allowsHitTesting(true)
                     }
                     Spacer()
                     
-                    // 底部弹窗
+                    // 底部弹窗 - 添加底部安全区域padding
                     let bottomPopups = popupManager.activePopups.filter { $0.position == .bottom }
-                    ForEach(bottomPopups.sorted(by: { $0.zIndex > $1.zIndex })) { popupData in
-                        PopupView(
-                            popup: popupData,
-                            onClose: { 
-                                popupManager.close(id: popupData.id)
+                    if !bottomPopups.isEmpty {
+                      
+                            ForEach(bottomPopups.sorted(by: { $0.zIndex > $1.zIndex })) { popupData in
+                                PopupView(
+                                    popup: popupData,
+                                    onClose: { 
+                                        popupManager.close(id: popupData.id)
+                                    }
+                                )
                             }
-                        )
-                        .allowsHitTesting(true)
+                     
                     }
                 }
             }
         }
         .ignoresSafeArea(.all, edges: .all)
-        .allowsHitTesting(true) // 确保整个容器能接收触摸事件
         .onTapGesture {
             // 防止触摸事件穿透到下层
             // 这个手势处理器会拦截所有触摸事件
         }
-
     }
 }
 

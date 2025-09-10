@@ -52,7 +52,7 @@ public struct ToastModifier: ViewModifier {
                 .animation(.spring(response: 0.4, dampingFraction: 0.8), value: toast != nil)
                 .zIndex(2000)
             )
-            .onChange(of: toast) { newValue in
+            .onChange(of: toast) { _ , newValue in
                 if newValue != nil {
                     // 取消上一个计时器
                     workItem?.cancel()
