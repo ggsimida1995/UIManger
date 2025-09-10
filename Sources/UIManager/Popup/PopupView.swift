@@ -104,11 +104,11 @@ public struct PopupContainer: View {
             // 使用官方 GlassEffectContainer API 来让多个弹窗视觉融合
             GlassEffectContainer(spacing: 8) {
                 VStack(spacing: 0) {
-                    // 顶部弹窗 - 添加安全区域padding
+                    // 顶部弹窗 - 按layer排序（layer小的在上方）
                     let topPopups = popupManager.activePopups.filter { $0.position == .top }
                     if !topPopups.isEmpty {
                         
-                            ForEach(topPopups.sorted(by: { $0.zIndex > $1.zIndex })) { popupData in
+                            ForEach(topPopups.sorted(by: { $0.layer < $1.layer })) { popupData in
                                 PopupView(
                                     popup: popupData,
                                     onClose: { 
@@ -131,11 +131,11 @@ public struct PopupContainer: View {
                     }
                     Spacer()
                     
-                    // 底部弹窗 - 添加底部安全区域padding
+                    // 底部弹窗 - 按layer排序（layer小的在上方，layer大的靠近底部）
                     let bottomPopups = popupManager.activePopups.filter { $0.position == .bottom }
                     if !bottomPopups.isEmpty {
                       
-                            ForEach(bottomPopups.sorted(by: { $0.zIndex < $1.zIndex })) { popupData in
+                            ForEach(bottomPopups.sorted(by: { $0.layer < $1.layer })) { popupData in
                                 PopupView(
                                     popup: popupData,
                                     onClose: { 

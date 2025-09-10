@@ -27,6 +27,7 @@ public struct PopupData: Identifiable {
     public let height: CGFloat?
     public let zIndex: Double
     public let customId: String?
+    public let layer: Int // 新增：层级概念，用于维护弹窗的相对顺序
     
     public init<Content: View>(
         content: Content,
@@ -34,7 +35,8 @@ public struct PopupData: Identifiable {
         width: CGFloat? = nil,
         height: CGFloat? = nil,
         zIndex: Double = 1000,
-        customId: String? = nil
+        customId: String? = nil,
+        layer: Int = 0
     ) {
         self.content = AnyView(content)
         self.position = position
@@ -42,6 +44,7 @@ public struct PopupData: Identifiable {
         self.height = height
         self.zIndex = zIndex
         self.customId = customId
+        self.layer = layer
     }
 }
 
@@ -62,12 +65,16 @@ public class PopupManager: ObservableObject {
         width: CGFloat? = nil,
         height: CGFloat? = nil,
         zIndex: Double = 1000,
-        id: String? = nil
+        id: String? = nil,
+        layer: Int? = nil
     ) {
         // 防重复弹窗：如果指定了ID且该ID已存在，则不创建新弹窗
         if let customId = id, activePopups.contains(where: { $0.customId == customId }) {
             return
         }
+        
+        // 如果没有指定layer，则根据当前同位置弹窗数量自动分配
+        let finalLayer = layer ?? activePopups.filter { $0.position == position }.count
         
         let popup = PopupData(
             content: content(),
@@ -75,7 +82,8 @@ public class PopupManager: ObservableObject {
             width: width,
             height: height,
             zIndex: zIndex,
-            customId: id
+            customId: id,
+            layer: finalLayer
         )
         
         // 直接在主线程更新，不使用 DispatchQueue.main.async
@@ -148,6 +156,89 @@ public class PopupManager: ObservableObject {
         } else {
             // 如果弹窗不存在，则显示
             show(content: content, position: position, id: customId)
+        }
+    }
+    
+    /// 替换指定customId的弹窗，保持其在队列中的位置和层级
+    public func replace<Content: View>(
+        customId: String,
+        @ViewBuilder content: @escaping () -> Content,
+        position: PopupPosition = .center,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil
+    ) {
+        // 查找要替换的弹窗
+        guard let index = activePopups.firstIndex(where: { $0.customId == customId }) else {
+            // 如果找不到，则直接显示新弹窗
+            show(content: content, position: position, width: width, height: height, id: customId)
+            return
+        }
+        
+        // 获取原弹窗的zIndex和layer，保持层级顺序
+        let originalZIndex = activePopups[index].zIndex
+        let originalLayer = activePopups[index].layer
+        
+        // 创建新弹窗数据，保持原有的zIndex和layer
+        let newPopup = PopupData(
+            content: content(),
+            position: position,
+            width: width,
+            height: height,
+            zIndex: originalZIndex,
+            customId: customId,
+            layer: originalLayer
+        )
+        
+        // 发送关闭原弹窗的通知
+        let originalId = activePopups[index].id
+        NotificationCenter.default.post(
+            name: NSNotification.Name("ClosePopup"),
+            object: nil,
+            userInfo: ["popupId": originalId]
+        )
+        
+        // 直接替换数组中的元素，保持位置不变
+        withAnimation(.easeInOut(duration: 0.3)) {
+            self.activePopups[index] = newPopup
+        }
+    }
+    
+    /// 切换弹窗，如果目标弹窗不存在且找到可替换的弹窗，则替换它，否则正常切换
+    public func smartToggle<Content: View>(
+        customId: String,
+        @ViewBuilder content: @escaping () -> Content,
+        position: PopupPosition = .center,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil,
+        replaceTargetId: String? = nil
+    ) {
+        if activePopups.contains(where: { $0.customId == customId }) {
+            // 如果目标弹窗存在，则关闭它
+            close(customId: customId)
+        } else {
+            // 目标弹窗不存在
+            if let replaceId = replaceTargetId, 
+               activePopups.contains(where: { $0.customId == replaceId }) {
+                // 如果指定了要替换的弹窗ID，且该弹窗存在，则替换它
+                replace(customId: replaceId, content: content, position: position, width: width, height: height)
+                
+                // 更新为新的customId
+                if let index = activePopups.firstIndex(where: { $0.customId == replaceId }) {
+                    let newPopup = PopupData(
+                        content: content(),
+                        position: position,
+                        width: width,
+                        height: height,
+                        zIndex: activePopups[index].zIndex,
+                        customId: customId,
+                        layer: activePopups[index].layer
+                    )
+                    activePopups[index] = newPopup
+                }
+            } else {
+                // 没有指定替换目标或替换目标不存在，正常显示新弹窗
+                show(content: content, position: position, width: width, height: height, id: customId)
+            }
         }
     }
     

@@ -137,139 +137,10 @@ public struct PopupPreview: View {
                             .padding()
                         }
                         
-                        // 尺寸自适应演示
-                        GroupBox("尺寸自适应演示") {
-                            VStack(spacing: 12) {
-                                // 1. 指定宽度，高度自适应
-                                Button("指定宽度，高度自适应") {
-                                    popup.show(
-                                        content: {
-                                            VStack(spacing: 12) {
-                                                Text("固定宽度弹窗")
-                                                    .font(.headline)
-                                                Text("width: 280, height: nil")
-                                                    .foregroundColor(.secondary)
-                                                    .font(.caption)
-                                                
-                                                Text("这是一段较长的文本内容，用来测试高度自适应功能。高度会根据内容自动调整，但宽度固定为280pt。")
-                                                    .multilineTextAlignment(.center)
-                                                    .font(.body)
-                                                
-                                                Button("确定") {
-                                                    print("确定")
-                                                }
-                                                .buttonStyle(.borderedProminent)
-                                            }
-                                            .padding()
-                                            .frame(width: 280, height: 200, alignment: .center)
-                                            .border(Color.red, width: 1)
-                                        },
-                                        position: .center,
-                                        width: 280,
-                                        height: 200
-                                    )
-                                }
-                                .buttonStyle(.bordered)
-                                
-                            }
-                            .padding()
-                        }
-                        
-                        // 防重复弹窗演示
-                        GroupBox("防重复弹窗演示") {
-                            VStack(spacing: 12) {
-                                HStack {
-                                    Text("状态: ")
-                                    Text(PopupManager.shared.isShowing(id: "unique-popup") ? "已显示" : "未显示")
-                                        .foregroundColor(PopupManager.shared.isShowing(id: "unique-popup") ? .green : .secondary)
-                                        .fontWeight(.medium)
-                                }
-                                .font(.caption)
-                                
-                                Button("多次点击我试试 (ID: unique-popup)") {
-                                    popup.show(
-                                        content: {
-                                            VStack(spacing: 16) {
-                                                Text("唯一弹窗")
-                                                    .font(.headline)
-                                                
-                                                Text("这个弹窗有固定ID: 'unique-popup'")
-                                                    .foregroundColor(.secondary)
-                                                    .font(.caption)
-                                                
-                                                Text("无论你点击多少次按钮，都只会显示一个弹窗")
-                                                    .multilineTextAlignment(.center)
-                                                
-                                                Button("关闭") {
-                                                    PopupManager.shared.close(customId: "unique-popup")
-                                                }
-                                                .buttonStyle(.borderedProminent)
-                                            }
-                                            .padding()
-                                            .background(Color.white.opacity(0.95))
-                                            .cornerRadius(12)
-                                        },
-                                        position: .center,
-                                        width: 280,
-                                        height: nil,
-                                        id: "unique-popup"
-                                    )
-                                }
-                                .buttonStyle(.borderedProminent)
-                                
-                                Button("可重复弹窗 (无ID)") {
-                                    popup.show(
-                                        content: {
-                                            VStack(spacing: 16) {
-                                                Text("可重复弹窗")
-                                                    .font(.headline)
-                                                
-                                                Text("这个弹窗没有ID，可以重复显示")
-                                                    .foregroundColor(.secondary)
-                                                    .font(.caption)
-                                                
-                                                Text("每次点击都会创建新的弹窗实例")
-                                                    .multilineTextAlignment(.center)
-                                                
-                                                Button("关闭全部") {
-                                                    PopupManager.shared.closeAll()
-                                                }
-                                                .buttonStyle(.borderedProminent)
-                                            }
-                                            .padding()
-                                            .background(Color.white.opacity(0.95))
-                                            .cornerRadius(12)
-                                        },
-                                        position: .center,
-                                        width: 280,
-                                        height: nil
-                                        // 没有传入id参数，所以可以重复创建
-                                    )
-                                }
-                                .buttonStyle(.bordered)
-                                
-                                HStack(spacing: 12) {
-                                    Button("检查弹窗状态") {
-                                        let isShowing = PopupManager.shared.isShowing(id: "unique-popup")
-                                        print("unique-popup 是否显示: \(isShowing)")
-                                    }
-                                    .buttonStyle(.bordered)
-                                    .font(.caption)
-                                    
-                                    Button("弹窗总数: \(PopupManager.shared.count)") {
-                                        print("当前弹窗总数: \(PopupManager.shared.count)")
-                                    }
-                                    .buttonStyle(.bordered)
-                                    .font(.caption)
-                                }
-                            }
-                            .padding()
-                        }
-                        
                         // 多弹窗演示
                         GroupBox("多弹窗演示") {
                             VStack(spacing: 12) {
-                                Button("显示多个弹窗") {
+                                Button("显示传统多弹窗") {
                                     // 显示顶部弹窗
                                     popup.show(
                                         content: {
@@ -346,6 +217,69 @@ public struct PopupPreview: View {
                                         id: "bottom2"
                                     )
                                 }
+                                .buttonStyle(.bordered)
+                                
+                                Button("智能切换弹窗演示") {
+                                    // 先清空所有弹窗
+                                    popup.closeAll()
+                                    
+                                    // 延迟显示新弹窗
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        
+                                        popup.show(
+                                            content: {
+                                                VStack(spacing: 16) {
+                                                    Text("顶部弹窗")
+                                                        .font(.headline)
+                                                    Text("width: nil (自适应), height: 150")
+                                                        .foregroundColor(.secondary)
+                                                    HStack {
+                                                        Rectangle()
+                                                            .fill(Color.blue.opacity(0.3))
+                                                            .frame(width: 40, height: 40)
+                                                        Spacer()
+                                                        Text("应该填满宽度")
+                                                            .font(.caption)
+                                                        Spacer()
+                                                        Rectangle()
+                                                            .fill(Color.green.opacity(0.3))
+                                                            .frame(width: 40, height: 40)
+                                                    }
+                                                }
+                                                .padding()
+                                                .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
+                                                .glassEffect(in: .rect(cornerRadius: 16.0))
+                                            },
+                                            position: .top,
+                                            width: nil,
+                                            height: 250
+                                        )
+                                        
+                                        // 显示A弹窗（layer 0）
+                                        popup.show(
+                                            content: {
+                                                SmartPopupContentA(popupManager: popup)
+                                            },
+                                            position: .bottom,
+                                            width: nil,
+                                            height: 180,
+                                            id: "smartA",
+                                            layer: 0
+                                        )
+                                        
+                                        // 显示B弹窗（layer 1，在底部）
+                                        popup.show(
+                                            content: {
+                                                SmartPopupContentB(popupManager: popup)
+                                            },
+                                            position: .bottom,
+                                            width: nil,
+                                            height: 140,
+                                            id: "smartB",
+                                            layer: 1
+                                        )
+                                    }
+                                }
                                 .buttonStyle(.borderedProminent)
                             }
                             .padding()
@@ -371,6 +305,174 @@ public struct PopupPreview: View {
             }
             .navigationTitle("弹窗演示")
         }
+    }
+}
+
+// MARK: - 智能切换弹窗内容组件
+
+/// A弹窗内容（用于演示智能切换）
+struct SmartPopupContentA: View {
+    let popupManager: PopupManager
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            HStack {
+                Text("弹窗 A")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.blue)
+                Spacer()
+                Text("Layer 0")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.blue.opacity(0.1))
+                    .clipShape(Capsule())
+            }
+            
+            Text("我是A弹窗，在B弹窗的上方")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            
+            HStack(spacing: 10) {
+                Circle()
+                    .fill(Color.blue.opacity(0.3))
+                    .frame(width: 30, height: 30)
+                Text("点击B弹窗中的按钮来切换我为C")
+                    .font(.caption)
+                    .multilineTextAlignment(.leading)
+                Spacer()
+            }
+        }
+        .padding()
+        .background(Color.blue)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
+                                                // .glassEffect(in: .rect(cornerRadius: 16.0))
+    }
+}
+
+/// C弹窗内容（用于演示智能切换）
+struct SmartPopupContentC: View {
+    let popupManager: PopupManager
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            HStack {
+                Text("弹窗 C")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.orange)
+                Spacer()
+                Text("Layer 0")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.orange.opacity(0.1))
+                    .clipShape(Capsule())
+            }
+            
+            Text("我是C弹窗，替换了A弹窗的位置")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            
+            HStack(spacing: 10) {
+                Circle()
+                    .fill(Color.orange.opacity(0.3))
+                    .frame(width: 30, height: 30)
+                Text("点击B弹窗中的按钮来切换回A")
+                    .font(.caption)
+                    .multilineTextAlignment(.leading)
+                Spacer()
+            }
+        }
+        .padding()
+        .background(Color.orange)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
+                                                // .glassEffect(in: .rect(cornerRadius: 16.0))
+    }
+}
+
+/// B弹窗内容（用于演示智能切换）
+struct SmartPopupContentB: View {
+    let popupManager: PopupManager
+    @State private var currentTopPopup = "A" // 当前顶层弹窗
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            HStack {
+                Text("弹窗 B - 控制器")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.green)
+                Spacer()
+                Text("Layer 1")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.green.opacity(0.1))
+                    .clipShape(Capsule())
+            }
+            
+            Text("我始终在底部，控制上方弹窗的切换")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            
+            HStack(spacing: 12) {
+                Button(currentTopPopup == "A" ? "切换为 C" : "切换为 A") {
+                    if currentTopPopup == "A" {
+                        switchToC()
+                    } else {
+                        switchToA()
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+                
+                Text("当前: \(currentTopPopup)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding()
+        .background(Color.green)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
+                                                // .glassEffect(in: .rect(cornerRadius: 16.0))
+    }
+    
+    /// 切换到C弹窗
+    private func switchToC() {
+        popupManager.smartToggle(
+            customId: "smartC",
+            content: {
+                SmartPopupContentC(popupManager: popupManager)
+            },
+            position: .bottom,
+            width: nil,
+            height: 180,
+            replaceTargetId: "smartA"
+        )
+        currentTopPopup = "C"
+    }
+    
+    /// 切换回A弹窗
+    private func switchToA() {
+        popupManager.smartToggle(
+            customId: "smartA",
+            content: {
+                SmartPopupContentA(popupManager: popupManager)
+            },
+            position: .bottom,
+            width: nil,
+            height: 180,
+            replaceTargetId: "smartC"
+        )
+        currentTopPopup = "A"
     }
 }
 
