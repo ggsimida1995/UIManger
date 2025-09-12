@@ -65,7 +65,7 @@ public struct MultiButtonFilterView<Content: View>: View {
                             }
                         }
                     }
-                    .glassEffect(.clear,in: RoundedRectangle(cornerRadius: 0))
+                    // .glassEffect(.clear,in: RoundedRectangle(cornerRadius: 0))
                     
                     .background(Color.backgroundColor)
                     
