@@ -65,9 +65,8 @@ public struct MultiButtonFilterView<Content: View>: View {
                             }
                         }
                     }
-                    // .glassEffect(.clear,in: RoundedRectangle(cornerRadius: 0))
+                    .glassEffect(.clear,in: RoundedRectangle(cornerRadius: 0))
                     
-                    .background(Color.backgroundColor)
                     
                     if let expandedButtonId = expandedButtonId,
                        let button = buttons.first(where: { $0.id == expandedButtonId }) {
@@ -98,10 +97,12 @@ public struct MultiButtonFilterView<Content: View>: View {
                     }
                     Spacer()
                 }
+                .background(Color.backgroundColor)
                 .frame(maxWidth: .infinity)
                 .zIndex(100)
                 
                 content
+                    .background(Color.backgroundColor)
                     .zIndex(10)
                 
                 if expandedButtonId != nil {

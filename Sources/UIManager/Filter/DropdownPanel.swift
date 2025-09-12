@@ -64,10 +64,11 @@ public struct DropdownPanel: View {
                 if option.key != options.last?.key {
                     Divider()
                         .foregroundColor(Color.separatorColor)
+                        .padding(.horizontal, 20)
                 }
             }
         }.padding(.vertical, 10)
-        // .glassEffect(.clear,in: RoundedRectangle(cornerRadius: 0))
+        .glassEffect(in: RoundedRectangle(cornerRadius: 0))
         .background(Color.backgroundColor)
     }
 }
