@@ -261,22 +261,14 @@ struct SimpleHeightSwitchPopup: View {
             ZStack {
                 if showViewA {
                     SwitchViewA()
-                        .transition(.offset(y: UIScreen.main.bounds.height)) // 从屏幕底部外进入
+                        .transition(.offset(y: 1000)) // 从屏幕底部外进入
                 }
                 
                 if showViewB {
                     SwitchViewB()
-                        .transition(.offset(y: UIScreen.main.bounds.height)) // 从屏幕底部外进入
+                        .transition(.offset(y: 1000)) // 从屏幕底部外进入
                 }
             }
-            // .onAppear {
-            //     // 初始显示ViewA
-            //     showViewA = false
-            //     showViewB = false
-            //     withAnimation(.spring(response: 0.5, dampingFraction: 0.6).delay(0.1)) {
-            //         showViewA = true
-            //     }
-            // }
             
             // 切换按钮
             VStack{

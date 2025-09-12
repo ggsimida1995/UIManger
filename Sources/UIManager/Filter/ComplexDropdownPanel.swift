@@ -166,6 +166,7 @@ public struct ComplexDropdownPanel: View {
             .padding(.top, 12)
             .padding(.bottom, 12)
         }.glassEffect(.clear,in: RoundedRectangle(cornerRadius: 0))
+        .background(Color.backgroundColor)
     }
     
     private func toggleItem(sectionIndex: Int, itemIndex: Int) {
