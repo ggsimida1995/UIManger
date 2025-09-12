@@ -12,8 +12,7 @@ public struct UIManagerDemos: View {
                 }
                 
                 Section("弹窗组件") {
-                    NavigationLink("弹窗演示", destination: PopupPreview())
-                   
+                    NavigationLink("弹窗演示", destination: PopupDemo().withUI())
                 }
                 
                 Section("Toast 提示") {
