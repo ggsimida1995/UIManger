@@ -165,7 +165,8 @@ public struct ComplexDropdownPanel: View {
             .padding(.horizontal, 16)
             .padding(.top, 12)
             .padding(.bottom, 12)
-        }.glassEffect(.clear,in: RoundedRectangle(cornerRadius: 0))
+        }
+        // .glassEffect(.clear,in: RoundedRectangle(cornerRadius: 0))
         .background(Color.backgroundColor)
     }
     
