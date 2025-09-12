@@ -18,9 +18,9 @@ public struct PopupView: View {
         Group {
             if popup.width != nil || popup.height != nil {
                 popup.content
-                    .frame(width: popup.width, height: popup.height)
+                    .frame(width: popup.width, height: popup.height) .border(Color.red,width: 1)
             } else {
-                popup.content
+                popup.content .border(Color.red,width: 1)
             }
         }
         .clipped()
@@ -53,6 +53,7 @@ public struct PopupView: View {
             }
             // 移除了无ID通知的处理，避免重复关闭
         }
+         .border(Color.red,width: 1)
     }
     
     private func closePopup() {

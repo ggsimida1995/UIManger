@@ -262,7 +262,7 @@ public struct PopupPreview: View {
                                             },
                                             position: .bottom,
                                             width: nil,
-                                            height: 180,
+                                            height: 60,
                                             id: "smartA",
                                             layer: 0
                                         )
@@ -344,12 +344,12 @@ struct SmartPopupContentA: View {
                     .multilineTextAlignment(.leading)
                 Spacer()
             }
-        }
+        }.border(Color.red,width: 1)
         .padding()
-        .background(Color.blue)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
-                                                // .glassEffect(in: .rect(cornerRadius: 16.0))
+        // .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
+                                                .glassEffect(in: .rect(cornerRadius: 16.0))
+        .border(Color.red,width: 1)
+
     }
 }
 
@@ -387,12 +387,12 @@ struct SmartPopupContentC: View {
                     .multilineTextAlignment(.leading)
                 Spacer()
             }
-        }
+        }.border(Color.red,width: 1)
         .padding()
-        .background(Color.orange)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
-                                                // .glassEffect(in: .rect(cornerRadius: 16.0))
+     
+        // .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
+                                                .glassEffect(in: .rect(cornerRadius: 16.0))
+                                                   .border(Color.red,width: 1)
     }
 }
 
@@ -437,12 +437,11 @@ struct SmartPopupContentB: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
-        }
+        }.border(Color.red,width: 1)
         .padding()
-        .background(Color.green)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
-                                                // .glassEffect(in: .rect(cornerRadius: 16.0))
+        // .frame(maxWidth: .infinity,maxHeight: .infinity, alignment: .center)
+         .glassEffect(in: .rect(cornerRadius: 16.0))
+         .border(Color.red,width: 1)
     }
     
     /// 切换到C弹窗
@@ -469,7 +468,7 @@ struct SmartPopupContentB: View {
             },
             position: .bottom,
             width: nil,
-            height: 180,
+            height: 60,
             replaceTargetId: "smartC"
         )
         currentTopPopup = "A"
