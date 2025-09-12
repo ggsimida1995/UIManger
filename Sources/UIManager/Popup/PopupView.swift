@@ -14,7 +14,7 @@ public struct PopupView: View {
     
     // 统一的弹簧动画配置
     private var springAnimation: Animation {
-        .spring(response: 0.4, dampingFraction: 0.95, blendDuration: 0)
+        .spring(response: 0.3, dampingFraction: 0.95, blendDuration: 0)
     }
     
     public var body: some View {
@@ -63,7 +63,7 @@ public struct PopupContainer: View {
     
     // 统一的弹簧动画配置
     private var springAnimation: Animation {
-        .spring(response: 0.4, dampingFraction: 0.95, blendDuration: 0)
+        .spring(response: 0.3, dampingFraction: 0.95, blendDuration: 0)
     }
     
     public var body: some View {

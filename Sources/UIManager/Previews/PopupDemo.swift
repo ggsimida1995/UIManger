@@ -250,7 +250,7 @@ struct SimpleHeightSwitchPopup: View {
      // 定义弹簧动画参数
     private var springAnimation: Animation {
         Animation.spring(
-            response: 0.4,  // 响应时间，控制动画速度
+            response: 0.3,  // 响应时间，控制动画速度
             dampingFraction: 0.95,  // 阻尼系数，值越小弹性越强
             blendDuration: 0  // 混合时间，控制动画过渡
         )
