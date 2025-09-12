@@ -63,21 +63,11 @@ public struct MultiButtonFilterView<Content: View>: View {
                                     toggleButton(button.id)
                                 }
                             }
-                            
-                            // 移除按钮之间的竖线分隔符
-                            // if index < buttons.count - 1 {
-                            //     Divider()
-                            //         .frame(height: 20)
-                            //         .foregroundColor(.secondary.opacity(0.3))
-                            // }
                         }
-                    }.glassEffect(.clear,in: RoundedRectangle(cornerRadius: 0))
-                    // .background(Color.backgroundColor)
-                    // .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
-                    // .overlay(
-                    //     Rectangle()
-                    //         .stroke(Color.borderColor, lineWidth: 0.5)
-                    // )
+                    }
+                    .glassEffect(.clear,in: RoundedRectangle(cornerRadius: 0))
+                    
+                    .background(Color.backgroundColor)
                     
                     if let expandedButtonId = expandedButtonId,
                        let button = buttons.first(where: { $0.id == expandedButtonId }) {
