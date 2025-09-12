@@ -34,6 +34,14 @@ public struct MultiButtonFilterView<Content: View>: View {
         .spring(response: 0.4, dampingFraction: 0.7, blendDuration: 0)
     }
     
+    // 计算筛选按钮的高度，避免与content重叠
+    private var buttonHeight: CGFloat {
+        let fontSize: CGFloat = buttonStyle.fontSize
+        let verticalPadding: CGFloat = buttonStyle.verticalPadding
+        // 文字高度 + 图标高度 + 上下padding + 额外间距
+        return fontSize + 12 + (verticalPadding * 2) + 8
+    }
+    
     public init(
         buttons: [FilterButton], 
         buttonStyle: FilterButtonStyle = .default,
@@ -64,7 +72,7 @@ public struct MultiButtonFilterView<Content: View>: View {
                                 }
                             }
                         }
-                    }
+                    }.zIndex(1000)
                     .glassEffect(in: RoundedRectangle(cornerRadius: 0))
                     .background(Color.backgroundColor)
                     
@@ -90,20 +98,23 @@ public struct MultiButtonFilterView<Content: View>: View {
                             }
                         )
                         // .background(Color.backgroundColor)
-                        .transition(.asymmetric(
-                            insertion: .opacity.combined(with: .offset(y: -20)),
-                            removal: .opacity.combined(with: .offset(y: -20))
-                        ))
-                        .zIndex(1000)
+                        .transition(.offset(y: -buttonHeight))
+                        // .zIndex(1000)
                     }
                     Spacer()
                 }
                 .frame(maxWidth: .infinity)
                 .zIndex(100)
                 
-                content
-                    .background(Color.backgroundColor)
-                    .zIndex(10)
+                VStack(spacing: 0) {
+                    // 添加间距，避免与筛选按钮重叠
+                    Spacer()
+                        .frame(height: buttonHeight)
+                    
+                    content
+                }
+                .background(Color.backgroundColor)
+                .zIndex(10)
                 
                 if expandedButtonId != nil {
                     Color.overlayColor
