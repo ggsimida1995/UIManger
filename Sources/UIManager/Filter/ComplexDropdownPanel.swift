@@ -117,7 +117,7 @@ public struct ComplexDropdownPanel: View {
                     }
                 }
                 .padding(.vertical, 16)
-                .padding(.bottom, 60)
+                .padding(.bottom, 30)
             }
             .frame(height: 350)
             
@@ -132,11 +132,13 @@ public struct ComplexDropdownPanel: View {
                         Text("重置")
                             .font(.system(size: 13, weight: .medium))
                             .foregroundColor(Color.secondaryButtonText)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(Color.secondaryButtonBackground)
-                            .cornerRadius(6)
-                    }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                    }.buttonStyle(.glass)
+                    .background(
+                        Capsule()
+                            .fill(Color.secondaryButtonBackground)
+                    )
                     
                     Button(action: {
                         let cacheData = workingSections.map { section in
@@ -151,17 +153,19 @@ public struct ComplexDropdownPanel: View {
                         Text("确定")
                             .font(.system(size: 13, weight: .medium))
                             .foregroundColor(.white)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(Color.primaryButtonText)
-                            .cornerRadius(6)
-                    }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical,5)
+                    }.buttonStyle(.glass)
+                    .background(
+                        Capsule()
+                            .fill(Color.primaryButtonText)
+                    )
                 }
             }
             .padding(.horizontal, 16)
             .padding(.top, 12)
             .padding(.bottom, 12)
-        }
+        }.glassEffect(.clear,in: RoundedRectangle(cornerRadius: 0))
     }
     
     private func toggleItem(sectionIndex: Int, itemIndex: Int) {
@@ -258,21 +262,16 @@ private struct TagButton: View {
     var body: some View {
         Button(action: onTap) {
             Text(title)
-                .font(.system(size: 13, weight: .medium))
+                .font(.system(size: 12, weight: .medium))
                 .foregroundColor(isSelected ? .white : Color.textColor)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
                 .frame(maxWidth: .infinity)
-                .background(
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(isSelected ? Color.primaryButtonText : Color.secondaryBackgroundColor)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 6)
-                        .stroke(isSelected ? Color.primaryButtonText : Color.borderColor, lineWidth: 1)
-                )
+                .padding(2)
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(.glass)
+        .background(
+            Capsule()
+                .fill(isSelected ? Color.primaryButtonText : Color.secondaryBackgroundColor)
+        )
     }
 }
 

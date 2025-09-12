@@ -33,7 +33,7 @@ public struct DropdownPanel: View {
     }
     
     public var body: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 5) {
             ForEach(options, id: \.key) { option in
                 Button(action: {
                     currentSelection = option
@@ -43,7 +43,7 @@ public struct DropdownPanel: View {
                 }) {
                     HStack {
                         Text(option.title)
-                            .font(.system(size: 13, weight: .medium))
+                            .font(.system(size: 12, weight: .medium))
                             .foregroundColor(Color.textColor)
                         Spacer()
                         if option.key == currentSelection.key {
@@ -52,17 +52,25 @@ public struct DropdownPanel: View {
                                 .foregroundColor(Color.primaryButtonText)
                         }
                     }
-                    .padding()
+                    .padding(5)
                     .contentShape(Rectangle())
                 }
-                .buttonStyle(PlainButtonStyle())
+                .buttonStyle(.glass)
+                .background(
+                    Capsule()
+                        .fill(option.key == currentSelection.key ? Color.primaryButtonText : Color.secondaryBackgroundColor)
+                ).padding(.horizontal, 20)
+                // .background(
+                //     Capsule()
+                //         .fill(Color.secondaryBackgroundColor)
+                // )
                 
                 if option.key != options.last?.key {
                     Divider()
                         .foregroundColor(Color.separatorColor)
                 }
             }
-        }
+        }.padding(.vertical, 10).glassEffect(.clear,in: RoundedRectangle(cornerRadius: 0))
     }
 }
 

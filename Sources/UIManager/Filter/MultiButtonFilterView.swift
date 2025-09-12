@@ -44,84 +44,86 @@ public struct MultiButtonFilterView<Content: View>: View {
         self.content = content()
         
         _buttonTitles = State(initialValue: Dictionary(uniqueKeysWithValues: 
-            buttons.map { ($0.id, $0.defaultTitle) }
-        ))
+                                                        buttons.map { ($0.id, $0.defaultTitle) }
+                                                      ))
     }
     
     public var body: some View {
         ZStack {
-            VStack(spacing: 0) {
-                HStack(spacing: 0) {
-                    ForEach(Array(buttons.enumerated()), id: \.element.id) { index, button in
-                        FilterButtonView(
-                            title: buttonTitles[button.id] ?? button.defaultTitle,
-                            isExpanded: expandedButtonId == button.id,
-                            style: buttonStyle
-                        ) {
-                            withAnimation(springAnimation) {
-                                toggleButton(button.id)
+            GlassEffectContainer(spacing: 8.0) {
+                VStack(spacing: 0) {
+                    HStack(spacing: 0) {
+                        ForEach(Array(buttons.enumerated()), id: \.element.id) { index, button in
+                            FilterButtonView(
+                                title: buttonTitles[button.id] ?? button.defaultTitle,
+                                isExpanded: expandedButtonId == button.id,
+                                style: buttonStyle
+                            ) {
+                                withAnimation(springAnimation) {
+                                    toggleButton(button.id)
+                                }
                             }
+                            
+                            // 移除按钮之间的竖线分隔符
+                            // if index < buttons.count - 1 {
+                            //     Divider()
+                            //         .frame(height: 20)
+                            //         .foregroundColor(.secondary.opacity(0.3))
+                            // }
                         }
-                        
-                        // 移除按钮之间的竖线分隔符
-                        // if index < buttons.count - 1 {
-                        //     Divider()
-                        //         .frame(height: 20)
-                        //         .foregroundColor(.secondary.opacity(0.3))
-                        // }
-                    }
-                }
-                .background(Color.backgroundColor)
-                .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
-                .overlay(
-                    Rectangle()
-                        .stroke(Color.borderColor, lineWidth: 0.5)
-                )
-                
-                if let expandedButtonId = expandedButtonId,
-                   let button = buttons.first(where: { $0.id == expandedButtonId }) {
+                    }.glassEffect(.clear,in: RoundedRectangle(cornerRadius: 0))
+                    // .background(Color.backgroundColor)
+                    // .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                    // .overlay(
+                    //     Rectangle()
+                    //         .stroke(Color.borderColor, lineWidth: 0.5)
+                    // )
                     
-                    button.dropdownContent(
-                        Binding(
-                            get: { buttonTitles[button.id] ?? button.defaultTitle },
-                            set: { buttonTitles[button.id] = $0 }
-                        ),
-                        {
+                    if let expandedButtonId = expandedButtonId,
+                       let button = buttons.first(where: { $0.id == expandedButtonId }) {
+                        
+                        button.dropdownContent(
+                            Binding(
+                                get: { buttonTitles[button.id] ?? button.defaultTitle },
+                                set: { buttonTitles[button.id] = $0 }
+                            ),
+                            {
+                                withAnimation(springAnimation) {
+                                    closeAllPanels()
+                                }
+                            },
+                            { data in
+                                setCachedData(data, for: button)
+                            },
+                            {
+                                getCachedData(for: button)
+                            }
+                        )
+                        // .background(Color.backgroundColor)
+                        .transition(.asymmetric(
+                            insertion: .opacity.combined(with: .offset(y: -20)),
+                            removal: .opacity.combined(with: .offset(y: -20))
+                        ))
+                        .zIndex(1000)
+                    }
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
+                .zIndex(100)
+                
+                content
+                    .zIndex(10)
+                
+                if expandedButtonId != nil {
+                    Color.overlayColor
+                        .onTapGesture {
                             withAnimation(springAnimation) {
                                 closeAllPanels()
                             }
-                        },
-                        { data in
-                            setCachedData(data, for: button)
-                        },
-                        {
-                            getCachedData(for: button)
                         }
-                    )
-                    .background(Color.backgroundColor)
-                    .transition(.asymmetric(
-                        insertion: .opacity.combined(with: .offset(y: -20)),
-                        removal: .opacity.combined(with: .offset(y: -20))
-                    ))
-                    .zIndex(1000)
+                        .transition(.opacity)
+                        .zIndex(50)
                 }
-                Spacer()
-            }
-            .frame(maxWidth: .infinity)
-            .zIndex(100)
-            
-            content
-                .zIndex(10)
-            
-            if expandedButtonId != nil {
-                Color.overlayColor
-                    .onTapGesture {
-                        withAnimation(springAnimation) {
-                            closeAllPanels()
-                        }
-                    }
-                    .transition(.opacity)
-                    .zIndex(50)
             }
         }
         .frame(maxWidth: .infinity)
@@ -150,7 +152,7 @@ public struct MultiButtonFilterView<Content: View>: View {
     public func clearAllFiltersCache() {
         buttonCache.removeAll()
         buttonTitles = Dictionary(uniqueKeysWithValues: 
-            buttons.map { ($0.id, $0.defaultTitle) }
+                                    buttons.map { ($0.id, $0.defaultTitle) }
         )
     }
 }
@@ -179,7 +181,7 @@ private struct FilterButtonView: View {
             .frame(maxWidth: .infinity)
             .contentShape(Rectangle())
         }
-        .buttonStyle(PlainButtonStyle())
+        // .buttonStyle(.glass)
     }
 }
 
