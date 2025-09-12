@@ -1,6 +1,6 @@
 import SwiftUI
 
-@main
+// 移除@main - 这只是一个演示组件，不应该作为应用入口点
 struct LiquidGlassDemoApp: App {
     var body: some Scene {
         WindowGroup {
@@ -196,7 +196,7 @@ struct ListLayoutDemo: View {
                 }
             }
         }
-        .listStyle(.grouped)
+        .listStyle(.plain)
         .navigationTitle("设置")
     }
 }
