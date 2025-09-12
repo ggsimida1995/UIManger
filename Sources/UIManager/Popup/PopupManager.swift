@@ -218,22 +218,35 @@ public class PopupManager: ObservableObject {
         } else {
             // 目标弹窗不存在
             if let replaceId = replaceTargetId, 
-               activePopups.contains(where: { $0.customId == replaceId }) {
+               let index = activePopups.firstIndex(where: { $0.customId == replaceId }) {
                 // 如果指定了要替换的弹窗ID，且该弹窗存在，则替换它
-                replace(customId: replaceId, content: content, position: position, width: width, height: height)
                 
-                // 更新为新的customId
-                if let index = activePopups.firstIndex(where: { $0.customId == replaceId }) {
-                    let newPopup = PopupData(
-                        content: content(),
-                        position: position,
-                        width: width,
-                        height: height,
-                        zIndex: activePopups[index].zIndex,
-                        customId: customId,
-                        layer: activePopups[index].layer
-                    )
-                    activePopups[index] = newPopup
+                // 保存原弹窗的属性
+                let originalZIndex = activePopups[index].zIndex
+                let originalLayer = activePopups[index].layer
+                let originalId = activePopups[index].id
+                
+                // 发送关闭原弹窗的通知
+                NotificationCenter.default.post(
+                    name: NSNotification.Name("ClosePopup"),
+                    object: nil,
+                    userInfo: ["popupId": originalId]
+                )
+                
+                // 创建新弹窗数据，保持原有的位置、zIndex和layer
+                let newPopup = PopupData(
+                    content: content(),
+                    position: position,
+                    width: width,
+                    height: height,
+                    zIndex: originalZIndex,
+                    customId: customId,
+                    layer: originalLayer
+                )
+                
+                // 直接替换数组中的元素，保持位置不变
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    self.activePopups[index] = newPopup
                 }
             } else {
                 // 没有指定替换目标或替换目标不存在，正常显示新弹窗
