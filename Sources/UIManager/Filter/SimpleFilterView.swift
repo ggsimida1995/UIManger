@@ -92,6 +92,7 @@ public struct SimpleFilterView<Content: View>: View {
                                 onFilterEvent?(filterEvent)
                             }
                         )
+                        .id(button.id) // 添加唯一ID，确保不同按钮的面板不会被重用
                         .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .top)))
                     }
                     
