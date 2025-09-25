@@ -20,21 +20,37 @@ public struct SimpleFilterDemo: View {
                     }
                 ),
                 
-                // 方式2：分组面板 - 支持单选/多选，需要确定按钮
+                // 方式2a：第一个分组面板
                 .sections(
-                    title: "筛选",
+                    title: "类型筛选",
                     sections: [
                         DropdownSection(
-                            title: "类型",
+                            title: "内容类型",
                             items: [
                                 DropdownItem(title: "阅读", key: "type", val: "read"),
                                 DropdownItem(title: "听书", key: "type", val: "audio"),
                                 DropdownItem(title: "漫画", key: "type", val: "comic")
                             ],
                             selectionMode: .multiple
-                        ),
+                        )
+                    ],
+                    onConfirm: { selectedItems in
+                        print("类型筛选确认: 选中了 \(selectedItems.count) 个项目")
+                        for item in selectedItems {
+                            print("  - \(item.title) (key: \(item.key), val: \(item.val))")
+                        }
+                    },
+                    onReset: {
+                        print("类型筛选重置: 清空所有选择")
+                    }
+                ),
+                
+                // 方式2b：第二个分组面板 - 测试相邻sections切换
+                .sections(
+                    title: "等级筛选",
+                    sections: [
                         DropdownSection(
-                            title: "等级", 
+                            title: "难度等级", 
                             items: [
                                 DropdownItem(title: "初级", key: "level", val: "basic"),
                                 DropdownItem(title: "中级", key: "level", val: "intermediate"),
@@ -44,13 +60,13 @@ public struct SimpleFilterDemo: View {
                         )
                     ],
                     onConfirm: { selectedItems in
-                        print("分组确认: 选中了 \(selectedItems.count) 个项目")
+                        print("等级筛选确认: 选中了 \(selectedItems.count) 个项目")
                         for item in selectedItems {
                             print("  - \(item.title) (key: \(item.key), val: \(item.val))")
                         }
                     },
                     onReset: {
-                        print("分组重置: 清空所有选择")
+                        print("等级筛选重置: 清空所有选择")
                     }
                 )
             ]
