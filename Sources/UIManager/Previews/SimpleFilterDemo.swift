@@ -14,7 +14,10 @@ public struct SimpleFilterDemo: View {
                         DropdownOption(title: "全部", key: "all", val: "all"),
                         DropdownOption(title: "启用", key: "enabled", val: "enabled"),
                         DropdownOption(title: "禁用", key: "disabled", val: "disabled")
-                    ]
+                    ],
+                    onConfirm: { selectedOption in
+                        print("下拉选择: \(selectedOption.title) (key: \(selectedOption.key), val: \(selectedOption.val))")
+                    }
                 ),
                 
                 // 方式2：分组面板 - 支持单选/多选，需要确定按钮
@@ -24,22 +27,31 @@ public struct SimpleFilterDemo: View {
                         DropdownSection(
                             title: "类型",
                             items: [
-                                DropdownItem(title: "阅读", key: "read", val: "read"),
-                                DropdownItem(title: "听书", key: "audio", val: "audio"),
-                                DropdownItem(title: "漫画", key: "comic", val: "comic")
+                                DropdownItem(title: "阅读", key: "type", val: "read"),
+                                DropdownItem(title: "听书", key: "type", val: "audio"),
+                                DropdownItem(title: "漫画", key: "type", val: "comic")
                             ],
                             selectionMode: .multiple
                         ),
                         DropdownSection(
                             title: "等级", 
                             items: [
-                                DropdownItem(title: "初级", key: "basic", val: "basic"),
-                                DropdownItem(title: "中级", key: "intermediate", val: "intermediate"),
-                                DropdownItem(title: "高级", key: "advanced", val: "advanced")
+                                DropdownItem(title: "初级", key: "level", val: "basic"),
+                                DropdownItem(title: "中级", key: "level", val: "intermediate"),
+                                DropdownItem(title: "高级", key: "level", val: "advanced")
                             ],
                             selectionMode: .single
                         )
-                    ]
+                    ],
+                    onConfirm: { selectedItems in
+                        print("分组确认: 选中了 \(selectedItems.count) 个项目")
+                        for item in selectedItems {
+                            print("  - \(item.title) (key: \(item.key), val: \(item.val))")
+                        }
+                    },
+                    onReset: {
+                        print("分组重置: 清空所有选择")
+                    }
                 )
             ]
         ) {
@@ -68,7 +80,6 @@ public struct SimpleFilterDemo: View {
         }
     }
 }
-
 
 #if DEBUG
 #Preview {
