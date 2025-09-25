@@ -431,20 +431,22 @@ private struct SimpleSectionView: View {
                                 .fill(Color.secondaryButtonBackground)
                         )
                         .glassEffect(.clear.interactive())
-                        .onTapGesture {
-                            
-                            // 触发单独的重置回调
-                            onSectionsReset?()
-                            
-                            // 触发通用重置事件 (按钮ID将在上层修正)
-                            let filterEvent = FilterEvent(
-                                buttonId: UUID(), // 占位ID，将在上层被替换
-                                buttonTitle: titleBinding.wrappedValue,
-                                eventType: .sectionsReset,
-                                data: .sections(selectedItems: [])
-                            )
-                            onFilterEvent(filterEvent)
-                        }
+                         .onTapGesture {
+                             // 先重置选择状态
+                             resetSelections()
+                             
+                             // 触发单独的重置回调
+                             onSectionsReset?()
+                             
+                             // 触发通用重置事件 (按钮ID将在上层修正)
+                             let filterEvent = FilterEvent(
+                                 buttonId: UUID(), // 占位ID，将在上层被替换
+                                 buttonTitle: titleBinding.wrappedValue,
+                                 eventType: .sectionsReset,
+                                 data: .sections(selectedItems: [])
+                             )
+                             onFilterEvent(filterEvent)
+                         }
                     
                     Text("确定")
                         .font(.system(size: 13, weight: .medium))
