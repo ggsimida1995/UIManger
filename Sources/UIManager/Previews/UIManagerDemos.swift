@@ -8,7 +8,7 @@ public struct UIManagerDemos: View {
         NavigationView {
             List {
                 Section("筛选组件") {
-                    NavigationLink("多按钮筛选器", destination: MultiButtonFilterDemo())
+                    NavigationLink("简化筛选器", destination: SimpleFilterDemo())
                 }
                 
                 Section("弹窗组件") {

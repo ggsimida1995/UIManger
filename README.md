@@ -5,10 +5,10 @@ UIManager 是一个用于 SwiftUI 的现代化、轻量级用户界面组件库�
 ## 功能特性
 
 - **🔍 筛选组件系统**：
-  - 多按钮筛选器，支持复杂下拉面板
-  - 简单下拉面板，支持单选和多选
+  - 简化的筛选器，支持两种筛选模式
+  - 简单下拉列表和复杂分组面板
   - 缓存机制，记住用户选择
-  - 自定义颜色系统，支持深浅色模式
+  - 统一的颜色系统，支持深浅色模式
 - **📱 弹窗系统**：
   - 简单弹窗管理器，支持多种动画效果
   - 自定义内容和样式
@@ -30,7 +30,7 @@ UIManager 是一个用于 SwiftUI 的现代化、轻量级用户界面组件库�
 ## 最新更新 (v2.0.0)
 
 - 🔄 **重构架构**：完全重写为 UIManager，移除复杂的旧组件
-- 🔍 **新增筛选组件**：多按钮筛选器，支持复杂下拉面板和缓存
+- 🔍 **简化筛选组件**：重新设计的筛选器，支持简单下拉和分组面板
 - 📱 **简化弹窗系统**：保留核心功能，提升易用性
 - 🍞 **优化Toast系统**：统一视觉设计，支持多种类型
 - 🔄 **系统组件对比**：新增系统原生组件演示，便于选择合适方案
@@ -68,9 +68,8 @@ UIManager/
 │       ├── Extensions/                  # 扩展功能
 │       │   └── Color+UIManager.swift    # 颜色系统
 │       ├── Filter/                      # 筛选组件
-│       │   ├── MultiButtonFilterView.swift    # 多按钮筛选器
-│       │   ├── ComplexDropdownPanel.swift     # 复杂下拉面板
-│       │   └── DropdownPanel.swift            # 下拉面板
+│       │   ├── FilterModels.swift       # 筛选数据模型
+│       │   └── SimpleFilterView.swift   # 简化筛选组件
 │       ├── Popup/                       # 弹窗组件
 │       │   ├── PopupManager.swift       # 弹窗管理器
 │       │   └── PopupView.swift          # 弹窗视图
@@ -79,7 +78,7 @@ UIManager/
 │       │   └── ToastView.swift          # Toast视图
 │       └── Previews/                    # 演示组件
 │           ├── UIManagerDemos.swift     # 主演示入口
-│           ├── MultiButtonFilterDemo.swift    # 筛选器演示
+│           ├── SimpleFilterDemo.swift  # 筛选器演示
 │           ├── PopupPreview.swift       # 弹窗演示
 │           ├── ToastDemo.swift          # Toast演示
 │           ├── SystemInputAlertDemo.swift     # 系统输入演示
@@ -206,28 +205,36 @@ struct ContentView: View {
 ```swift
 struct ContentView: View {
     var body: some View {
-        MultiButtonFilterView(
+        SimpleFilterView(
             buttons: [
-                FilterButton(title: "分类") { titleBinding, closePanel, setCacheData, getCacheData in
-                    DropdownPanel(
-                        options: [
-                            DropdownOption(title: "全部", key: "all", val: "all"),
-                            DropdownOption(title: "新品", key: "new", val: "new")
-                        ],
-                        selectedTitle: titleBinding,
-                        onSelect: { option in
-                            print("选择了：\(option.title)")
-                            closePanel()
-                        },
-                        setCacheData: setCacheData,
-                        getCacheData: getCacheData
-                    )
-                }
+                // 简单下拉列表
+                .dropdown(
+                    title: "分类",
+                    options: [
+                        DropdownOption(title: "全部", key: "all", val: "all"),
+                        DropdownOption(title: "新品", key: "new", val: "new")
+                    ]
+                ),
+                // 分组面板
+                .sections(
+                    title: "筛选",
+                    sections: [
+                        DropdownSection(
+                            title: "类型",
+                            items: [
+                                DropdownItem(title: "阅读", key: "type", val: "read"),
+                                DropdownItem(title: "听书", key: "type", val: "audio")
+                            ],
+                            selectionMode: .single
+                        )
+                    ]
+                )
             ]
         ) {
             // 内容区域
             Text("这里是筛选后的内容")
                 .padding()
+        }
     }
 }
 ```
