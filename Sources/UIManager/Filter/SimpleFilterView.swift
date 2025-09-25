@@ -4,11 +4,11 @@ import SwiftUI
 public struct SimpleFilterButton: Identifiable {
     public let id = UUID()
     public let defaultTitle: String
-    public let panelContent: (Binding<String>, @escaping () -> Void, @escaping (Any?) -> Void, @escaping () -> Any?) -> AnyView
+    public let panelContent: (Binding<String>, @escaping () -> Void, @escaping (Any?) -> Void, @escaping () -> Any?, @escaping (FilterEvent) -> Void) -> AnyView
     
     fileprivate init(
         title: String,
-        content: @escaping (Binding<String>, @escaping () -> Void, @escaping (Any?) -> Void, @escaping () -> Any?) -> AnyView
+        content: @escaping (Binding<String>, @escaping () -> Void, @escaping (Any?) -> Void, @escaping () -> Any?, @escaping (FilterEvent) -> Void) -> AnyView
     ) {
         self.defaultTitle = title
         self.panelContent = content
@@ -20,6 +20,7 @@ public struct SimpleFilterButton: Identifiable {
 public struct SimpleFilterView<Content: View>: View {
     let buttons: [SimpleFilterButton]
     let content: Content
+    let onFilterEvent: FilterEventCallback?
     
     @State private var expandedButtonId: UUID?
     @State private var buttonTitles: [UUID: String] = [:]
@@ -27,10 +28,12 @@ public struct SimpleFilterView<Content: View>: View {
     
     public init(
         buttons: [SimpleFilterButton],
+        onFilterEvent: FilterEventCallback? = nil,
         @ViewBuilder content: () -> Content
     ) {
         self.buttons = buttons
         self.content = content()
+        self.onFilterEvent = onFilterEvent
         
         // 初始化按钮标题
         _buttonTitles = State(initialValue: Dictionary(uniqueKeysWithValues: 
@@ -84,6 +87,9 @@ public struct SimpleFilterView<Content: View>: View {
                             },
                             {
                                 buttonCache[button.id]
+                            },
+                            { filterEvent in
+                                onFilterEvent?(filterEvent)
                             }
                         )
                         .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .top)))
@@ -160,18 +166,21 @@ public extension SimpleFilterButton {
     /// 方式1：简单下拉列表
     static func dropdown(
         title: String,
-        options: [DropdownOption]
+        options: [DropdownOption],
+        onConfirm: ((DropdownOption) -> Void)? = nil
     ) -> SimpleFilterButton {
         // 如果有选项，使用第一个选项作为初始标题
         let initialTitle = options.first?.title ?? title
         
-        return SimpleFilterButton(title: initialTitle) { titleBinding, closePanel, setCacheData, getCacheData in
+        return SimpleFilterButton(title: initialTitle) { titleBinding, closePanel, setCacheData, getCacheData, onFilterEvent in
             AnyView(SimpleDropdownView(
                 options: options,
                 titleBinding: titleBinding,
                 closePanel: closePanel,
                 setCacheData: setCacheData,
-                getCacheData: getCacheData
+                getCacheData: getCacheData,
+                onFilterEvent: onFilterEvent,
+                onDropdownSelect: onConfirm
             ))
         }
     }
@@ -180,16 +189,21 @@ public extension SimpleFilterButton {
     static func sections(
         title: String,
         sections: [DropdownSection],
-        globalSelectionMode: SelectionMode? = nil
+        globalSelectionMode: SelectionMode? = nil,
+        onConfirm: (([DropdownItem]) -> Void)? = nil,
+        onReset: (() -> Void)? = nil
     ) -> SimpleFilterButton {
-        return SimpleFilterButton(title: title) { titleBinding, closePanel, setCacheData, getCacheData in
+        return SimpleFilterButton(title: title) { titleBinding, closePanel, setCacheData, getCacheData, onFilterEvent in
             AnyView(SimpleSectionView(
                 sections: sections,
                 globalSelectionMode: globalSelectionMode,
                 titleBinding: titleBinding,
                 closePanel: closePanel,
                 setCacheData: setCacheData,
-                getCacheData: getCacheData
+                getCacheData: getCacheData,
+                onFilterEvent: onFilterEvent,
+                onSectionsConfirm: onConfirm,
+                onSectionsReset: onReset
             ))
         }
     }
@@ -205,6 +219,8 @@ private struct SimpleDropdownView: View {
     let closePanel: () -> Void
     let setCacheData: (Any?) -> Void
     let getCacheData: () -> Any?
+    let onFilterEvent: (FilterEvent) -> Void
+    let onDropdownSelect: ((DropdownOption) -> Void)?
     
     @State private var selectedOption: DropdownOption?
     
@@ -213,13 +229,17 @@ private struct SimpleDropdownView: View {
         titleBinding: Binding<String>,
         closePanel: @escaping () -> Void,
         setCacheData: @escaping (Any?) -> Void,
-        getCacheData: @escaping () -> Any?
+        getCacheData: @escaping () -> Any?,
+        onFilterEvent: @escaping (FilterEvent) -> Void,
+        onDropdownSelect: ((DropdownOption) -> Void)? = nil
     ) {
         self.options = options
         self.titleBinding = titleBinding
         self.closePanel = closePanel
         self.setCacheData = setCacheData
         self.getCacheData = getCacheData
+        self.onFilterEvent = onFilterEvent
+        self.onDropdownSelect = onDropdownSelect
         
         // 优先恢复缓存的选择，否则匹配当前title，最后默认第一个
         let cachedKey = getCacheData() as? String
@@ -261,6 +281,19 @@ private struct SimpleDropdownView: View {
                     selectedOption = option
                     titleBinding.wrappedValue = option.title
                     setCacheData(option.key) // 保存选择到缓存
+                    
+                    // 触发单独的事件回调
+                    onDropdownSelect?(option)
+                    
+                    // 触发通用事件回调 (按钮ID将在上层修正)
+                    let filterEvent = FilterEvent(
+                        buttonId: UUID(), // 占位ID，将在上层被替换
+                        buttonTitle: titleBinding.wrappedValue,
+                        eventType: .dropdownSelected,
+                        data: .dropdown(selectedOption: option)
+                    )
+                    onFilterEvent(filterEvent)
+                    
                     closePanel()
                 }
                 
@@ -299,6 +332,9 @@ private struct SimpleSectionView: View {
     let closePanel: () -> Void
     let setCacheData: (Any?) -> Void
     let getCacheData: () -> Any?
+    let onFilterEvent: (FilterEvent) -> Void
+    let onSectionsConfirm: (([DropdownItem]) -> Void)?
+    let onSectionsReset: (() -> Void)?
     
     @State private var workingSections: [DropdownSection]
     
@@ -308,7 +344,10 @@ private struct SimpleSectionView: View {
         titleBinding: Binding<String>,
         closePanel: @escaping () -> Void,
         setCacheData: @escaping (Any?) -> Void,
-        getCacheData: @escaping () -> Any?
+        getCacheData: @escaping () -> Any?,
+        onFilterEvent: @escaping (FilterEvent) -> Void,
+        onSectionsConfirm: (([DropdownItem]) -> Void)? = nil,
+        onSectionsReset: (() -> Void)? = nil
     ) {
         self.initialSections = sections
         self.globalSelectionMode = globalSelectionMode
@@ -316,6 +355,9 @@ private struct SimpleSectionView: View {
         self.closePanel = closePanel
         self.setCacheData = setCacheData
         self.getCacheData = getCacheData
+        self.onFilterEvent = onFilterEvent
+        self.onSectionsConfirm = onSectionsConfirm
+        self.onSectionsReset = onSectionsReset
         
         var initializedSections = sections
         
@@ -378,6 +420,18 @@ private struct SimpleSectionView: View {
                 HStack(spacing: 8) {
                     Button(action: {
                         resetSelections()
+                        
+                        // 触发单独的重置回调
+                        onSectionsReset?()
+                        
+                        // 触发通用重置事件 (按钮ID将在上层修正)
+                        let filterEvent = FilterEvent(
+                            buttonId: UUID(), // 占位ID，将在上层被替换
+                            buttonTitle: titleBinding.wrappedValue,
+                            eventType: .sectionsReset,
+                            data: .sections(selectedItems: [])
+                        )
+                        onFilterEvent(filterEvent)
                     }) {
                         Text("重置")
                             .font(.system(size: 13, weight: .medium))
@@ -396,6 +450,22 @@ private struct SimpleSectionView: View {
                         }
                         setCacheData(cacheData) // 保存选择状态到缓存
                         updateTitle()
+                        
+                        // 获取所有选中的项目
+                        let selectedItems = workingSections.flatMap { $0.items }.filter { $0.isSelected }
+                        
+                        // 触发单独的确认回调
+                        onSectionsConfirm?(selectedItems)
+                        
+                        // 触发通用确认事件 (按钮ID将在上层修正)
+                        let filterEvent = FilterEvent(
+                            buttonId: UUID(), // 占位ID，将在上层被替换
+                            buttonTitle: titleBinding.wrappedValue,
+                            eventType: .sectionsConfirmed,
+                            data: .sections(selectedItems: selectedItems)
+                        )
+                        onFilterEvent(filterEvent)
+                        
                         closePanel()
                     }) {
                         Text("确定")

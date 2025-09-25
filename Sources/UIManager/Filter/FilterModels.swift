@@ -50,3 +50,36 @@ public struct DropdownOption {
         self.val = val
     }
 }
+
+// MARK: - 筛选事件定义
+
+/// 筛选事件类型
+public enum FilterEventType {
+    case dropdownSelected  // 下拉列表选择
+    case sectionsConfirmed // 分组面板确认
+    case sectionsReset     // 分组面板重置
+}
+
+/// 筛选事件数据
+public struct FilterEvent {
+    public let buttonId: UUID
+    public let buttonTitle: String
+    public let eventType: FilterEventType
+    public let data: FilterEventData
+    
+    public init(buttonId: UUID, buttonTitle: String, eventType: FilterEventType, data: FilterEventData) {
+        self.buttonId = buttonId
+        self.buttonTitle = buttonTitle
+        self.eventType = eventType
+        self.data = data
+    }
+}
+
+/// 筛选事件数据联合体
+public enum FilterEventData {
+    case dropdown(selectedOption: DropdownOption)
+    case sections(selectedItems: [DropdownItem])
+}
+
+/// 筛选事件回调类型
+public typealias FilterEventCallback = (FilterEvent) -> Void
