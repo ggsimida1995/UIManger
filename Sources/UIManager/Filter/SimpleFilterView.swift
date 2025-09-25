@@ -37,8 +37,8 @@ public struct SimpleFilterView<Content: View>: View {
         
         // 初始化按钮标题
         _buttonTitles = State(initialValue: Dictionary(uniqueKeysWithValues: 
-            buttons.map { ($0.id, $0.defaultTitle) }
-        ))
+                                                        buttons.map { ($0.id, $0.defaultTitle) }
+                                                      ))
     }
     
     public var body: some View {
@@ -67,7 +67,7 @@ public struct SimpleFilterView<Content: View>: View {
                 
                 // 下拉面板层
                 VStack(spacing: 0) {
-                   
+                    
                     // 下拉面板
                     if let expandedButtonId = expandedButtonId,
                        let button = buttons.first(where: { $0.id == expandedButtonId }) {
@@ -101,10 +101,10 @@ public struct SimpleFilterView<Content: View>: View {
                 .frame(maxWidth: .infinity)
                 
                 Spacer()
-
+                
             }
             .zIndex(1000)
-
+            
             
             VStack {
                 Spacer().frame(height: 40)
@@ -269,13 +269,13 @@ private struct SimpleDropdownView: View {
                             .foregroundColor(Color.primaryButtonText)
                     }
                 }
-                .padding(5)
+                .frame(height: 30)
+                .padding(.vertical, 5)
                 .padding(.horizontal, 20)
                 .contentShape(Rectangle())
-                .frame(height: 30)
                 .background(
                     Capsule()
-                        .fill(option.key == selectedOption?.key ? Color.primaryButtonText : Color.secondaryBackgroundColor)
+                        .fill(option.key == selectedOption?.key ? Color.primaryButtonText.opacity(0.3) : Color.secondaryBackgroundColor)
                 )
                 .glassEffect(.clear.interactive())
                 .onTapGesture {
@@ -419,66 +419,70 @@ private struct SimpleSectionView: View {
                 Spacer()
                 
                 HStack(spacing: 8) {
-                    Button(action: {
-                        resetSelections()
-                        
-                        // 触发单独的重置回调
-                        onSectionsReset?()
-                        
-                        // 触发通用重置事件 (按钮ID将在上层修正)
-                        let filterEvent = FilterEvent(
-                            buttonId: UUID(), // 占位ID，将在上层被替换
-                            buttonTitle: titleBinding.wrappedValue,
-                            eventType: .sectionsReset,
-                            data: .sections(selectedItems: [])
-                        )
-                        onFilterEvent(filterEvent)
-                    }) {
-                        Text("重置")
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundColor(Color.secondaryButtonText)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                    }.buttonStyle(.glass)
-                    .background(
-                        Capsule()
-                            .fill(Color.secondaryButtonBackground)
-                    )
                     
-                    Button(action: {
-                        let cacheData = workingSections.map { section in
-                            section.items.map { $0.isSelected }
-                        }
-                        setCacheData(cacheData) // 保存选择状态到缓存
-                        updateTitle()
-                        
-                        // 获取所有选中的项目
-                        let selectedItems = workingSections.flatMap { $0.items }.filter { $0.isSelected }
-                        
-                        // 触发单独的确认回调
-                        onSectionsConfirm?(selectedItems)
-                        
-                        // 触发通用确认事件 (按钮ID将在上层修正)
-                        let filterEvent = FilterEvent(
-                            buttonId: UUID(), // 占位ID，将在上层被替换
-                            buttonTitle: titleBinding.wrappedValue,
-                            eventType: .sectionsConfirmed,
-                            data: .sections(selectedItems: selectedItems)
+                    Text("重置")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(Color.secondaryButtonText)
+                        .frame(width: 60, height: 30)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(
+                            Capsule()
+                                .fill(Color.secondaryButtonBackground)
                         )
-                        onFilterEvent(filterEvent)
-                        
-                        closePanel()
-                    }) {
-                        Text("确定")
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                    }.buttonStyle(.glass)
-                    .background(
-                        Capsule()
-                            .fill(Color.primaryButtonText)
-                    )
+                        .glassEffect(.clear.interactive())
+                        .onTapGesture {
+                            
+                            // 触发单独的重置回调
+                            onSectionsReset?()
+                            
+                            // 触发通用重置事件 (按钮ID将在上层修正)
+                            let filterEvent = FilterEvent(
+                                buttonId: UUID(), // 占位ID，将在上层被替换
+                                buttonTitle: titleBinding.wrappedValue,
+                                eventType: .sectionsReset,
+                                data: .sections(selectedItems: [])
+                            )
+                            onFilterEvent(filterEvent)
+                        }
+                    
+                    Text("确定")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(.white)
+                        .frame(width: 60, height: 30)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(
+                            Capsule()
+                                .fill(Color.primaryButtonText)
+                        )
+                        .glassEffect(.clear.interactive())
+                        .onTapGesture {
+                            let cacheData = workingSections.map { section in
+                                section.items.map { $0.isSelected }
+                            }
+                            setCacheData(cacheData) // 保存选择状态到缓存
+                            updateTitle()
+                            
+                            // 获取所有选中的项目
+                            let selectedItems = workingSections.flatMap { $0.items }.filter { $0.isSelected }
+                            
+                            // 触发单独的确认回调
+                            onSectionsConfirm?(selectedItems)
+                            
+                            // 触发通用确认事件 (按钮ID将在上层修正)
+                            let filterEvent = FilterEvent(
+                                buttonId: UUID(), // 占位ID，将在上层被替换
+                                buttonTitle: titleBinding.wrappedValue,
+                                eventType: .sectionsConfirmed,
+                                data: .sections(selectedItems: selectedItems)
+                            )
+                            onFilterEvent(filterEvent)
+                            
+                            closePanel()
+                        }
+                    
+                    
                 }
             }
             .padding(.horizontal, 16)
@@ -578,7 +582,7 @@ private struct SectionItemsView: View {
                     .padding(2)
                     .background(
                         Capsule()
-                            .fill(item.isSelected ? Color.primaryButtonText : Color.secondaryBackgroundColor)
+                            .fill(item.isSelected ? Color.primaryButtonText.opacity(0.3) : Color.secondaryBackgroundColor)
                     )
                     .glassEffect(.clear.interactive())
                     .onTapGesture {
