@@ -127,12 +127,3 @@ public extension EnvironmentValues {
     }
 }
 
-// MARK: - 便捷扩展
-
-public extension View {
-    /// 添加弹窗支持
-    func withPopup() -> some View {
-        self.overlay(PopupContainer())
-            .environment(\.popup, PopupManager.shared)
-    }
-}

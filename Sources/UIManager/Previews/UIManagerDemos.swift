@@ -19,12 +19,7 @@ public struct UIManagerDemos: View {
                     NavigationLink("Toast 演示", destination: ToastDemo())
                 }
                 
-                Section("系统组件对比") {
-                    NavigationLink("系统输入弹窗", destination: SystemInputAlertDemo())
-                    NavigationLink("系统菜单", destination: SystemLikeMenuDemo())
-                    NavigationLink("系统分段器", destination: SystemSegmentedDemo())
-                    NavigationLink("系统Toast对比", destination: SystemToastDemo())
-                }
+          
             }
             .navigationTitle("UIManager")
         }
