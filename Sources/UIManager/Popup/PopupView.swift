@@ -52,7 +52,6 @@ public struct PopupView: View {
                 isVisible = false
             }
         }
-        .preferredColorScheme(.light)
     }
 }
 
@@ -124,7 +123,8 @@ public struct PopupContainer: View {
                 }
             }
         }
-        .ignoresSafeArea(.all, edges: .all)
+        .preferredColorScheme(.light)
+        // .ignoresSafeArea(.all, edges: .all)
         .allowsHitTesting(popupManager.hasActivePopups)
     }
 }
