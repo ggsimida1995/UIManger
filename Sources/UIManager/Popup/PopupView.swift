@@ -123,7 +123,6 @@ public struct PopupContainer: View {
                 }
             }
         }
-        .preferredColorScheme(.light)
         .ignoresSafeArea(.all, edges: .all)
         .allowsHitTesting(popupManager.hasActivePopups)
     }
